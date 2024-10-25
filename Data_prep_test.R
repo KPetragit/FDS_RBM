@@ -52,3 +52,5 @@ dis_seeing <- dis_seeing %>%
     membername_seeing = str_squish(membername_seeing),  
     memberposition_seeing = str_extract(membername_seeing, "^[0-9]+"), 
     membername_seeing = str_trim(str_remove(membername_seeing, "^[0-9]+\\s*[-–—]\\s*")))
+
+#TRY TO PUSH
