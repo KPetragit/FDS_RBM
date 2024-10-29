@@ -1,0 +1,288 @@
+---
+title: "FDS Questionnaire v1 - RBM Indicator Calculations"
+author: "Global Survey Team"
+output: html_document
+unhcrdown::html_page:
+    toc: true
+    toc_depth: 2
+    toc_float: true
+---
+
+Date: Last revision was on October 2024
+
+*For any issues please contact Ilgi Bozdag at bozdag@unhcr.org or Petra Kaps at kaps@unhcr.org*
+
+*Important Instructions* 
+1. For correct calculations, ensure you have two datasets named 'main' and 'roster'. 
+2. Confirm that your datasets are cleaned and weighted as required for accurate results!
+
+# RBM Core Impact and Outcome Indicators
+
+There is broad consensus around the key indicators used to measure, inform and monitor progress towards global development objectives, as exemplified by the Sustainable Development Goals and related efforts of the MICS, DHS, IHSN, together with national governments.
+UNHCR's objectives are largely aligned with these frameworks.
+
+[The Forced Displacement Survey (FDS)](https://www.unhcr.org/what-we-do/reports-and-publications/data-and-statistics/forced-displacement-survey) is a household-level survey with standard questionnaires following context-appropriate methodological approaches.
+They can be implemented across UNHCR operations to monitor changes in the lives of all relevant groups of persons of concern (impacts) and in UNHCR's key areas of engagement (outcomes). 
+
+FDS help us to calculate impact and outcome indicators in a standardized way to have a global understanding of the results. Both indicators and questionnaire is also largely aligned with MICS, DHS, IHSN, national household surveys and other UNHCR standardized surveys.
+
+This document will guide you on how each and every indicator will be calculated with the standard questionnaire module corresponding to each indicator.
+
+**Population** refers to survey population in this guidance for the calculation of indicators as shown by enumerator and denominator.
+
+**How to calculate an indicator?** In the calculation of a percentage or rate, the denominator is often the total number of observations, events, or units in the population or sample being studied. The numerator, on the other hand, represents the specific part or subset of interest.
+
+Percentage = \(\left(\frac{\text{Numerator}}{\text{Denominator}}\right) \times 100\)
+
+
+
+*At this step, you should already have main and ind datasets structured in a way that will allow you to calculate your indicators as you will be guided in this document. It's not recommended to clear your work space.*
+
+```{r, eval=FALSE}
+# Install pacman if not already installed
+if(!require(pacman)) install.packages('pacman')
+
+# Install the unhcrthemes package from GitHub
+install.packages("remotes")
+remotes::install_github("unhcr/unhcrthemes")
+
+
+# Load all required libraries using pacman
+pacman::p_load(
+  tidyverse, dplyr, tidyr, rlang, purrr, magrittr, expss, srvyr,
+  readr,labelled,pastecs,psych,tableone, outbreaks, ggplot2, unhcrthemes,
+  scales, gt,webshot2, sjlabelled, waffle, writexl,remotes )
+```
+
+#ONCE THE DATASETS ARE FINAL (WITH DISABILITY VARIABLES AND LAND VARIABLES AND OTHERS - ADD HERE A PORTION FOR USERS TO CHECK ALL NECESSARY DISAGGREGATION VARIABLES - OR ADD SCRIPTS TO CALCULATE THEM TO THIS PART IF THEY WON'T BE IN THE DATASETS)
+
+# 2.2 Core Imapct Indicator
+**Core Impact 2.2 Proportion of people residing in physically safe and secure settlements with access to basic facilities**
+
+This indicator aims to measure the proportion of forcibly displaced and stateless people that reside in safe and secure settlements with access to basic facilities such as shelter, WASH, energy and security from natural hazards.
+
+To facilitate measurement for UNHCR, four basic services are considered for this indicator: shelter, drinking water, energy (access to electricity) and health. All of these basic services must be available to people for it to be considered that they have access to basic services.
+
+This indicator is linked to the SGD indicator [1] and [11](https://unstats.un.org/sdgs/metadata/?Text=&Goal=11&Target=).
+
+| Services       | Variables                                                     |
+|----------------|:--------------------------------------------------------:     |
+| Electricity    |HL01, HL03|
+| Health care    |H11, H15d, H15d_1, H15d_2, H15d_3, H21, H21_1, H21_2, H21_3    |
+| Drinking water |BD21,BD22, BD01, BD01a, BD20_1,BD20_2,BD20_3,BD20_4,BD20_5     |
+| Shelter        |HH04, HH05, HH10,HH08,HH09, HH11,HH20, ExpShock02              |
+
+### 1. Calculate variables for access to four basic services {.tabset}
+
+**Click on services below to see how they are calculated**
+
+#### Electricity
+Households lighting provides a sense of safety and security within and outside the households after sunset.
+If households lack access to electricity, especially for lighting and connectivity, this affects the occupants' security and limits their opportunities for socialization, learning and self-reliance.
+
+**Numerator**: Number of individuals with access to electricity
+
+**Denominator**: Total number of individuals
+
+```{r}
+##Here we will create a binary variable if they use anything for lighting (LIGHT01), and the light source for most of the time is electricity (LIGHT02) - exclude cases if they selected LIGHT03 - 0 ( no electricity)
+
+table(main$HL01)
+table(main$HL03)
+
+main <- main %>%
+  mutate(electricity = ifelse(HL01 == 1 & HL03 == 1, 1, 0)
+  ) %>%
+  mutate( electricity = labelled(electricity,
+                                 labels = c(
+                                   "Yes" = 1,
+                                   "No" = 0
+                                 ),
+                                 label = "Access to electricity"))
+
+table(main$electricity)
+```
+
+#### Healthcare
+
+Access to healthcare depends on availability of healthcare, including physical reach, acceptability and affordability for all.
+For this indicator, the focus is on the availability of healthcare system.
+According to [The Sphere Handbook](https://spherestandards.org/wp-content/uploads/Sphere-Handbook-2018-EN.pdf), primary healthcare facility should be accessible within one hour's walk from dwellings.
+
+**Numerator**: Individuals that can reach a primary healthcare facility within one hour from dwellings
+
+**Denominator**: Total number of individuals
+
+```{r}
+###Access to healthcare if household has any facility available
+#within one hour distance (cannot be > 60) (walking or any other type of transport)
+table(main$H11)
+table(main$H15d)
+
+main <- main %>%
+  mutate(healthcare = ifelse(H11 %in% c(1, 2, 3, 4, 5, 6, 7, 8, 9, 12) & H15d == 1, 1, 0)) %>%
+  mutate(healthcare = labelled(healthcare,
+                               labels = c(
+                                 "Yes" = 1,
+                                 "No" = 0
+                               ),
+                               label = "Access to healthcare"))
+
+table(main$healthcare)
+
+
+```
+#### Drinking water
+
+Access to clean drinking water is essential for a person's survival and well being and a precursor for achieving protection outcomes related to health, education and economic developed.
+The FDS only measure access to at least basic drinking water services which needs to fulfill the following conditions, in accordance with  [JMP WASH guidance](https://washdata.org/sites/default/files/documents/reports/2019-03/JMP-2018-core-questions-for-household-surveys.pdf).
+
+1. improved water source
+2. main water source is in own dwelling/yard or reachable in at most 30-minute round trip, including queuing
+
+**Numerator**: Population using drinking water from an improved source, provided collection time is not more than 30 minutes for a round trip, including queuing. 
+
+**Denominator**: Total number of individuals
+
+```{r}
+#Step 1: Check all variables
+table(main$BD01)
+table(main$BD01a)
+table(main$BD20_2)
+table(main$BD22)
+
+# Step 2: Add a coloumn specifying is the household uses improved or unimproved source of drinking water 
+main <- main %>%
+  mutate(drinkingWaterImproved = ifelse(BD01 %in% c(11, 12, 13, 14, 21, 31, 41, 51, 61, 71, 72, 91, 92), 1, 0)) %>%
+  mutate(drinkingWaterImproved = labelled(drinkingWaterImproved,
+                               labels = c(
+                                 "Yes" = 1,
+                                 "No" = 0
+                               ),
+                               label = "Improved drinking water source"))
+```
+
+
+```{r}
+#Step 3: Add a coloumn specifying if the improved water source is located in own dwelling/yard/plot or elsewhere. 
+main <- main %>%
+mutate(ImprovedDrinkingWaterLocation = ifelse(BD01 %in% c(11, 12) | (((BD01 %in% c(13, 14, 21, 31, 41, 51, 61, 71, 72, 91, 92))) & BD01a %in% c(1, 2)),1,0))%>%
+mutate(ImprovedDrinkingWaterLocation = labelled(ImprovedDrinkingWaterLocation,
+                               labels = c(
+                                 "Yes" = 1,
+                                 "No" = 0
+                               ),
+                               label = "Improved drinking water source in own dwelling, yard or plot"))
+
+```
+```{r}
+#Step 4: Add a coloumn specifying if it takes more or less than 30 min to the improved drinking water source. If the improved drinking water source is located in own dwelling, yard or plot, it is considered that it takes less than 30 minutes to reach. 
+main <- main %>%
+  mutate(
+    ImprovedDrinkingWaterAccess = ifelse(
+      (ImprovedDrinkingWaterLocation == 1 )|
+      (ImprovedDrinkingWaterLocation == 0 & BD20_2 == 1 & BD20_3 < 30) |
+      (ImprovedDrinkingWaterLocation == 0 & BD20_2 == 98 & BD22 == 1),
+      1,
+      0
+    )
+  )%>%
+mutate(ImprovedDrinkingWaterAccess = labelled(ImprovedDrinkingWaterAccess,
+                               labels = c(
+                                 "Yes" = 1,
+                                 "No" = 0
+                               ),
+                               label = "Basic drinking water services"))
+
+
+```
+```{r}
+table(main$ImprovedDrinkingWaterAccess)
+```
+
+#### Habitable housing
+
+Habitable housing refers to the presence of adequate space which is defined by the minimum emergency standards. Habitable housing also refers to the fact that the housing should provide protection from cold, damp, heat, rain, wind, and other threats to health, structural hazards, and disease vectors. It should provide physical safety to its occupants. This indicator does not measure ‘adequate’ housing but focuses on whether housing is livable.
+
+
+**Numerator**: Individuals that are living in habitable housing
+
+**Denominator**: Total number of individuals
+
+```{r}
+##Condition 1
+
+##Classify as habitable for below conditions - if 96 selected, put into missing
+
+##Step 1: First check the variables
+
+table(main$HH04)
+table(main$HH05)
+table(main$HH08)
+table(main$HH09)
+table(main$HH10)
+table(main$HH11)
+
+
+```
+```{r}
+#Step 2: Classify 96 responses as NAs
+#For Ilgi: Not sure if this is a corect approach, however there is 18 cases in HH04 where 96 was selected. The text answers are either in English, but also in pashtu and urdu (but written in latin alphabet) meaning it would be very difficult to treat them without a translator. Additionally not sure how to make a standard script for all text answers which might be submitted. 
+main <- main %>%
+  mutate_at(vars(HH04, HH05, HH08, HH09, HH10, HH11), ~ ifelse(. == 96, NA, .))
+
+```
+```{r}
+#Step 3:  Add coloumn to classify the provision of protection from cold, damp, heat, rain, wind, and other threats to health, structural hazards, and disease vectors.
+main <- main %>%
+  mutate(habitablehousing = case_when(
+    (HH04 == "1") & (HH05 == "1") & (HH10 == "1") & 
+      (HH08 == "2") & (HH09 == "2") & (HH11 == "2") ~ 1,
+    HH01 %in% c(4, 5) | HH04 == "2"| HH05 == "2" | 
+      HH10 %in% c(2, 3) | HH08 %in% c(1, 3) | HH09 %in% c(1, 3) | HH11 %in% c(1, 3) ~ 0,
+    TRUE ~ NA_integer_
+  ))
+
+```
+```{r}
+table(main$habitablehousing)
+
+```
+```{r}
+#Step 4: Calculate condition 2
+####Calculate crowding index - overcrowded when more than 3 persons share one room to sleep
+###Overcrowding may cause health issues, thus not considered as physically safe
+
+#Need to calculate the number of household members in each household. 
+household_counts <- hhroster %>%
+  group_by(`_uuid`) %>%
+  summarise(HHmembersize = sum(member == 1, na.rm = TRUE))
+#Join with the main data set
+main <- main %>%
+  left_join(household_counts, by = "_uuid")
+
+```
+```{r}
+#Calculate crowding
+main <- main %>%
+  mutate(crowding=HHmembersize/HH14
+  ) %>%
+  mutate(HH14_cat=case_when( ##if crowding <= 3, not overcrowded 
+    crowding <= 3 ~ 1, TRUE ~ 0)
+  )
+```
+```{r}
+table(main$HH14_cat)
+
+```
+```{r}
+#Step 5: ###Combine both conditions for habitable housing
+main <- main %>%
+  mutate(shelter=case_when(
+    HH14_cat==1 & habitablehousing==1 ~ 1,
+    TRUE ~ 0
+  ))
+
+table(main$shelter)
+```
+
