@@ -285,4 +285,6 @@ main <- main %>%
 
 table(main$shelter)
 ```
-
+##Ilgi - For 2.2 - Access to basic drinking water services is asked to Random Adult, while other 3 categories are asked to the HoH. For crowding - I calculated a number of household members, which is not the same as the amount of people that might be present in the household at the time of the data collection. In FDS, the HoH or the most knowledge person gives information on all HoH members. Then varisous questions are asked about all these people. Following, we have a check which check if they are actually HH members or not. The latter was takes as the size of the household for crowding. I have not included the aspect on shocks - proximity to e flooding, landslides, landmines, 
+and close proximity to military installations and hazardous zones. 
+##Ilgi - I still have to add the final composite calculation for 2.2 - will do once we talk about the above. 
