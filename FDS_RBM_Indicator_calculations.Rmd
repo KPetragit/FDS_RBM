@@ -285,6 +285,52 @@ main <- main %>%
 
 table(main$shelter)
 ```
-##Ilgi - For 2.2 - Access to basic drinking water services is asked to Random Adult, while other 3 categories are asked to the HoH. For crowding - I calculated a number of household members, which is not the same as the amount of people that might be present in the household at the time of the data collection. In FDS, the HoH or the most knowledge person gives information on all HoH members. Then varisous questions are asked about all these people. Following, we have a check which check if they are actually HH members or not. The latter was takes as the size of the household for crowding. I have not included the aspect on shocks - proximity to e flooding, landslides, landmines, 
-and close proximity to military installations and hazardous zones. 
+After computing the four basic services, we will include an assessment of whether individuals reside in physically safe and secure environments. Safe and secure settlements are those with no risks and hazards like flooding, landslides, landmines, and close proximity to military installations and hazardous zones. In FDS, we only look at the risk of flooding and landslides. 
+
+```{r}
+#Step 1: The variables we need to calculate this are in a repeat group, meaning we first need to compute a composite variable specifying if the household has experienced floods or landslides in the past 12 months. 
+
+#Step 1.1 - Identify coloumns that contain information on shocks: 
+shock_columns <- grep("^Shock\\d+_ExpShock02$", names(main), value = TRUE)
+
+#Step 1.2 - Assign 1 if any shock coloumn has the value 2, else 0 
+main$Landslides_flooding <- apply(main[shock_columns], 1, function(row) ifelse(any(row == 2), 1, 0))
+
+```
+```{r}
+table(main$Landslides_flooding)
+```
+
+
+
+##Ilgi - For 2.2 - Access to basic drinking water services is asked to Random Adult, while other 3 categories are asked to the HoH. For crowding - I calculated a number of household members, which is not the same as the amount of people that might be present in the household at the time of the data collection. In FDS, the HoH or the most knowledge person gives information on all HoH members. Then varisous questions are asked about all these people. Following, we have a check which check if they are actually HH members or not. The latter was takes as the size of the household for crowding.
 ##Ilgi - I still have to add the final composite calculation for 2.2 - will do once we talk about the above. 
+
+# 2.3 Core Imapct Indicator
+**Core Impact 2.3 Proportion of people with access to health services**
+
+This indicator measures access to essential primary health care services for forcibly displaced and stateless people in need of health services. Health services refers to preventive, promotive, curative, rehabilitative and palliative health services.
+
+Note that FDS does not measure access to mental health, psychosocial support, rehabilitative services, palliative care. Moreover, three months is the standard recall period to use for this indicator.However in FDS, 30 days have been used as a recall period. Therefore, the below results can only partially be considered as 2.3 Core Imapact Indicator. 
+
+| Standard Questions                |
+|:---------------------------------:|
+|  H01_1, H02, H04, H06, H11, H22   |
+
+*Unit of observation*: Individual
+
+*Numerator*: Number of individuals who received the health care they needed in the previous 30 months
+
+*Denominator*: Total number of individuals who needed health care services in the previous 30 months
+
+
+The standard survey/FDS methodology for this indicator entails asking households whether any household member needed to see health professionals in the past 30 days, their reasons for seeking consultation and whether they received the needed medical attention, and if not, reasons for not receiving this. Individuals who chose not to seek services are excluded from the calculation.
+Healthcare can be delivered through a combination of community level, mobile and fixed healthcare facilities.
+
+```{r}
+table(ind$HACC01) ## Needed to see a health professional for any reason
+table(ind$HACC02) ## the reason for seeking care
+table(ind$HACC03) ## did receive the needed health care
+table(ind$HACC04) ## if not, what are the reasons for not receiving the health care
+```
+
