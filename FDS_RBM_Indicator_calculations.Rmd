@@ -1,5 +1,4 @@
----
-title: "FDS Questionnaire v1 - RBM Indicator Calculations"
+title: "FDS Questionnaire v1 RBM Indicator Calculations"
 author: "Global Survey Team"
 output: html_document
 unhcrdown::html_page:
@@ -186,7 +185,7 @@ main <- main %>%
       (ImprovedDrinkingWaterLocation == 2 & BD20_2 == 1 & BD20_3 < 30) |
       (ImprovedDrinkingWaterLocation == 2 & BD20_2 == 98 & BD22 == 1),
       1,
-      0
+      2
     )
   )%>%
 mutate(ImprovedDrinkingWaterAccess = labelled(ImprovedDrinkingWaterAccess,
@@ -1112,8 +1111,10 @@ Since data is often unavailable for individual ages and to facilitate and harmon
 
 **Numerator**: Number of students enrolled in primary education (regardless of age)
 
-**Denominator**: Total number of individuals of tertiary school age (18 - 24 years)
+**Denominator**: Total number of individuals of tertiary school age 
 
+**Other sources**
+1. [RBM 11.1 Outcome Indicator Guidance](https://intranet.unhcr.org/content/dam/unhcr/intranet/protection-operations/prog-hub/program-cycle/indictors/core/outcome/Core%20outcome%2011.1%20Proportion%20of%20young%20people%20enrolled%20in%20tertiary%20and%20higher%20education.pdf)
 
 ```{r}
 table(hhroster$HH_Educ02a) ## if the respondent is currently going to school
@@ -1138,6 +1139,290 @@ hhroster <- hhroster %>%
     )
   )
 ```
+# <span style="color:blue; font-size:28px;"><strong>11.2 Core Outcome Indicator - Partially</strong></span>
+**11.2 Proportion of children and young people enrolled in the national education system**
+##RBM21102
 
-TEST
-TEST
+This indicator is defined as the proportion of forcibly displaced and stateless students enrolled in the national education system at primary and secondary level. Enrolled refers to the Gross Enrolment Ratio rather than the Net Enrolment Ratio because it aims to  show what proportion of the forcibly displaced and stateless population is included in the national  education system, even if not at the correct age. National education system is to be intended as public schools recognised by the national authorities, i.e., their certification is recognised to access the next education level or, when relevant, the labour market. 
+
+**Unit of observation**: Individual 
+
+**Numerator**:  Number of students enrolled in national primary and secondary school education
+
+**Denominator**:  Total number of individuals of primary and secondary school age 
+
+**Other sources**
+1. [RBM 11.2 Outcome Indicator Guidance](https://intranet.unhcr.org/content/dam/unhcr/intranet/protection-operations/prog-hub/program-cycle/indictors/core/outcome/Core%20outcome%2011.2%20Proportion%20of%20children%20and%20young%20people%20enrolled%20in%20national%20education%20system.pdf)
+```{r}
+table(hhroster$HH_Educ02a) ## if the respondent is currently going to school
+table(hhroster$HH_Educ03)  ## grade the respondent is currently attending 
+table(hhroster$HH_Educ04a) ## What type of school you going to? Governement school, UN or NGO, community school, religious or faith-based private school, non-religious private school or any other type of school?
+table(hhroster$HH_Educ04b) ## Is the school that you are going accepted by the national authorities?
+```
+```{r}
+#Create a variable specifying when individual is enrolled in primary or secondary school 
+hhroster <- hhroster %>%
+  mutate(edu_pri_sec = case_when(
+    (HH_Educ02a == 1 & HH_Educ03 %in% 1:12 & (HH_Educ04a == 1 | HH_Educ04a %in% c(2,3,4,5,6,96,98) & HH_Educ04b == 1)) ~ 1,# Ensure to check possible grade levels. In these example answers 1 - 12 were considered for primary and secondary grade level. 
+    (HH_Educ02a == 1 & HH_Educ03 %in% 1:12 & (HH_Educ04a == 1 | HH_Educ04a %in% c(2,3,4,5,6,96,98) & HH_Educ04b == 2)) ~ 2,
+    TRUE ~ NA_real_
+  ))
+```
+```{r}
+#Create a variable to adjust age groups for tertiary level 
+hhroster <- hhroster %>%
+  mutate(
+    age_pri_sec = case_when(
+      HH_04 >= 6 & HH_04 <= 16 ~ 1,  #Remember to adjust age levels based on the tertiary education age per country
+      TRUE ~ 2
+    )
+  )
+```
+Ilgi: The indicator says" Proportion of children and young people, but the nominator is number of students enrolled (regardless of age) - seems counter intuitive. Secondly, if someone doesn't know in what kind of school they are going, but knows it is accepted by the natioinal authorities, would this be enough for a yes? 
+For "no", do we need to account for cases where they are not enrolled at all? 
+
+
+# <span style="color:blue; font-size:28px;"><strong>12.1 Core Outcome Indicator - Partially</strong></span>
+**11.2 Proportion of people using at least basic drinking water services **
+##RBM21201
+
+This indicator is defined as the percentage of people using at least basic water services. Basic drinking water services is defined as drinking water from an improved source, provided collection time is not more than 30 minutes for a round trip, including queuing. 
+
+**Unit of observation**: Individual
+
+**Numerator**: Number of individuals with access to basic drinking water services
+
+**Denominator**: Total number of individuals
+
+To calculate the indicator value, the standard survey methodology considers for the numerator only people using improved sources of drinking water either in their dwelling/yard/plot or within 30  minutes round trip collection time.
+
+The FDS only measure access to at least basic drinking water services which needs to fulfill the following conditions, in accordance with  [JMP WASH guidance](https://washdata.org/sites/default/files/documents/reports/2019-03/JMP-2018-core-questions-for-household-surveys.pdf).
+
+**Other sources**
+1. [RBM 12.1 Outcome Indicator Guidance](https://intranet.unhcr.org/content/dam/unhcr/intranet/protection-operations/prog-hub/program-cycle/indictors/core/outcome/Core%20outcome%2012.1%20Proportion%20of%20people%20using%20at%20least%20basic%20drinking%20water%20services.pdf)
+
+```{r}
+##Step 1: Check all variables
+table(main$BD01)   ##What is the main source of drinking water used by members of your household?
+table(main$BD01a)  ##Where is this main drinking water source located? In your own dwelling, in your own yard or plot , or elsewhere?
+table(main$BD20_2) ##How long does it take for members of your household to go to the main source of drinking water, stay in a queue, get water, and come back? Please do not include time spent socializing. 
+table(main$BD22)   ##Does it take more or less than 30 minutes?
+
+
+## Step 2: Add a coloumn specifying is the household uses improved or unimproved source of drinking water 
+main <- main %>%
+  mutate(drinkingWaterImproved = ifelse(BD01 %in% c(11, 12, 13, 14, 21, 31, 41, 51, 61, 71, 72, 91, 92), 1, 2)) %>%
+  mutate(drinkingWaterImproved = labelled(drinkingWaterImproved,
+                               labels = c(
+                                 "Yes" = 1,
+                                 "No" = 2
+                               ),
+                               label = "Improved drinking water source"))
+```
+
+```{r}
+##Step 3: Add a coloumn specifying if the improved water source is located in own dwelling/yard/plot or elsewhere. 
+main <- main %>%
+mutate(ImprovedDrinkingWaterLocation = ifelse(BD01 %in% c(11, 12) | (((BD01 %in% c(13, 14, 21, 31, 41, 51, 61, 71, 72, 91, 92))) & BD01a %in% c(1, 2)),1,2))%>%
+mutate(ImprovedDrinkingWaterLocation = labelled(ImprovedDrinkingWaterLocation,
+                               labels = c(
+                                 "Yes" = 1,
+                                 "No" = 2
+                               ),
+                               label = "Improved drinking water source in own dwelling, yard or plot"))
+
+```
+```{r}
+##Step 4: Add a coloumn specifying if it takes more or less than 30 min to the improved drinking water source. If the improved drinking water source is located in own dwelling, yard or plot, it is considered that it takes less than 30 minutes to reach. 
+## BD20-3 - Minutes
+main <- main %>%
+  mutate(
+    outcome12_1 = ifelse(
+      (ImprovedDrinkingWaterLocation == 1 )|
+      (ImprovedDrinkingWaterLocation == 2 & BD20_2 == 1 & BD20_3 < 30) |
+      (ImprovedDrinkingWaterLocation == 2 & BD20_2 == 98 & BD22 == 1),
+      1,
+      2
+    )
+  )%>%
+mutate(outcome12_1 = labelled(outcome12_1,
+                               labels = c(
+                                 "Yes" = 1,
+                                 "No" = 2
+                               ),
+                               label = "Basic drinking water services"))
+
+
+```
+
+```{r}
+table(main$outcome12_1)
+```
+
+
+# <span style="color:blue; font-size:28px;"><strong>12.2 Core Outcome Indicator - Partially</strong></span>
+**12.2 Proportion of people with access to a safe household toilet **
+##RBM21202
+
+This indicator measures the proportion of people with access to at least basic sanitation services. Basic sanitation services are defined as improved facilities (toilets) that are not shared with other households. 
+
+As this indicator measures 'at least basic sanitation services ' as defined by the JMP sanitation ladder it includes also safely managed sanitation services which are defined as the use of hygienic toilet facilities that are not shared with other households and where excreta are either separated from human contact and safely disposed of in situ or transported and treated off-site, thereby protecting people and the environment from disease agents. Safely disposed in situ when pit latrines and septic tanks are not emptied, the excreta may still remain isolated from human contact and can beconsidered safely managed.
+
+**Unit of observation**: Individual
+
+**Numerator**:  Number of individuals with access to sanitation facility at their household
+
+**Denominator**: Total number of individuals
+
+**Other sources**
+1. [RBM 12.2 Outcome Indicator Guidance](https://intranet.unhcr.org/content/dam/unhcr/intranet/protection-operations/prog-hub/program-cycle/indictors/core/outcome/Core%20outcome%2012.2%20Proportion%20of%20people%20with%20access%20to%20a%20safe%20household%20toilet.pdf)
+
+
+```{r}
+table(main$SAN01) #What kind of toilet facility do members of your household use most of the time?
+table(main$SAN02) #To the best of your knowledge, has this toilet ever been emptied?
+table(main$SAN03) #The last time it was emptied, where were the contents emptied to?
+table(main$SAN05) #Do you share this toilet facility with others who are not members of your household?
+```
+```{r}
+#Step 1: Create a variable to check if the household uses an improved or unimproved sanitation facility 
+main <- main %>%
+  mutate(type_san_facility = case_when(
+    SAN01 %in% c("11", "12", "13", "14", "18", "21", "22", "31") ~ 1,  # Improved sanitation facility
+    SAN01 %in% c("23", "41", "51", "95", "96") ~ 2,  # Unimproved sanitation facility
+    TRUE ~ NA_real_ 
+    ))# Missing or invalid
+```
+```{r}
+#Step 2: Create a variable to check if the contents of the toilet are safely disposed
+main <- main %>%
+ mutate(disposal_san_facility = case_when(
+    SAN02 == 1 & SAN03 %in% c("5", "96", "98") ~ 2,  # Unsafe disposal
+    SAN02 == 1 & SAN03 %in% c("1", "2", "3", "4") ~ 1,  # Safe disposal
+    SAN02 == 2 ~ 2,  # Unsafe if no toilet
+    SAN02 == 98 ~ 2,  # Unavailable information
+    TRUE ~ NA_real_ )) # Missing or invalid
+```
+```{r}
+
+```
+```{r}
+#Step 3: Create a variable to check if the household shares the toilet facility with other households 
+main <- main %>%
+  mutate(shared_san_facility = case_when(
+    SAN05 == 1 ~ 2,             # Shared toilet
+    SAN05 == 2 ~ 1,             # Not shared
+    SAN05 %in% c("98", "99") ~ NA # NA for 98 or 99
+  ))
+
+```
+```{r}
+#Step 4: Combine all three conditions
+main <- main %>%
+mutate(outcome12_2 = case_when(
+    type_san_facility == 1 & disposal_san_facility == 1 & shared_san_facility == 1 ~ 1,  # Basic sanitation service
+    TRUE ~ 2  # If any condition fails
+  )) %>%
+  mutate(outcome12_2 = labelled(outcome12_2,
+                                labels = c(
+                                  "Yes" = 1,
+                                  "No" = 2
+                                ),
+                                label = "This indicator measures the proportion of people with access to at least basic sanitation services."
+  ))
+```
+```{r}
+table(main$outcome12_2)
+```
+
+# <span style="color:blue; font-size:28px;"><strong>13.1 Core Outcome Indicator - Partially</strong></span>
+**13.1 Proportion of people with an account at a bank or other financial institution or with a mobile-money provider **
+##RBM21301
+
+This indicator measures the percentage of people (age 18+) who report having an account (by themselves or together with someone else) at a bank or another type of financial institution or personally using a mobile money service in the past 12 months in the country of asylum or habitual residence (for returnees, countries of origin are included).
+Personal mobile and bank accounts are defined as accounts that are fully owned by the person, where they can transact freely as per the country’s rules and regulations. UNHCR or any other third party does not have access to the account details (such as movements on the account) and cannot withdraw money.
+
+**Unit of observation*: Individual
+
+**Numerator**: Number of individuals above 18 having a personal mobile or bank account 
+
+**Denominator**: Total number of individuals above 18
+
+**Other sources**
+1. [RBM 13.1 Outcome Indicator Guidance](https://intranet.unhcr.org/content/dam/unhcr/intranet/protection-operations/prog-hub/program-cycle/indictors/core/outcome/Core%20outcome%213.1.%20Proportion%20of%20people%20with%20an%20account%20at%20a%20bank%20or%20other%20financial%20institution%20or%20mobile%20money.pdf)
+
+```{r}
+table(main$FI01) #Do you, either by yourself or together with someone else, currently have an account at a bank or another type of formal financial institution in the host country?
+table(main$FI02) #Do you, personally, have a debit card in the host country?
+table(main$FS03) #Do you, personally, have a credit card in the host country?
+table(main$FI10) #In the past 12 months, have you personally used a mobile phone to make payments, buy things, or to send or receive money using a service such as [country specific example]?
+```
+
+```{r}
+main <- main %>%
+  mutate(outcome13_1 = case_when(
+    age_selected > 18 & (FI01 == 1 | FI02 == 1 | FI03 == 1 | FI10 == 1) ~ 1,
+    age_selected > 18 & FI01 == 2 & FI02 == 2 & FI03 == 2 & FI10 %in% c(2,3) ~ 2,
+    TRUE ~ NA                # For individuals under 18 and all other cases, assigns NA
+  ))
+
+```
+```{r}
+main <- main %>%
+   mutate(outcome13_1 = labelled(outcome13_1,
+                                labels = c(
+                                  "Yes" = 1,  # Label for Yes
+                                  "No" = 2    # Label for No
+                                ),
+                                label = "Proportion of people above with an account at a bank or other financial institution or with a mobile-money-service provider"
+  ))
+```
+```{r}
+table(main$outcome13_1)
+```
+Ilgi: For FI10 we also have a response option: I don't know what mobile money is. Can be assume that if someone doesn't know what it is they also don't use it? 
+Moreover, in all other cases, where respondents are below 18, or respond with don't know or refuse to answer, this has been put to NA. 
+
+# <span style="color:blue; font-size:28px;"><strong>13.2 Core Outcome Indicator - Partially</strong></span>
+**13.2 Proportion of people who self-report positive changes in their income compared to the prevoius year**
+##RBM21302
+
+This indicator measures the proportion of forcibly displaced and stateless people who self-report positive changes in their income compared to the previous year. It aims to track changes in income levels compared to the previous year. According to FAO and ILO, income is defined as the value of resources flowing towards the household from their engagement in wage- or self-employment comprising of both income in money (profits, wage, interest, social benefits etc.) and in kind (goods and services). It is equal to the value of goods and services produced by the wage- or self-employed, net of operating expenses (such as salaries paid, raw materials used, depreciation of machines and instruments and taxes paid), plus any salary received and social security benefits (net of contributions).Income also includes benefits received by employed persons who are no longer in employment, such as unemployment benefits, pensions, invalidity benefits. As with income related to paid employment, all these social benefits will be part of income from employment only insofar as workers received them as a result of their participation in work activities.’ (ILO)The indicator includes income from self-employment and/or wage-employment in both agricultural and non-agricultural activities.
+
+**Unit of observation:** Individual
+
+**Numerator:** Number of individuals of working age who self-report increased income compared to the previous year
+
+**Denominator:** Total number of individuals of working age
+
+Note that the working age population is to be defined by each country context in line with legal definitions, this could be those aged between 18 and 65. To calculate the indicator value, the standard survey methodology considers for the numerator only individuals who state their income increased and who can also afford more goods and services, or those whose income remained the same or decreased but who can still afford more goods and services (to account for possible inflation).
+
+**Other sources**
+1. [RBM 13.2 Outcome Indicator Guidance](https://intranet.unhcr.org/content/dam/unhcr/intranet/protection-operations/prog-hub/program-cycle/indictors/core/outcome/Core%20outcome%2013.2%20Proportion%20of%20people%20who%20self-report%20positive%20changes%20in%20their%20income%20compared%20to%20previous%20year.pdf)
+
+```{r}
+table(main$CH01b)  #Compared to this time last year, would you say that your personal income increased, remained the same, or decreased?
+table(main$CH02b)  #Compared to this time last year, do you think you personally can now afford more goods and services, the same, or less goods and services?
+```
+
+```{r}
+main <- main %>%
+  mutate(outcome13_2 = case_when(
+    CH01b == 1 & CH02b == 1 ~ 1,  # Income increased and can afford more
+     (CH01b == 2 | CH01b == 3) & CH02b == 1 ~ 1,  # Income decreased/same and can afford more
+    TRUE ~ 0)) # Default to 0
+```
+```{r}
+main <- main %>%
+   mutate(outcome13_2 = labelled(outcome13_2,
+                                labels = c(
+                                  "Yes" = 1,  # Label for Yes
+                                  "No" = 2    # Label for No
+                                ),
+                                label = "Proportion of people who self-report positive changes in their income compared to previous year"
+  ))
+```
+```{r}
+table(main$outcome13_2)
+```
+
