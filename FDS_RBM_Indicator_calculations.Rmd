@@ -348,9 +348,9 @@ This indicator measures access to essential primary health care services for for
 
 Note that FDS does not measure access to mental health, psychosocial support, rehabilitative services, palliative care. Moreover, three months is the standard recall period to use for this indicator.However in FDS, 30 days have been used as a recall period. Therefore, the below results can only partially be considered as 2.3 Core Imapact Indicator. 
 
-| Standard Questions    |
-|:---------------------:|
-|  H01_1, H02, H04, H06 |
+| Standard Questions         |
+|:--------------------------:|
+|  H01_1, H02, H04, H06, H08 |
 
 *Unit of observation*: Individual
 
@@ -370,21 +370,38 @@ table(main$H06)   # did receive the needed health care
 table(main$H08)   # What are the reasons why you did not try to see a health professional in the past 30 days? - check if this variable is present in your data set
 ```
 ```{r}
+#Option 1: Use this option in cases when H08 is not present in the data set. In this option, cases where an individual needed to see a health professional but did not try to see it are classified as 1 - Has access to health services. 
 main <- main %>%
   mutate(impact2_3=case_when(
     H01_1==1 & H04== 1 & H06==1 ~ 1,
+    H01_1==1 & H04== 2 ~ 1,
     H01_1==2 ~ NA,
-    H01_1==1 & H04== 1 & H06==2 ~ 2 ,)) %>%
-  mutate(impact2_3=labelled(impact2_3,
+    H01_1==1 & H04== 1 & H06==2 ~ 2 ))
+```
+```{r}
+#Option 2: Use this option in cases when H08 is present in the data set.
+#main <- main %>%
+ # mutate(impact2_3=case_when(
+   # H01_1==1 & H04== 1 & H06==1 ~ 1,
+   # H01_1==1 & H04== 2 & (H08 == "E" |H08 == "H" |H08 == "X" | |H08 == "Y") ~ 1, #Individuals who needed to see a health professional, and didn't try due to lack of time, fear of coronavirus, other reasons, or don't know why they didn't try are deemed as having access to health services. 
+   # H01_1==1 & H04== 2 & H08 %in% c("A", "B","C", "D", "F", "G") ~ 2, #Individuals who needed to see a health professional, and didn't try due to non personal reasons/choices are deemed as not having access to health services. 
+   # H01_1==2 ~ NA,
+   # H01_1==1 & H04== 1 & H06==2 ~ 2 ))
+```
+
+
+```{r}
+main <- main %>%
+ mutate(impact2_3=labelled(impact2_3,
                             labels =c(
                               "Yes"=1,
                               "No"=2
                             ),
                             label="Proportion of people with access to health services"))
 ```
+
 ```{r}
 table(main$impact2_3)
-
 ```
 
 # <span style="color:blue; font-size:28px;"><strong>3.2a Core Impact Indicator</strong></span>
@@ -531,6 +548,10 @@ This indicator measures the proportion of children under 5 years old whose birth
 This is directly linked to SGD indicator [16.9.1](https://unstats.un.org/sdgs/metadata/files/Metadata-16-09-01.pdf).
 
 The standard module for this indicator is taken from MICS and adjusted to UNHCR context.
+
+| Standard Questions |
+|:------------------:|
+| HH_07a, HH_07b     |
 
 ***Definitions***
 
@@ -841,8 +862,8 @@ This indicator measures the proportion of people living in habitable and afforda
 **Habitable housing** refers to the presence of adequate space which is defined by the minimum emergency standards. Habitable housing also refers to the fact that the housing should provide protection from cold, damp, heat, rain, wind, and other threats to health, structural hazards, and disease vectors. It should provide physical safety to its occupants. This indicator does not measure ‘adequate’ housing but focuses on whether housing is livable.
 
 
-|    Standard Questions     |
-|:-------------------------:|
+|    Standard Questions                       |
+|:-------------------------------------------:|
 | DWE01 – SHEL01-SHEL06 – DWE05 – DWE08-DWE09 |
 
 **Unit of observation**: Individual
@@ -1166,6 +1187,10 @@ hhroster <- hhroster %>%
 
 This indicator is defined as the percentage of people using at least basic water services. Basic drinking water services is defined as drinking water from an improved source, provided collection time is not more than 30 minutes for a round trip, including queuing. 
 
+| Standard Questions    |
+|:---------------------:|
+| BD01, BD01a, BD20_2   |
+
 **Unit of observation**: Individual
 
 **Numerator**: Number of individuals with access to basic drinking water services
@@ -1246,6 +1271,10 @@ This indicator measures the proportion of people with access to at least basic s
 
 As this indicator measures 'at least basic sanitation services ' as defined by the JMP sanitation ladder it includes also safely managed sanitation services which are defined as the use of hygienic toilet facilities that are not shared with other households and where excreta are either separated from human contact and safely disposed of in situ or transported and treated off-site, thereby protecting people and the environment from disease agents. Safely disposed in situ when pit latrines and septic tanks are not emptied, the excreta may still remain isolated from human contact and can beconsidered safely managed.
 
+| Standard Questions           |
+|:----------------------------:|
+| SAN01, SAN02, SAN03, SAN05   |
+
 **Unit of observation**: Individual
 
 **Numerator**:  Number of individuals with access to sanitation facility at their household
@@ -1320,6 +1349,10 @@ table(main$outcome12_2)
 This indicator measures the percentage of people (age 18+) who report having an account (by themselves or together with someone else) at a bank or another type of financial institution or personally using a mobile money service in the past 12 months in the country of asylum or habitual residence (for returnees, countries of origin are included).
 Personal mobile and bank accounts are defined as accounts that are fully owned by the person, where they can transact freely as per the country’s rules and regulations. UNHCR or any other third party does not have access to the account details (such as movements on the account) and cannot withdraw money.
 
+| Standard Questions           |
+|:----------------------------:|
+| FI01, FI02, FI03, FI10       |
+
 **Unit of observation*: Individual
 
 **Numerator**: Number of individuals above 18 having a personal mobile or bank account 
@@ -1332,7 +1365,7 @@ Personal mobile and bank accounts are defined as accounts that are fully owned b
 ```{r}
 table(main$FI01) #Do you, either by yourself or together with someone else, currently have an account at a bank or another type of formal financial institution in the host country?
 table(main$FI02) #Do you, personally, have a debit card in the host country?
-table(main$FS03) #Do you, personally, have a credit card in the host country?
+table(main$FI03) #Do you, personally, have a credit card in the host country?
 table(main$FI10) #In the past 12 months, have you personally used a mobile phone to make payments, buy things, or to send or receive money using a service such as [country specific example]?
 ```
 
@@ -1366,6 +1399,10 @@ Moreover, in all other cases, where respondents are below 18, or respond with do
 ##RBM21302
 
 This indicator measures the proportion of forcibly displaced and stateless people who self-report positive changes in their income compared to the previous year. It aims to track changes in income levels compared to the previous year. According to FAO and ILO, income is defined as the value of resources flowing towards the household from their engagement in wage- or self-employment comprising of both income in money (profits, wage, interest, social benefits etc.) and in kind (goods and services). It is equal to the value of goods and services produced by the wage- or self-employed, net of operating expenses (such as salaries paid, raw materials used, depreciation of machines and instruments and taxes paid), plus any salary received and social security benefits (net of contributions).Income also includes benefits received by employed persons who are no longer in employment, such as unemployment benefits, pensions, invalidity benefits. As with income related to paid employment, all these social benefits will be part of income from employment only insofar as workers received them as a result of their participation in work activities.’ (ILO)The indicator includes income from self-employment and/or wage-employment in both agricultural and non-agricultural activities.
+
+| Standard Questions  |
+|:-------------------:|
+| CH01b, CH02b        |
 
 **Unit of observation:** Individual
 
@@ -1413,6 +1450,10 @@ This indicator measures the level of unemployment among forcibly displaced and s
 The labour force, also known as workforce, refers to the total number of people who are either in employment or in unemployment, as defined above (SDG Indicator 8.5.2). It is intricately linked to the working age population defined by each country's legal framework, representing the segment of the population within the designated working age range.
 
 The 7 days recall period is in alignment with ILO standard methodology as well as with UNHCR Socioeconomic assessment standard. 
+
+| Standard Questions                                                                           |
+|:--------------------------------------------------------------------------------------------:|
+| EMP01, EMP02, EMP03, EMP04, EMP05, EMP06a, EMP06b, EMP06c, EMP06d, EMP25a, EMP25aa, EMP29    |
 
 **Unit of observation:** Individual
 
@@ -1502,5 +1543,104 @@ main <- main %>%
                                 ),
                                 label = "Proportion of people (working age) who are unemployed"))
 
+```
+
+# <span style="color:blue; font-size:28px;"><strong>14.1 Core Outcome Indicator - Partially</strong></span>
+**14.1 Proportion of returnees with legally recognized identity documents or credentials  **
+##RBM21401
+
+#Same as for 1.3 - The variables related to identitiy documents or credentials need to be incorporated into the hhroster data set. Once they will be, I can calculate this indicator. 
+
+# <span style="color:blue; font-size:28px;"><strong>16.1 Core Outcome Indicator - Partially</strong></span>
+**16.1 Proportion of people with secure tenure rights and/or property rights to housing and/or land   **
+##RBM21601
+
+#Land variables have not been incorporated in the main data set yet. Magrith is working on these. 
+
+# <span style="color:blue; font-size:28px;"><strong>16.2 Core Outcome Indicator - Partially</strong></span>
+**16.2 Proportion of people covered by social protection floors/systems    **
+##RBM21602
+
+This indicator measures the proportion of people who receive government social protection benefits and services as a result of inclusion in national social protection systems. This counts those who actually receive social protection benefits or are actively contributing to a social insurance scheme. This means it does not consider whether they have legal rights to social protection (for which there are other rights-based monitoring mechanisms), and it does not count just those who are registered for benefits (which can be reported using the Good Practice Indicator: “Number of people enrolled in social registries”).
+
+|    Standard Questions                                  |
+|:------------------------------------------------------:|
+| ScProtec01, ScProtec04, ScProtec16                     |
+
+**Unit of observation:** Individual
+
+**Numerator:** Number of individuals who benefit from national social protection systems 
+
+**Denominator:** Total number of individuals 
+
+To calculate the indicator value, the standard RMS methodology considers in the numerator only individuals in households where any household member has received any benefits from the national or local government social protection system in the country in the last 12 months.
+
+**Other sources**
+1. [RBM 16.2 Outcome Indicator Guidance](https://intranet.unhcr.org/content/dam/unhcr/intranet/protection-operations/prog-hub/program-cycle/indictors/core/outcome/Core%20outcome%2016.2%20Proportion%20of%20people%20covered%20by%20national%20social%20protection%20systems.pdf)
+
+```{r}
+table(main$ScProtec01) #In the past 12 months while in the host country, have you or anyone in your household received support from any assistance programme?
+table(main$ScProtec04) #From whom have you or anyone in your household received the assistance provided by this programme?
+#ScProtec16: In the last 12 months, have you or anyone in your household received any of the following payments from the host country government?  
+table(main$ScProtec16a)#Social protection cash benefit
+table(main$ScProtec16b)#Parental/Maternity benefit
+table(main$ScProtec16c)#Disability benefit
+table(main$ScProtec16d)#Unemployment benefit
+table(main$ScProtec16e)#Employment injury benefit
+table(main$ScProtec16f)#Sickness benefit
+table(main$ScProtec16g)#Old-age pension
+table(main$ScProtec16h)#Other vulnerability benefit
+table(main$ScProtec16i)#Social assistance cash benefit
+
+```
+
+```{r}
+#Step 1: Create a new variable to check if the household receives any social benefit from the government
+main <- main %>%
+  rowwise() %>%
+  mutate(Social_Benefit = case_when(
+    any(c_across(starts_with("ScProtec16")) == 1, na.rm = TRUE) ~ 1,  # If any column has 1
+    all(c_across(starts_with("ScProtec16")) == 2, na.rm = TRUE) ~ 2,  # If all columns are 2
+    TRUE ~ 2                                                   # Default to NA
+  )) %>%
+  ungroup()
+
+```
+```{r}
+#Step 2: Create a new variable to check if the household received any support from a social assistance programme by the government
+#Step 2.2: ScProtec04 is a repeat group meaning that depending on how many social assistance programmes the respondent lists, for each of them they answer to ScProtec04. Therefore, we first need to identify all coloumns matching the pattern "ProgrammeX_ScProtec04". 
+programme_columns <- grep("^Programme\\d+_ScProtec04$", names(main), value = TRUE)
+
+```
+```{r}
+#Step 2.3: Create a new varibale checking if the household recived any assistance programme from the government
+main <- main %>%
+  mutate(Social_assistance = case_when(
+    ScProtec01 == 1 & apply(main[programme_columns], 1, function(row) any(row == 1, na.rm = TRUE)) ~ 1, # Assigns 1 if assistance is received from the government 
+    ScProtec01 == 2 ~ 2,  # Assigns a 2 if no assistance is received 
+    ScProtec01 == 1 & apply(main[programme_columns], 1, function(row) all(row != 1, na.rm = TRUE)) ~ 2, # Assignes a 2 if assistance received is not from the government
+    TRUE ~ 2  # Condition 4: Default case
+  ))
+```
+```{r}
+#Step 3: Combine social benefit and social assistance 
+main <- main %>%
+  mutate(outcome16_2 = case_when(
+    Social_Benefit == 1 | Government_assistance == 1 ~ 1,  # If either variable is 1, assign 1
+    Social_Benefit == 2 & Government_assistance == 2 ~ 2,  # If both variables are 2, assign 2
+    TRUE ~ 2  # Default case: assign 2 for any other cases
+  )) %>%
+  
+  # Add labels to the new variable 'outcome16_2'
+  mutate(outcome16_2 = labelled(outcome16_2,
+                                labels = c(
+                                  'Yes' = 1,
+                                  'No' = 2
+                                ),
+                                label = "Proportion of people covered by national social protection systems"))
+
+```
+```{r}
+table(main$outcome16_2)
 ```
 
