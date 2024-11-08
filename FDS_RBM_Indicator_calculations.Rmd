@@ -85,7 +85,6 @@ If households lack access to electricity, especially for lighting and connectivi
 **Denominator**: Total number of individuals
 
 ```{r}
-##Here we will create a binary variable if they use anything for lighting (LIGHT01), and the light source for most of the time is electricity (LIGHT02) - exclude cases if they selected LIGHT03 - 0 ( no electricity)
 
 table(main$HL01) ##Does this household use anything for lighting?
 table(main$HL03) ##What does this household use most of the time as energy for lighting, or as a light source? 
@@ -100,6 +99,9 @@ main <- main %>%
                                  ),
                                  label = "Access to electricity"))
 
+
+```
+```{r}
 table(main$electricity)
 ```
 
@@ -127,10 +129,11 @@ main <- main %>%
                                ),
                                label = "Access to healthcare"))
 
-table(main$healthcare)
-
-
 ```
+```{r}
+table(main$healthcare)
+```
+
 #### Drinking water
 
 Access to clean drinking water is essential for a person's survival and well being and a precursor for achieving protection outcomes related to health, education and economic developed.
@@ -228,7 +231,6 @@ table(main$HH11) ##Leakage / rottenness in the walls / floors?
 ```
 ```{r}
 ##Step 2: Classify 96 responses as NAs
-##For Ilgi: Not sure if this is a correct approach, however there are 18 cases in HH04 where 96 was selected. Some of the text answers are in English, but also in pashtu and urdu (but written in latin alphabet) meaning it would be very difficult to treat them without a translator. Additionally not sure how to make a standard script for all text answers which might be submitted. 
 main <- main %>%
   mutate_at(vars(HH04, HH05, HH08, HH09, HH10, HH11), ~ ifelse(. == 96, NA, .))
 
@@ -291,7 +293,7 @@ table(main$shelter)
 After computing the four basic services, we will include an assessment of whether individuals reside in physically safe and secure environments. Safe and secure settlements are those with no risks and hazards like flooding, landslides, landmines, and close proximity to military installations and hazardous zones. In FDS, we only look at the risk of flooding and landslides. 
 
 ```{r}
-##Step 1: The variables we need to calculate this are in a repeat group, meaning we first need to compute a composite variable specifying if the household has experienced floods or landslides in the past 12 months. The main variable used for this is "ExpShock02". Based on the amount of shocks households specify, you will have a varying number of coloumns capturing different shocks. 
+##Step 5: The variables we need to calculate this are in a repeat group, meaning we first need to compute a composite variable specifying if the household has experienced floods or landslides in the past 12 months. The main variable used for this is "ExpShock02". Based on the amount of shocks households specify, you will have a varying number of coloumns capturing different shocks. 
 ##ExpShock02 - What is the event at the origin of this shock?
 ##Shock01_ExpShock02 - Shock 1
 ##Shock02_ExpShock02 - Shock 2
@@ -300,18 +302,42 @@ After computing the four basic services, we will include an assessment of whethe
 ##Step 1.1 - Identify coloumns that contain information on shocks: 
 shock_columns <- grep("^Shock\\d+_ExpShock02$", names(main), value = TRUE)
 
-##Step 1.2 - Assign 1 if any shock coloumn has the value 2, else 2
-main$Landslides_flooding <- apply(main[shock_columns], 1, function(row) ifelse(any(row == 2), 1, 2))
+##Step 1.2 - Assign 2 if any shock column has value 2, otherwise assign 1 
+main$Landslides_flooding <- apply(main[shock_columns], 1, function(row) {
+  if (any(row == 2, na.rm = TRUE)) {
+    2  # Not secure
+  } else {
+    1  # Secure
+  }
+})
+
 
 ```
 ```{r}
 table(main$Landslides_flooding)
 ```
 
+```{r}
+#step 6: Combine all services and calculate impact indicator based on electricity, healthcare, drinkingwater, shelter and landslides_flooding. 
+
+main <-main %>%
+  mutate(impact2_2=case_when(
+    shelter==2 | electricity==2 | ImprovedDrinkingWaterAccess==2 | healthcare==2 | Landslides_flooding==2 ~ 2,
+    shelter==1 & electricity==1 & ImprovedDrinkingWaterAccess==1 & healthcare==1 & Landslides_flooding==1 ~ 1)
+  ) %>% 
+  mutate(impact2_2=labelled(impact2_2,
+                            labels =c(
+                              "Yes"=1,
+                              "No"=2
+                            ),
+                            label="Proportion of people residing in physically safe and secure settlements with access to basic facilities"))
+```
+```{r}
+table(main$impact2_2)
+```
 
 
-##Ilgi - For 2.2 - Access to basic drinking water services is asked to Random Adult, while other 3 categories are asked to the HoH. For crowding - I calculated a number of household members, which is not the same as the amount of people that might be present in the household at the time of the data collection. In FDS, the HoH or the most knowledge person gives information on all HoH members. Then varisous questions are asked about all these people. Following, we have a check which check if they are actually HH members or not. The latter was takes as the size of the household for crowding.
-##Ilgi - I still have to add the final composite calculation for 2.2 - will do once we talk about the above. 
+
 
 # <span style="color:blue; font-size:28px;"><strong>2.3 Core Impact Indicator</strong></span>
 
@@ -337,17 +363,18 @@ The standard survey/FDS methodology for this indicator entails asking households
 Healthcare can be delivered through a combination of community level, mobile and fixed healthcare facilities.
 
 ```{r}
-table(main$H01_1) ## need to see a health professional for any reason
-table(main$H02)   ## reasons to see a health professional
-table(main$H04)   ## tried to see a health professional for any reason
-table(main$H06)   ## did receive the needed health care
+table(main$H01_1) # need to see a health professional for any reason
+table(main$H02)   # reasons to see a health professional
+table(main$H04)   # tried to see a health professional for any reason
+table(main$H06)   # did receive the needed health care
+table(main$H08)   # What are the reasons why you did not try to see a health professional in the past 30 days? - check if this variable is present in your data set
 ```
 ```{r}
 main <- main %>%
   mutate(impact2_3=case_when(
-    H01_1==1 & H06==1 ~ 1,
+    H01_1==1 & H04== 1 & H06==1 ~ 1,
     H01_1==2 ~ NA,
-    H01_1==1 & H06==2 ~ 2 ,)) %>%
+    H01_1==1 & H04== 1 & H06==2 ~ 2 ,)) %>%
   mutate(impact2_3=labelled(impact2_3,
                             labels =c(
                               "Yes"=1,
@@ -359,12 +386,6 @@ main <- main %>%
 table(main$impact2_3)
 
 ```
-Ilgi: In FDS we also have a question H04 which asked if they tried to see a health professional (for those who needed to see it). I wonder if this should be incorporated here? In H08 we have different reasons for not getting the health case as in RMS. Additionally, H08 for example was not asked in Pakistan. 
-Need to see + tried to see + got health care = 1
-Needs to see + tried to see + didn't get health care = 0 
-Doesn't need = NA 
-Need to see + doesn't try = ? 
-
 
 # <span style="color:blue; font-size:28px;"><strong>3.2a Core Impact Indicator</strong></span>
 
@@ -478,11 +499,13 @@ The standard survey question module for this indicator is taken from SGD indicat
 table(main$FS01) ## How safe do you feel walking alone in your area after dark? Very safe, fairly safe, bit unsafe, very unsafe?
 main <- main %>%
   mutate(
-    impact3_3 = case_when(
-      FS01 == 1 | FS01 == 2 ~ 1,  # Assign 1 for Yes (feels safe)
-      FS01 == 3 | FS01 == 4 ~ 2,  # Assign 2 for No (does not feel safe)
-      FS01 == 98 | FS01 == 5 ~ NA_real_  # Handle missing/unknown values as well as when the respondent does not walk alone at night with NA_real_
-    ))
+  impact3_3 = case_when(
+    FS01 == 1 | FS01 == 2 ~ 1,     # Assign 1 for Yes (feels safe)
+    FS01 == 3 | FS01 == 4 | FS01 == 5 | FS01 == 98 ~ 2,  # Assign 2 for No (does not feel safe)
+    TRUE ~ NA_real_                 # Assign NA for any other values (if needed)
+  )
+)
+
 ```
 ```{r}
 main <- main %>%
@@ -491,14 +514,12 @@ main <- main %>%
       impact3_3,
       labels = c(
         "Yes" = 1,  # Label for Yes (1)
-        "No" = 0    # Label for No (2)
+        "No" = 2    # Label for No (2)
       ),
       label = "Proportion of people that feel safe walking alone in their neighbourhood after dark"  # Assign the variable label
     )
   )
 ```
-## Ilgi: in FS01 one of the answer options is 5:I don't walk alone at night. I have classified it as NA, but worth to discuss if this is the correct approach. In SSD it was classified as No. 98 was also classified as No. 
-
 
 # <span style="color:blue; font-size:28px;"><strong>1.2 Core Outcome Indicator</strong></span>
 
@@ -661,7 +682,7 @@ main <- main %>%
 table(main$outcome4_1)
 
 ```
-Ilgi: In FDS, we have 5 questions in this section. See them above. In SSD the calculation was different. Then they looked at the proportion of people who are aware of one of the 4 services while excluding police. Let's discuss
+
 
 # <span style="color:blue; font-size:28px;"><strong>4.2 Core Outcome Indicator</strong></span>
 
@@ -806,7 +827,7 @@ main <- main %>%
 ```{r}
 table(main$outcome8_2)
 ```
-Ilgi: For 8.2 we should check the RMS script, I think there might me a mistake or perhaps I misunderstood. Moreover, in FDS SSD, this condition HC01 == 1 & HC02 == 8 & HC04 == 2), for HC02 was equaled to 6, which is a manufactured solid fuel stove, while HC04 was 1,3 which is alcohol/paraffin. 
+
 
 # <span style="color:blue; font-size:28px;"><strong>9.1 Core Outcome Indicator - Partially</strong></span>
 
@@ -1088,7 +1109,6 @@ mutate(outcome10_2 = labelled(outcome10_2,
 table(main$outcome10_2)
 
 ```
-Ilgi: X has been set as NA. To double check if this is ok
 
 # <span style="color:blue; font-size:28px;"><strong>11.1 Core Outcome Indicator - Partially</strong></span>
 **11.1 Proportion of young people enrolled in tertiary and higher education**
@@ -1139,51 +1159,9 @@ hhroster <- hhroster %>%
     )
   )
 ```
-# <span style="color:blue; font-size:28px;"><strong>11.2 Core Outcome Indicator - Partially</strong></span>
-**11.2 Proportion of children and young people enrolled in the national education system**
-##RBM21102
-
-This indicator is defined as the proportion of forcibly displaced and stateless students enrolled in the national education system at primary and secondary level. Enrolled refers to the Gross Enrolment Ratio rather than the Net Enrolment Ratio because it aims to  show what proportion of the forcibly displaced and stateless population is included in the national  education system, even if not at the correct age. National education system is to be intended as public schools recognised by the national authorities, i.e., their certification is recognised to access the next education level or, when relevant, the labour market. 
-
-**Unit of observation**: Individual 
-
-**Numerator**:  Number of students enrolled in national primary and secondary school education
-
-**Denominator**:  Total number of individuals of primary and secondary school age 
-
-**Other sources**
-1. [RBM 11.2 Outcome Indicator Guidance](https://intranet.unhcr.org/content/dam/unhcr/intranet/protection-operations/prog-hub/program-cycle/indictors/core/outcome/Core%20outcome%2011.2%20Proportion%20of%20children%20and%20young%20people%20enrolled%20in%20national%20education%20system.pdf)
-```{r}
-table(hhroster$HH_Educ02a) ## if the respondent is currently going to school
-table(hhroster$HH_Educ03)  ## grade the respondent is currently attending 
-table(hhroster$HH_Educ04a) ## What type of school you going to? Governement school, UN or NGO, community school, religious or faith-based private school, non-religious private school or any other type of school?
-table(hhroster$HH_Educ04b) ## Is the school that you are going accepted by the national authorities?
-```
-```{r}
-#Create a variable specifying when individual is enrolled in primary or secondary school 
-hhroster <- hhroster %>%
-  mutate(edu_pri_sec = case_when(
-    (HH_Educ02a == 1 & HH_Educ03 %in% 1:12 & (HH_Educ04a == 1 | HH_Educ04a %in% c(2,3,4,5,6,96,98) & HH_Educ04b == 1)) ~ 1,# Ensure to check possible grade levels. In these example answers 1 - 12 were considered for primary and secondary grade level. 
-    (HH_Educ02a == 1 & HH_Educ03 %in% 1:12 & (HH_Educ04a == 1 | HH_Educ04a %in% c(2,3,4,5,6,96,98) & HH_Educ04b == 2)) ~ 2,
-    TRUE ~ NA_real_
-  ))
-```
-```{r}
-#Create a variable to adjust age groups for tertiary level 
-hhroster <- hhroster %>%
-  mutate(
-    age_pri_sec = case_when(
-      HH_04 >= 6 & HH_04 <= 16 ~ 1,  #Remember to adjust age levels based on the tertiary education age per country
-      TRUE ~ 2
-    )
-  )
-```
-Ilgi: The indicator says" Proportion of children and young people, but the nominator is number of students enrolled (regardless of age) - seems counter intuitive. Secondly, if someone doesn't know in what kind of school they are going, but knows it is accepted by the natioinal authorities, would this be enough for a yes? 
-For "no", do we need to account for cases where they are not enrolled at all? 
-
 
 # <span style="color:blue; font-size:28px;"><strong>12.1 Core Outcome Indicator - Partially</strong></span>
-**11.2 Proportion of people using at least basic drinking water services **
+**12.1 Proportion of people using at least basic drinking water services **
 ##RBM21201
 
 This indicator is defined as the percentage of people using at least basic water services. Basic drinking water services is defined as drinking water from an improved source, provided collection time is not more than 30 minutes for a round trip, including queuing. 
@@ -1424,5 +1402,105 @@ main <- main %>%
 ```
 ```{r}
 table(main$outcome13_2)
+```
+
+# <span style="color:blue; font-size:28px;"><strong>13.3 Core Outcome Indicator - Partially</strong></span>
+**13.3 Proportion of people (working age) who are unemployed **
+##RBM21303
+
+This indicator measures the level of unemployment among forcibly displaced and stateless people. Unemployed persons are defined as all those in the labour force who were not in employment, carried out activities to seek employment during the past 7 days and were currently available to take up employment (SDG Indicator 8.5.2). Persons in employment are defined as all those in the labour force who, during the past 7 days, were engaged in any activity to produce goods or provide services for pay or profit (SDG Indicator 8.5.2).
+
+The labour force, also known as workforce, refers to the total number of people who are either in employment or in unemployment, as defined above (SDG Indicator 8.5.2). It is intricately linked to the working age population defined by each country's legal framework, representing the segment of the population within the designated working age range.
+
+The 7 days recall period is in alignment with ILO standard methodology as well as with UNHCR Socioeconomic assessment standard. 
+
+**Unit of observation:** Individual
+
+**Numerator:** Number of individuals in the labour force who are unemployed
+
+**Denominator:** Total number of individuals in the labour force
+
+To calculate the indicator value, the standard survey methodology considers for the numerator only individuals in the labour force who were not in employment and seeking a job within 7 days prior to the reference date and who are available to start work within the next 14 days.
+Individuals who worked for pay or profit, even if only for one hour, in past 7 days, or who were temporarily absent from a job to which they will return are considered employed.
+
+**Other sources**
+1. [RBM 13.3 Outcome Indicator Guidance](https://intranet.unhcr.org/content/dam/unhcr/intranet/protection-operations/prog-hub/program-cycle/indictors/core/outcome/Core%20outcome%2013.3%20Proportion%20of%20people%20(working%20age)%20who%20are%20unemployed.pdf)
+
+```{r}
+table(main$EMP01) #During the past 7 days, from [the same week day as the day of the interview] last week up to yesterday, did you work for someone else for pay, for one or more hours?
+table(main$EMP02) #During the past 7 days, from [the same week day as the day of the interview] last week up to yesterday, did you run or do any kind of business, farming or other activity to make money?
+table(main$EMP03) #During the past 7 days, from [the same week day as the day of the interview] last week up to yesterday, did you help in a family business or farm?
+table(main$EMP04) #Even though you did not work, during the past 7 days, did you have a paid job from which you were temporarily absent?
+table(main$EMP05) #Even though you did not work, during the past 7 days, did you have a business or a helper job in a family business/farm from which you were temporarily absent?
+table(main$EMP06a) #During the past 7 days, did you do any work in farming or rearing farm animals, fishing or fish farming, or none of these?
+table(main$EMP06b) #Was this work that you mentioned in farming or rearing farming animals, fishing or fish farming, or none of these?
+table(main$EMP06c) #Thinking about this work, are the products intended only for sale, mainly for sale, only for family use, or mainly for family use?
+table(main$EMP06d) #How many hours did you spend doing this work during the past 7 days?
+table(main$EMP25a) #During the past 30 days, did you do anything to find a paid job?
+table(main$EMP25aa)#During the past 30 days, did you do anything to start a business?
+table(main$EMP29)  #Could you start working within the next 14 days if you were offered a job?
+```
+
+```{r}
+#Step 1: Create a variable to determine those of working age 18+ years old. 
+
+main <- main %>%
+  mutate(working_age = case_when(
+    age_selected >= 18 ~ 1,  # If 18 or older, mark as working age (numeric)
+    TRUE ~ NA_real_  # Set to NA if not 18+
+  )) 
+```
+```{r}
+#Step 2: Determine who is employed based on various conditions 
+main <- main %>%
+  mutate(employed = case_when(
+    EMP01 == 1 & working_age == 1 ~ 1,  # Paid employment - employees
+    (EMP02 == 1 & EMP06b == 3) & working_age == 1 ~ 1,  # Self-employment
+    (EMP03 == 1 & EMP06b == 3) & working_age == 1 ~ 1,  # Unpaid contributing family workers
+    EMP04 == 1 & working_age == 1 ~ 1,  # Absent but still employed
+    (EMP05 == 1 & EMP06a == 3) & working_age == 1 ~ 1,  # Absent but self-employed
+    (EMP02 == 1 & EMP06b %in% c(1, 2) & EMP06c %in% c(1, 2)) & working_age == 1 ~ 1,  # Farming/rearing/fishing for sale
+    (EMP05 == 1 & EMP06a %in% c(1, 2) & EMP06c %in% c(1, 2)) & working_age == 1 ~ 1,  # Absent but farming for sale
+    working_age == 1 ~ 2,  # If working age but none of the above, mark as not employed
+    TRUE ~ NA_real_  # Set to NA for those not in the working age group
+  ))
+```
+```{r}
+#Step 3: Define unemployed: those not employed but actively looking for work
+main <- main %>%
+  mutate(unemployed = case_when(
+    (employed == 2 & (EMP25a == 1 | EMP25aa == 1) & EMP29 == 1) & working_age == 1 ~ 1,  # Actively looking for work
+    working_age == 1 ~ 2,  # Not unemployed if not actively looking or employed
+    TRUE ~ NA_real_  # Set to NA for those not in the working age group
+  ))
+```
+```{r}
+#Step 4: Define labour force: anyone employed or unemployed
+main <- main %>%
+  mutate(labour_force = case_when(
+    (employed == 1 | unemployed == 1) & working_age == 1 ~ 1,  # Employed or actively seeking work
+    working_age == 1 ~ 2,  # Not in labour force but 18+
+    TRUE ~ NA_real_  # Set to NA for those not in the working age group
+  ))
+```
+
+```{r}
+#Step 5: Outcome - unemployment status among those in the labor force (numeric outcome)
+main <- main %>%
+  mutate(outcome13_3 = case_when(
+    employed == 1 & labour_force == 1 ~ 2,  # If employed, outcome is 2 (not unemployed)
+    unemployed == 1 & labour_force == 1 ~ 1,  # If unemployed, outcome is 1
+    TRUE ~ NA_real_  # Catch-all for cases not in the labor force or with missing data
+  ))
+```
+```{r}
+main <- main %>%
+   mutate(outcome13_3 = labelled(outcome13_3,
+                                labels = c(
+                                  "Unemployed" = 1,  # Label for Yes
+                                  "Not unemployed" = 2   # Label for No
+                                ),
+                                label = "Proportion of people (working age) who are unemployed"))
+
 ```
 
