@@ -1,11 +1,17 @@
+---
 title: "FDS Questionnaire v1 RBM Indicator Calculations"
 author: "Global Survey Team"
-output: html_document
-unhcrdown::html_page:
+output:
+  unhcrdown::html_page:
     toc: true
     toc_depth: 2
     toc_float: true
 ---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(eval=FALSE)
+```
 
 Date: Last revision was on November 2024
 
@@ -15,6 +21,8 @@ Date: Last revision was on November 2024
 
 1. For correct calculations, ensure you have two datasets named 'main' and 'hhroster'. 
 2. Confirm that your datasets are cleaned and weighted as required for accurate results!
+
+Petra - I was checking MICS and they have 6 datasets so not sure how to go with datasets - to merge them or not as they different weights and maybe either way let's find another name then hhroster as it's more than hhroster that we have in the dataset 
 
 # RBM Core Impact and Outcome Indicators
 
@@ -26,7 +34,7 @@ They can be implemented across UNHCR operations to monitor changes in the lives 
 
 FDS help us to calculate impact and outcome indicators in a standardized way to have a global understanding of the results. Both indicators and questionnaire is also largely aligned with MICS, DHS, IHSN, national household surveys and other UNHCR standardized surveys.
 
-This document will guide you on how each and every indicator will be calculated with the standard questionnaire module corresponding to each indicator.
+This document will guide you on how each and every indicator will be calculated with the FDS standard questionnaire module corresponding to each indicator.
 
 **Population** refers to survey population in this guidance for the calculation of indicators as shown by numerator and denominator.
 
@@ -36,7 +44,7 @@ Percentage = \(\left(\frac{\text{Numerator}}{\text{Denominator}}\right) \times 1
 
 
 
-*At this step, you should already have main and hhroster datasets structured in a way that will allow you to calculate your indicators as you will be guided in this document. It's not recommended to clear your work space.*
+At this step, you should already have **main** and **hhroster** datasets structured in a way that will allow you to calculate your indicators as you will be guided in this document. It's not recommended to clear your work space if your datasets are already loaded. 
 
 ```{r, eval=FALSE}
 ## Install pacman if not already installed
@@ -56,9 +64,10 @@ pacman::p_load(
 
 ##Upload cleaned and weighted datasets 
 
-hhroster <- read_dta("FDS_PAK_2024_Allrespondents_complete.dta")
+hhroster <- read_dta("FDS_PAK_2024_Roster_complete.dta")
 
-main <- read_dta("FDS_PAK_2024_HoH_complete.dta")
+main <- read_dta("FDS_PAK_2024_Allrespondents_complete.dta")
+
 
 
 ###Add variable names for disaggregation variables
@@ -69,15 +78,18 @@ main <- read_dta("FDS_PAK_2024_HoH_complete.dta")
 
 
 
-# <span style="color:blue; font-size:28px;"><strong>2.2 Core Impact Indicator</strong></span>
+## 2.2 Core Impact Indicator
+
 **Core Impact 2.2 Proportion of people residing in physically safe and secure settlements with access to basic facilities**
 
-## RBM10202 - Impact 2.2
+*Indicator Code*: RBM10202
 
 This indicator aims to measure the proportion of forcibly displaced and stateless people that reside in safe and secure settlements with access to basic facilities such as shelter, WASH, energy and security from natural hazards.
 
 To facilitate measurement for UNHCR, four basic services are considered for this indicator: shelter, drinking water, energy (access to electricity) and health. All of these basic services must be available to people for it to be considered that they have access to basic services.
 
+
+Petra-should we link here the intranet? I saw that below you added; so we can add the same way everywhere
 This indicator is linked to the SGD indicator [1] and [11](https://unstats.un.org/sdgs/metadata/?Text=&Goal=11&Target=).
 
 | Services       | Variables                                                     |
@@ -87,7 +99,7 @@ This indicator is linked to the SGD indicator [1] and [11](https://unstats.un.or
 | Drinking water |BD21,BD22, BD01, BD01a, BD20_1,BD20_2,BD20_3,BD20_4,BD20_5     |
 | Shelter        |HH04, HH05, HH10,HH08,HH09, HH11,HH20, ExpShock02              |
 
-### 1. Calculate variables for access to four basic services {.tabset}
+### Calculate binary variables for access to four basic services {.tabset}
 
 **Click on services below to see how they are calculated**
 
@@ -99,7 +111,7 @@ If households lack access to electricity, especially for lighting and connectivi
 
 **Denominator**: Total number of individuals
 
-```{r, eval = FALSE}
+```{r, eval=FALSE}
 
 table(main$HL01) ##Does this household use anything for lighting?
 table(main$HL03) ##What does this household use most of the time as energy for lighting, or as a light source? 
@@ -113,11 +125,9 @@ main <- main %>%
                                    "No" = 2
                                  ),
                                  label = "Access to electricity"))
-
-
-```
-```{r}
 table(main$electricity)
+
+
 ```
 
 #### Healthcare
@@ -131,16 +141,13 @@ According to [The Sphere Handbook](https://spherestandards.org/wp-content/upload
 **Denominator**: Total number of individuals
 
 
-Petra - it does not find HH11?
-
-Add EVAL=False to only show the chunk in final rmarkdown later
-
-```{r, eval = FALSE}
+Petra - for the health indicator below, I think we use ind level so it codes a lot as they don't have access - can we maybe if someone from the HH needed access take it as for all HHs - or another option is put them into missing ( those who did not need access)
+```{r, eval=FALSE}
 
 
 ##Access to healthcare if household has any facility available within one hour distance (cannot be > 60) (walking or any other type of transport)
-table(hhroster$H11)  ##What place did you go first to try to see a health professional or healer?
-table(hhroster$H15d) ##Approximately, how long did it take to travel in one direction to that place for your first visit?
+table(main$H11)  ##What place did you go first to try to see a health professional or healer?
+table(main$H15d) ##Approximately, how long did it take to travel in one direction to that place for your first visit?
 
 main <- main %>%
   mutate(healthcare = ifelse(H11 %in% c(1, 2, 3, 4, 5, 6, 7, 8, 9, 12) & H15d == 1, 1, 2)) %>%
@@ -151,9 +158,9 @@ main <- main %>%
                                ),
                                label = "Access to healthcare"))
 
-```
-```{r}
+
 table(main$healthcare)
+
 ```
 
 #### Drinking water
@@ -161,12 +168,15 @@ table(main$healthcare)
 Access to clean drinking water is essential for a person's survival and well being and a precursor for achieving protection outcomes related to health, education and economic developed.
 The FDS only measure access to at least basic drinking water services which needs to fulfill the following conditions, in accordance with  [JMP WASH guidance](https://washdata.org/sites/default/files/documents/reports/2019-03/JMP-2018-core-questions-for-household-surveys.pdf).
 
-1. improved water source
-2. main water source is in own dwelling/yard or reachable in at most 30-minute round trip, including queuing
+1. Improved water source.
+2. The main water source is located within the household's dwelling or yard, or it is reachable within a 30-minute round trip, including any time spent queuing.
 
-**Numerator**: Population using drinking water from an improved source, provided collection time is not more than 30 minutes for a round trip, including queuing. 
+**Numerator**: Individuals using drinking water from an improved source, provided collection time is not more than 30 minutes for a round trip, including queuing. 
 
 **Denominator**: Total number of individuals
+
+
+Petra- can we shorten the variable names for drinking water? some stat packages might cut them 
 
 ```{r, eval=FALSE}
 ##Step 1: Check all variables
@@ -213,17 +223,13 @@ mutate(ImprovedDrinkingWaterAccess = labelled(ImprovedDrinkingWaterAccess,
                                  "Yes" = 1,
                                  "No" = 2
                                ),
-                               label = "Basic drinking water services"))
+                               label = "Access to clean drinking water services"))
+
+
+table(main$ImprovedDrinkingWaterAccess)
 
 
 ```
-```{r}
-
-
-
-```
-
-
 
 #### Habitable housing
 
@@ -234,29 +240,25 @@ Habitable housing refers to the presence of adequate space which is defined by t
 
 **Denominator**: Total number of individuals
 
-```{r}
+```{r, eval=FALSE}
 ##Condition 1
 
 ##Classify as habitable for below conditions - if 96 selected, put into missing
 
 ##Step 1: First check the variables
 
-table(main$HH04) ##OBSERVE IF DOOR is LOCKABLE
-table(main$HH05) ##OBSERVE IF WINDOWS ARE LOCKABLE
+table(main$HH04) ##Observe if door is lockable
+table(main$HH05) ##Observe if windows are lockable
 table(main$HH08) ##Shelter collapsed or partially collapsed?
 table(main$HH09) ##Damaged roof
 table(main$HH10) ##Are windows/doors sealed to natural elements?
 table(main$HH11) ##Leakage / rottenness in the walls / floors?
 
 
-```
-```{r}
 ##Step 2: Classify 96 responses as NAs
 main <- main %>%
   mutate_at(vars(HH04, HH05, HH08, HH09, HH10, HH11), ~ ifelse(. == 96, NA, .))
 
-```
-```{r}
 #Step 3:  Add column to classify the provision of protection from cold, damp, heat, rain, wind, and other threats to health, structural hazards, and disease vectors.
 main <- main %>%
   mutate(habitablehousing = case_when(
@@ -267,39 +269,37 @@ main <- main %>%
     TRUE ~ NA_integer_
   ))
 
-```
-```{r}
+
 table(main$habitablehousing)
 
+
 ```
-```{r}
+Add the calculation of crowding index.Overcrowded living conditions can facilitate the rapid transmission of infectious diseases due to close contact among individuals. (Smith, 2020). As a result, overcrowding may cause health issues, thus the shelter is not considered as livable.
+
+Petra  - maybe we can call HH14_cat something else like crowdingab3 or crowding_cat
+
+
+
+```{r, eval=FALSE}
+
+
 #Step 4: Calculate condition 2
+
 ####Calculate crowding index - overcrowded when more than 3 persons share one room to sleep
-###Overcrowding may cause health issues, thus not considered as physically safe
+###
 
 ##Need to calculate the number of household members in each household. 
-##Here we are using the varibale "member" which assignes a 1 for each person that passes the check for actually being a household member. This check done automatically in the data collection form. 
+##Here we are using the variable "member" which assigned a 1 for each person that passes the check for actually being a household member. This check done automatically in the data collection form. 
+
 household_counts <- hhroster %>%
   group_by(`_uuid`) %>%
   summarise(HHmembersize = sum(member == 1, na.rm = TRUE))
 ##Join with the main data set
 main <- main %>%
   left_join(household_counts, by = "_uuid")
-
-```
-
-
-Petra - it gives this error - ℹ In group 1: `_uuid = "000069c1-619b-4e48-9655-3017a66e9afb"`.
-Caused by error:
-! object 'member' not found
-```{r}
 ##Calculate crowding
 table(main$HH14) ##How many separate structures or buildings do the members of your household occupy? 
 
-
-#table() -- Petra add here a table on HHmembersize
-
-#also maybe we can call HH14_cat something else like crowding3
 
 main <- main %>%
   mutate(crowding=HHmembersize/HH14
@@ -315,6 +315,7 @@ table(main$HH14_cat)
 
 
 ```{r}
+
 #Step 5: ###Combine both conditions for habitable housing
 main <- main %>%
   mutate(shelter=case_when(
@@ -327,8 +328,9 @@ table(main$shelter)
 
 After computing the four basic services, we will include an assessment of whether individuals reside in physically safe and secure environments. Safe and secure settlements are those with no risks and hazards like flooding, landslides, landmines, and close proximity to military installations and hazardous zones. In FDS, we only look at the risk of flooding and landslides. 
 
-```{r}
-##Step 5: The variables we need to calculate this are in a repeat group, meaning we first need to compute a composite variable specifying if the household has experienced floods or landslides in the past 12 months. The main variable used for this is "ExpShock02". Based on the amount of shocks households specify, you will have a varying number of coloumns capturing different shocks. 
+```{r, eval=FALSE}
+
+##Step 5: The variables we need to calculate this are in a repeat group, meaning we first need to compute a composite variable specifying if the household has experienced floods or landslides in the past 12 months. The main variable used for this is "ExpShock02". Based on the amount of shocks households specify, you will have a varying number of columns capturing different shocks. 
 
 
 ##ExpShock02 - What is the event at the origin of this shock?
@@ -349,12 +351,17 @@ main$Landslides_flooding <- apply(main[shock_columns], 1, function(row) {
 })
 
 
-```
-```{r}
 table(main$Landslides_flooding)
 ```
 
-```{r}
+
+Combine all binary variables as below to calculate the final impact2_2.
+
+Petra - when we calculate the indicator; can we name with your official names, once we have time, we can also change for RMS scripts.
+
+Petra - I think also we need to add table as pop groups; the one Thomas provide gives values at the end but I think it's important to check all indicators one by one with disaggregation variables - let's discuss - the table is not enough especially that we have different pop groups.
+
+```{r, eval=FALSE}
 #step 6: Combine all services and calculate impact indicator based on electricity, healthcare, drinkingwater, shelter and landslides_flooding. 
 
 main <-main %>%
@@ -368,38 +375,36 @@ main <-main %>%
                               "No"=2
                             ),
                             label="Proportion of people residing in physically safe and secure settlements with access to basic facilities"))
-```
-```{r}
+
 table(main$impact2_2)
 
-
-##Add here - Thomas tables/or disaggregation tables each for RBM?
   
 ##Table by population groups
 
-impact2_2 <- RMS_XXX_202X_main %>%
-  filter(!is.na(pop_groups)) %>%                     # Exclude if pop groups is NA
-  group_by(pop_groups) %>%                           # Show results disaggregated by pop groups
-  summarise(                                         # put all variables here
-    var_name = "impact2_2",                          # name of the variable
-    num_obs_uw = unweighted(n()),                    # unweighted total count
-    denominator = survey_total(),                      # weighted total count
-    mean_value = survey_mean(impact2_2, vartype = c("ci", "se"), , na.rm = TRUE),  # indicator value ( weighted) with CI and SE
-  )
+#impact2_2 <- RMS_XXX_202X_main %>%
+  #filter(!is.na(pop_groups)) %>%                     # Exclude if pop groups is NA
+  #group_by(pop_groups) %>%                           # Show results disaggregated by pop groups
+  #summarise(                                         # put all variables here
+    #var_name = "impact2_2",                          # name of the variable
+    #num_obs_uw = unweighted(n()),                    # unweighted total count
+    #denominator = survey_total(),                      # weighted total count
+    #mean_value = survey_mean(impact2_2, vartype = c("ci", "se"), , na.rm = TRUE),  ## indicator value ( weighted) with CI and SE
+  #)
   
 ```
 
 
 
 
-# <span style="color:blue; font-size:28px;"><strong>2.3 Core Impact Indicator</strong></span>
+## 2.3 Core Impact Indicator
 
 **Core Impact 2.3 Proportion of people with access to health services**
-##RBM10203 - Impact 2.3
+
+*Indicator Code*: RBM10203
 
 This indicator measures access to essential primary health care services for forcibly displaced and stateless people in need of health services. Health services refers to preventive, promotive, curative, rehabilitative and palliative health services.
 
-Note that FDS does not measure access to mental health, psychosocial support, rehabilitative services, palliative care. Moreover, three months is the standard recall period to use for this indicator.However in FDS, 30 days have been used as a recall period. Therefore, the below results can only partially be considered as 2.3 Core Impact Indicator. 
+Please note that the FDS does not measure access to mental health, psycho social support, rehabilitative services, or palliative care. Additionally, the standard recall period is typically 3 months; however, in the FDS, a 30-day recall period is used. Therefore, the results below should be considered as a proxy for the 2.3 Core Impact Indicator. 
 
 | Standard Questions         |
 |:--------------------------:|
@@ -416,8 +421,8 @@ The standard survey/FDS methodology for this indicator entails asking households
 Healthcare can be delivered through a combination of community level, mobile and fixed healthcare facilities.
 
 
-Petra - maybe we can give the official name that you have when we calculate the final indicator?
-Petra - it seems like health indicators are not here?
+Petra - maybe we can give the official name that you have when we calculate the final indicator? so final indicator is called RBM10203 and to align with RBM we need to use either 1 2 or 1 0 both for RMS and FDS
+
 
 ```{r}
 table(main$H01_1) # need to see a health professional for any reason
@@ -425,8 +430,8 @@ table(main$H02)   # reasons to see a health professional
 table(main$H04)   # tried to see a health professional for any reason
 table(main$H06)   # did receive the needed health care
 table(main$H08)   # What are the reasons why you did not try to see a health professional in the past 30 days? - check if this variable is present in your data set
-```
-```{r}
+
+
 #Option 1: Use this option in cases when H08 is not present in the data set. In this option, cases where an individual needed to see a health professional but did not try to see it are classified as 1 - Has access to health services. 
 main <- main %>%
   mutate(impact2_3=case_when(
@@ -434,8 +439,7 @@ main <- main %>%
     H01_1==1 & H04== 2 ~ 1,
     H01_1==2 ~ NA,
     H01_1==1 & H04== 1 & H06==2 ~ 2 ))
-```
-```{r}
+
 #Option 2: Use this option in cases when H08 is present in the data set.
 #main <- main %>%
  # mutate(impact2_3=case_when(
@@ -446,7 +450,7 @@ main <- main %>%
    # H01_1==1 & H04== 1 & H06==2 ~ 2 ))
 ```
 
-
+Petra - the access is suspiciously high; it's because H08 is missing?
 ```{r}
 main <- main %>%
  mutate(impact2_3=labelled(impact2_3,
@@ -455,16 +459,15 @@ main <- main %>%
                               "No"=2
                             ),
                             label="Proportion of people with access to health services"))
-```
 
-```{r}
 table(main$impact2_3)
 ```
 
-# <span style="color:blue; font-size:28px;"><strong>3.2a Core Impact Indicator</strong></span>
+## 3.2a Core Impact Indicator
 
 **3.2a Proportion of children and young people enrolled in primary education**
-##RBM10302A
+
+*Indicator Code*: RBM10302A
 
 This indicator measures the number of students enrolled in primary education, regardless of age, expressed as a percentage of the official school-age population corresponding to the respective same level of education.
 This is also referred to as Gross enrollment rate (GER).
@@ -497,8 +500,8 @@ This is also referred to as Gross enrollment rate (GER).
 ```{r}
 table(hhroster$HH_Educ02a) ## if the respondent is currently going to school
 table(hhroster$HH_Educ03)  ## grade the respondent is currently attending 
-```
-```{r}
+
+
 #Create a variable specifying when individual is enrolled in primary school. 
 hhroster <- hhroster %>%
   mutate(edu_primary = case_when(
@@ -518,20 +521,23 @@ hhroster <- hhroster %>%
   )
 ```
 
-# <span style="color:blue; font-size:28px;"><strong>3.2b Core Impact Indicator</strong></span>
-\
 
-Petra - as the age enrolment will change; we need to put a note for them to check
-primary and secondary school rates - if this is already adjusted a note on how the script can change
 
+Petra - this indicator needsa table as the denom and num are a bit more tricky as in the standard RBM one - maybe we can add that table here?
+
+## 3.2b Core Impact Indicator
+
+
+Petra - readd here the definitions for secondary erolment as it's a dropdown menu; it's good to have in both indicators 
 **3.2b Proportion of children and young people enrolled in secondary education**
-##RBM10302B
+
+*Indicator Code*: RBM10302B
 
 ```{r}
 table(hhroster$HH_Educ02a) ## if the respondent is currently going to school
 table(hhroster$HH_Educ03)  ## grade the respondent is currently attending 
-```
-```{r}
+
+
 #Create a variable specifying when individual is enrolled in secondary school.
 hhroster <- hhroster %>%
   mutate(edu_secondary = case_when(
@@ -539,8 +545,8 @@ hhroster <- hhroster %>%
     HH_Educ02a %in% c(99, 98) ~ NA_real_, #When respondent answers with 99 - refuse to answer, or 98 - Don't know this is treated as NA. 
     HH_Educ02a == 2 ~ 2
   ))
-```
-```{r}
+
+
 #Create a variable to adjust age groups for secondary level 
 hhroster <- hhroster %>%
   mutate(
@@ -551,12 +557,16 @@ hhroster <- hhroster %>%
   )
 ```
 
-# <span style="color:blue; font-size:28px;"><strong>3.3 Core Impact Indicator</strong></span>
+
+
+Petra - same as above - add the table from RBM one
+
+## 3.3 Core Impact Indicator
 
 **3.3 Proportion of people feeling safe walking alone in their neighborhood after dark **
-##RBM10303
 
-Petra - how should we title the indicators? We need to make it clearer the title
+*Indicator Code*: RBM10303
+
 
 This indicator measures the proportion of people who self-report feeling safe while walking alone in their neighborhood after dark.
 This indicator only pertains to self-reported feeling of ‘safety’ and not ‘security’ since security is associated with additional external factors.
@@ -572,7 +582,7 @@ It is linked to SDG indicator [16.1.4](https://unstats.un.org/sdgs/metadata/file
 
 **Denominator**: Total number of individuals
 
-The standard survey question module for this indicator is taken from SGD indicator owner UNODC. To calculate the indicator value, the standard survey methodology considers in the numerator only individuals who respond they feel “very safe” and “fairly safe”.
+The standard survey question module for this indicator is taken from SDG indicator owner UNODC. To calculate the indicator value, the standard survey methodology considers in the numerator only individuals who respond they feel “very safe” and “fairly safe”.
 
 ```{r}
 ##This indicator comes from main dataset based on the randomly selected respondent
@@ -587,6 +597,12 @@ main <- main %>%
 )
 
 ```
+
+
+Petra - above should we put 5 ( never walk alone and 98 into missing instead of no?) assuming 98 is refused to answer
+
+Petra - same as above to add systematic tables to check results after each calculation
+
 ```{r}
 main <- main %>%
    mutate(
@@ -601,10 +617,11 @@ main <- main %>%
   )
 ```
 
-# <span style="color:blue; font-size:28px;"><strong>1.2 Core Outcome Indicator</strong></span>
+## 1.2 Core Outcome Indicator
 
-**1.2 Proportion of children under 5 years of age whose births have been registered with a civil authority  **
-##RBM20102
+**1.2 Proportion of children under 5 years of age whose births have been registered with a civil authority**
+
+*Indicator Code*:RBM20102
 
 
 This indicator measures the proportion of children under 5 years old whose births have been registered with a civil authority and civil documentation has been issued.
@@ -632,6 +649,7 @@ Operations are encouraged to track both the number of birth notifications and bi
 [UNICEF SDG 16.9.1 Guidance](https://data.unicef.org/wp-content/uploads/2018/04/SDG-briefing-note-15_birth-registration.pdf).
 [Core Outcome 1.2 Guidance](https://intranet.unhcr.org/content/dam/unhcr/intranet/protection-operations/prog-hub/program-cycle/indictors/core/outcome/Core%20outcome%201.2%20Proportion%20of%20children%20under%205%20years%20of%20age%20whose%20births%20have%20been%20registered%20with%20a%20civil%20authority.pdf).
 
+Petra - I like as below showing the value and label as below before calculation?
 
 ```{r}
 hhroster$HH_07a # Does [name] have a birth certificate?
@@ -656,6 +674,7 @@ hhroster <- hhroster %>%
   ))
 
 ```
+
 ```{r}
 # Step 2:Identify children whose birth has been registered with civil authorities
 hhroster <- hhroster %>%
@@ -674,6 +693,7 @@ hhroster <- hhroster %>%
     label = "Children under 5 birth registered with civil authorities"
   ))
 ```
+
 ```{r}
 #Step 3:Create outcome1_2 variable
 hhroster <- hhroster %>%
@@ -697,20 +717,23 @@ table(hhroster$outcome1_2)
 ```
 
 
-# <span style="color:blue; font-size:28px;"><strong>1.3 Core Outcome Indicator</strong></span>
+## 1.3 Core Outcome Indicator
 
 **1.3 Proportion of people with legally recognized identity documents or credentials**
-##RBM20401
+
+*Indicator Code*:RBM20103
 
 TO DO ONCE THE Legal variables are incorporated in the roster 
 
-# <span style="color:blue; font-size:28px;"><strong>4.1 Core Outcome Indicator</strong></span>
+## 4.1 Core Outcome Indicator
 
 **4.1 Proportion of people who know where to access available GBV service**
 
-The indicator is defined as the proportion of people who know where to access at least one of the two available lifesaving gender-based violence services (health and psychosocial) in the aftermath of a GBV incident.
+*Indicator Code*:RBM20401
 
-The indicator survey question collects information on knowledge of four GBV response services, but  the calculation itself focuses only on knowledge of two lifesaving GBV services that should be immediately set up at the onset of an emergency, health and psychosocial services. 
+The indicator is defined as the proportion of people who know where to access at least one of the two available lifesaving gender-based violence services (health and psycho social) in the aftermath of a GBV incident.
+
+The indicator survey question collects information on knowledge of four GBV response services, but  the calculation itself focuses only on knowledge of two lifesaving GBV services that should be immediately set up at the onset of an emergency, health and psycho social services. 
 
 This is linked to the Inter-Agency Minimum Standards for Gender-Based Violence in Emergencies Programming.
 
@@ -740,7 +763,7 @@ The response options will appear as below when the standardized module is used.
 
 **Denominator**: Total number of individuals
 
-To calculate the indicator value, the standard methodology considers in the numerator only individuals who self-report knowledge of at least one of the two lifesaving GBV services (Health or Psychosocial/Case Management services).
+To calculate the indicator value, the standard methodology considers in the numerator only individuals who self-report knowledge of at least one of the two lifesaving GBV services (Health or Psycho social/Case Management services).
 
 **Sources** 
 1. [Inter-Agency Minimum Standards for Gender-Based Violence in Emergencies Programming](https://www.unfpa.org/minimum-standards)
@@ -768,10 +791,11 @@ table(main$outcome4_1)
 ```
 
 
-# <span style="color:blue; font-size:28px;"><strong>4.2 Core Outcome Indicator</strong></span>
+## 4.2 Core Outcome Indicator<
 
 **4.2 Proportion of people who do not accept violence against women**
-##RBM20402
+
+*Indicator Code*:RBM20402
 
 This indicator measures the proportion of persons of concern who disagree that a husband is justified in hitting or beating his wife for a list of specific reasons.
 This serves as a proxy indicator for those who do not accept violence against women.
@@ -847,10 +871,11 @@ main <- main %>%
 table(main$outcome4_2)
 ```
 
-# <span style="color:blue; font-size:28px;"><strong>8.2 Core Outcome Indicator</strong></span>
+## 8.2 Core Outcome Indicator
 
 **8.2 Proportion of people with primary reliance on clean (cooking) fuels and technology**
-##RBM20802
+
+*Indicator Code*:RBM20802
 
 This indicator measures the proportion of population who use clean fuel and technology as primary source of cooking.
 Any type of cooking fuel and technology meeting the WHO set standards on indoor air emissions, as their main cooking solution.
@@ -913,10 +938,11 @@ table(main$outcome8_2)
 ```
 
 
-# <span style="color:blue; font-size:28px;"><strong>9.1 Core Outcome Indicator - Partially</strong></span>
+## 9.1 Core Outcome Indicator
 
 **9.1 Proportion of Persons of Concern living in habitable and affordable housing**
-RBM20901
+
+*Indicator Code*:RBM20901
 
 This indicator measures the proportion of people living in habitable and affordable housing. 
 
@@ -956,7 +982,7 @@ table(main$HH11) ##Leakage / rottenness in the walls / floors?
 ```
 ```{r}
 ##Step 2: Classify 96 responses as NAs
-##For Ilgi: Not sure if this is a correct approach, however there are 18 cases in HH04 where 96 was selected. Some of the text answers are in English, but also in pashtu and urdu (but written in latin alphabet) meaning it would be very difficult to treat them without a translator. Additionally not sure how to make a standard script for all text answers which might be submitted. 
+
 main <- main %>%
   mutate_at(vars(HH04, HH05, HH08, HH09, HH10, HH11), ~ ifelse(. == 96, NA, .))
 
@@ -1017,9 +1043,11 @@ main <- main %>%
 table(main$shelter)
 ```
   
-# <span style="color:blue; font-size:28px;"><strong>9.2 Core Outcome Indicator - Partially</strong></span>
+## 9.2 Core Outcome Indicator
 
 **9.2 Proportion of people that have energy to ensure lighting**
+
+*Indicator Code*:RBM20902
 
 This indicator measures the proportion of forcibly displaced and stateless people who primarily rely on clean fuels for lighting.
 Clean fuels for lighting include using lighting devices connected to electricity (on/off grid, including solar panels), lighting devices using renewable energy (solar-powered lantern or flashlights), lighting devices using fuels considered clean for health such as biogas/LPG lamps and battery powered/rechargeable flashlights/lantern. It excludes the usage of polluting fuels such as oil, kerosene and gasoline and insufficient sources of lighting such as candles and open fires.
@@ -1072,10 +1100,11 @@ table(main$outcome9_2)
 ```
 
 
-# <span style="color:blue; font-size:28px;"><strong>10.1 Core Outcome Indicator - Partially</strong></span>
+## 10.1 Core Outcome Indicator
 
 **10.1 Proportion of children aged 9 months to five years who have received measles vaccination**
-##RBM21001
+
+*Indicator Code*:RBM21001
 
 Coverage of measles vaccination in children in the target age group of 9 months to 5 years of age.
 Measles vaccination is an essential preventive primary care intervention to protect children from measles infection.
@@ -1103,6 +1132,21 @@ In that case the coverage may be a proxy indicator for children 9 months to 5 ye
 ```{r}
 table(main$MV2) #Has the child ever received a measles containing vaccine -  MMR/MR vaccine – that is, two shot in the arm usually by the age of 9 months - to prevent [him/her] from getting measles, mumps and rubella?
 table(main$MMV3) #How many times did the child receive the measles or MMR/MR vaccine vaccine?
+
+# Calculate the age of the child which was asked the questions on immunization
+main <- main %>%
+  mutate(
+    childnametouseAGE = as.numeric(childnametouseAGE),  # Convert to numeric
+    child_age_immunization = case_when(
+      childnametouseAGE != 99 ~ childnametouseAGE,  # Use childnametouseAGE if it’s not 99
+      childnametouseAGE == 99 & AN1_5 == 2 ~ age_child_5,
+      childnametouseAGE == 99 & AN1_4 == 2 ~ age_child_4,
+      childnametouseAGE == 99 & AN1_3 == 2 ~ age_child_3,
+      childnametouseAGE == 99 & AN1_2 == 2 ~ age_child_2,
+      childnametouseAGE == 99 & AN1 == 2 ~ age_child_1,
+      TRUE ~ NA_real_  # Set to NA (blank) if none of the conditions are met
+    )
+  ) 
 ```
 ```{r}
 main <- main %>%
@@ -1129,12 +1173,11 @@ mutate(outcome10_1 = labelled(outcome10_1,
 table(main$outcome10_1)
 
 ```
-#Ilgi: The variable child_age_immunization is not present in the dataset but was created by me - you can find it in "Data Preparation". This variable (with a different name) will be present for Zambia and on. For now, we either have to include the script here or make sure to add it to the data set prior to publishing the indicator scripts. 
-
-# <span style="color:blue; font-size:28px;"><strong>10.2 Core Outcome Indicator - Partially</strong></span>
+## 10.2 Core Outcome Indicator
 
 **10.2 Proportion of births attended by skilled health personnel**
-##RBM21002
+
+*Indicator Code*:RBM21002
 
 This indicator measures the percentage of births attended by personnel trained (doctors, nurses or midwives, auxiliary midwives) in providing lifesaving obstetric care including providing the necessary supervision, care, and advice to women during pregnancy, labor, and the postpartum period; to conduct deliveries on their own; and to care for newborns.
 Note: traditional birth attendants are not included as skilled health personnel.
@@ -1194,59 +1237,11 @@ table(main$outcome10_2)
 
 ```
 
-# <span style="color:blue; font-size:28px;"><strong>11.1 Core Outcome Indicator - Partially</strong></span>
-**11.1 Proportion of young people enrolled in tertiary and higher education**
-##RBM21101
+## 12.1 Core Outcome Indicator
 
-This indicator measures the number of forcibly displaced and stateless students enrolled in tertiary education, regardless of age, expressed as a percentage of the official school-age population corresponding to the same level of education. This indicator is often referred to as gross enrolment  ratio (GER) for tertiary education.
-The UNESCO Institute of Statistics (UIS) defines the GER as the number of students enrolled in tertiary education, expressed as percentage of the 5-year age group immediately following upper secondary education. 
-Since data is often unavailable for individual ages and to facilitate and harmonise reporting, UNHCR considers the age group from 18 to 24 years as the denominator.
+**12.1 Proportion of people using at least basic drinking water services**
 
-
-
-*Definitions*:
-
-| Standard Questions    |
-|:---------------------:|
-| HH_Educ03, HH_Educ02a |
-
-
-**Unit of observation**: Individual 
-
-**Numerator**: Number of students enrolled in primary education (regardless of age)
-
-**Denominator**: Total number of individuals of tertiary school age 
-
-**Other sources**
-1. [RBM 11.1 Outcome Indicator Guidance](https://intranet.unhcr.org/content/dam/unhcr/intranet/protection-operations/prog-hub/program-cycle/indictors/core/outcome/Core%20outcome%2011.1%20Proportion%20of%20young%20people%20enrolled%20in%20tertiary%20and%20higher%20education.pdf)
-
-```{r}
-table(hhroster$HH_Educ02a) ## if the respondent is currently going to school
-table(hhroster$HH_Educ03)  ## grade the respondent is currently attending 
-```
-```{r}
-#Create a variable specifying when individual is enrolled in tertiary school. 
-hhroster <- hhroster %>%
-  mutate(edu_tertiary = case_when(
-    HH_Educ02a == 1 & HH_Educ03 %in% 13:20 ~ 1, # Ensure to check possible grade levels. In these example answers 13 - 20 were considered for tertiary grade level. 
-    HH_Educ02a %in% c(99, 98) ~ NA_real_, #When respondent answers with 99 - refuse to answer, or 98 - Don't know this is treated as NA. 
-    HH_Educ02a == 2 ~ 2
-  ))
-```
-```{r}
-#Create a variable to adjust age groups for tertiary level 
-hhroster <- hhroster %>%
-  mutate(
-    age_tertiary = case_when(
-      HH_04 >= 18 & HH_04 <= 24 ~ 1,  #Remember to adjust age levels based on the tertiary education age per country
-      TRUE ~ 2
-    )
-  )
-```
-
-# <span style="color:blue; font-size:28px;"><strong>12.1 Core Outcome Indicator - Partially</strong></span>
-**12.1 Proportion of people using at least basic drinking water services **
-##RBM21201
+*Indicator Code*:RBM21201
 
 This indicator is defined as the percentage of people using at least basic water services. Basic drinking water services is defined as drinking water from an improved source, provided collection time is not more than 30 minutes for a round trip, including queuing. 
 
@@ -1299,7 +1294,7 @@ mutate(ImprovedDrinkingWaterLocation = labelled(ImprovedDrinkingWaterLocation,
 
 ```
 ```{r}
-##Step 4: Add a coloumn specifying if it takes more or less than 30 min to the improved drinking water source. If the improved drinking water source is located in own dwelling, yard or plot, it is considered that it takes less than 30 minutes to reach. 
+##Step 4: Add a column specifying if it takes more or less than 30 min to the improved drinking water source. If the improved drinking water source is located in own dwelling, yard or plot, it is considered that it takes less than 30 minutes to reach. 
 ## BD20-3 - Minutes
 main <- main %>%
   mutate(
@@ -1326,13 +1321,15 @@ table(main$outcome12_1)
 ```
 
 
-# <span style="color:blue; font-size:28px;"><strong>12.2 Core Outcome Indicator - Partially</strong></span>
-**12.2 Proportion of people with access to a safe household toilet **
-##RBM21202
+## 12.2 Core Outcome Indicator
+
+**12.2 Proportion of people with access to a safe household toilet**
+
+*Indicator Code*:RBM21202
 
 This indicator measures the proportion of people with access to at least basic sanitation services. Basic sanitation services are defined as improved facilities (toilets) that are not shared with other households. 
 
-As this indicator measures 'at least basic sanitation services ' as defined by the JMP sanitation ladder it includes also safely managed sanitation services which are defined as the use of hygienic toilet facilities that are not shared with other households and where excreta are either separated from human contact and safely disposed of in situ or transported and treated off-site, thereby protecting people and the environment from disease agents. Safely disposed in situ when pit latrines and septic tanks are not emptied, the excreta may still remain isolated from human contact and can beconsidered safely managed.
+As this indicator measures 'at least basic sanitation services ' as defined by the JMP sanitation ladder it includes also safely managed sanitation services which are defined as the use of hygienic toilet facilities that are not shared with other households and where excreta are either separated from human contact and safely disposed of in situ or transported and treated off-site, thereby protecting people and the environment from disease agents. Safely disposed in situ when pit latrines and septic tanks are not emptied, the excreta may still remain isolated from human contact and can reconsidered safely managed.
 
 | Standard Questions           |
 |:----------------------------:|
@@ -1374,9 +1371,6 @@ main <- main %>%
     TRUE ~ NA_real_ )) # Missing or invalid
 ```
 ```{r}
-
-```
-```{r}
 #Step 3: Create a variable to check if the household shares the toilet facility with other households 
 main <- main %>%
   mutate(shared_san_facility = case_when(
@@ -1404,10 +1398,13 @@ mutate(outcome12_2 = case_when(
 ```{r}
 table(main$outcome12_2)
 ```
+Petra - is it normal that very few people has access to safe toilet?
 
-# <span style="color:blue; font-size:28px;"><strong>13.1 Core Outcome Indicator - Partially</strong></span>
-**13.1 Proportion of people with an account at a bank or other financial institution or with a mobile-money provider **
-##RBM21301
+## 13.1 Core Outcome Indicator
+
+**13.1 Proportion of people with an account at a bank or other financial institution or with a mobile-money provider**
+
+*Indicator Code*:RBM21301
 
 This indicator measures the percentage of people (age 18+) who report having an account (by themselves or together with someone else) at a bank or another type of financial institution or personally using a mobile money service in the past 12 months in the country of asylum or habitual residence (for returnees, countries of origin are included).
 Personal mobile and bank accounts are defined as accounts that are fully owned by the person, where they can transact freely as per the country’s rules and regulations. UNHCR or any other third party does not have access to the account details (such as movements on the account) and cannot withdraw money.
@@ -1437,7 +1434,7 @@ main <- main %>%
   mutate(outcome13_1 = case_when(
     age_selected > 18 & (FI01 == 1 | FI02 == 1 | FI03 == 1 | FI10 == 1) ~ 1,
     age_selected > 18 & FI01 == 2 & FI02 == 2 & FI03 == 2 & FI10 %in% c(2,3) ~ 2,
-    TRUE ~ NA                # For individuals under 18 and all other cases, assigns NA
+    TRUE ~ NA # For individuals under 18 and all other cases, assigns NA
   ))
 
 ```
@@ -1456,10 +1453,15 @@ table(main$outcome13_1)
 ```
 Ilgi: For FI10 we also have a response option: I don't know what mobile money is. Can be assume that if someone doesn't know what it is they also don't use it? 
 Moreover, in all other cases, where respondents are below 18, or respond with don't know or refuse to answer, this has been put to NA. 
+Petra- agreed that if they don't know what it is, we can put the options into NA, I know that we can include above 15 so I wonder if it makes sense for FDS
 
-# <span style="color:blue; font-size:28px;"><strong>13.2 Core Outcome Indicator - Partially</strong></span>
-**13.2 Proportion of people who self-report positive changes in their income compared to the prevoius year**
-##RBM21302
+## 13.2 Core Outcome Indicator 
+
+**13.2 Proportion of people who self-report positive changes in their income compared to the previous year**
+
+*Indicator Code*:RBM21302
+
+Petra - the below calculation is 0 1 - would be good to align all script also with RMS scripts ( I know I said this before :())
 
 This indicator measures the proportion of forcibly displaced and stateless people who self-report positive changes in their income compared to the previous year. It aims to track changes in income levels compared to the previous year. According to FAO and ILO, income is defined as the value of resources flowing towards the household from their engagement in wage- or self-employment comprising of both income in money (profits, wage, interest, social benefits etc.) and in kind (goods and services). It is equal to the value of goods and services produced by the wage- or self-employed, net of operating expenses (such as salaries paid, raw materials used, depreciation of machines and instruments and taxes paid), plus any salary received and social security benefits (net of contributions).Income also includes benefits received by employed persons who are no longer in employment, such as unemployment benefits, pensions, invalidity benefits. As with income related to paid employment, all these social benefits will be part of income from employment only insofar as workers received them as a result of their participation in work activities.’ (ILO)The indicator includes income from self-employment and/or wage-employment in both agricultural and non-agricultural activities.
 
@@ -1504,9 +1506,11 @@ main <- main %>%
 table(main$outcome13_2)
 ```
 
-# <span style="color:blue; font-size:28px;"><strong>13.3 Core Outcome Indicator - Partially</strong></span>
-**13.3 Proportion of people (working age) who are unemployed **
-##RBM21303
+## 13.3 Core Outcome Indicator 
+
+**13.3 Proportion of people (working age) who are unemployed**
+
+*Indicator Code*:RBM21303
 
 This indicator measures the level of unemployment among forcibly displaced and stateless people. Unemployed persons are defined as all those in the labour force who were not in employment, carried out activities to seek employment during the past 7 days and were currently available to take up employment (SDG Indicator 8.5.2). Persons in employment are defined as all those in the labour force who, during the past 7 days, were engaged in any activity to produce goods or provide services for pay or profit (SDG Indicator 8.5.2).
 
@@ -1608,21 +1612,29 @@ main <- main %>%
 
 ```
 
-# <span style="color:blue; font-size:28px;"><strong>14.1 Core Outcome Indicator - Partially</strong></span>
-**14.1 Proportion of returnees with legally recognized identity documents or credentials  **
-##RBM21401
+Petra- I love the structure above! We should also add table here
 
-#Same as for 1.3 - The variables related to identitiy documents or credentials need to be incorporated into the hhroster data set. Once they will be, I can calculate this indicator. 
+## 14.1 Core Outcome Indicator
 
-# <span style="color:blue; font-size:28px;"><strong>16.1 Core Outcome Indicator - Partially</strong></span>
-**16.1 Proportion of people with secure tenure rights and/or property rights to housing and/or land   **
-##RBM21601
+**14.1 Proportion of returnees with legally recognized identity documents or credentials**
 
-#Land variables have not been incorporated in the main data set yet. Magrith is working on these. 
+*Indicator Code*:RBM21401
 
-# <span style="color:blue; font-size:28px;"><strong>16.2 Core Outcome Indicator - Partially</strong></span>
-**16.2 Proportion of people covered by social protection floors/systems    **
-##RBM21602
+Same as for 1.3 - The variables related to identity documents or credentials need to be incorporated into the hhroster data set. Once they will be, I can calculate this indicator. It's the same indicators but calculated for refugee returnees only.
+
+## 16.1 Core Outcome Indicator
+
+**16.1 Proportion of people with secure tenure rights and/or property rights to housing and/or land**
+
+*Indicator Code*:RBM21601
+
+Land variables have not been incorporated in the main data set yet. Magrith is working on these. 
+
+## 16.2 Core Outcome Indicator
+
+**16.2 Proportion of people covered by social protection floors/systems**
+
+*Indicator Code*:RBM21602
 
 This indicator measures the proportion of people who receive government social protection benefits and services as a result of inclusion in national social protection systems. This counts those who actually receive social protection benefits or are actively contributing to a social insurance scheme. This means it does not consider whether they have legal rights to social protection (for which there are other rights-based monitoring mechanisms), and it does not count just those who are registered for benefits (which can be reported using the Good Practice Indicator: “Number of people enrolled in social registries”).
 
@@ -1640,6 +1652,8 @@ To calculate the indicator value, the standard RMS methodology considers in the 
 
 **Other sources**
 1. [RBM 16.2 Outcome Indicator Guidance](https://intranet.unhcr.org/content/dam/unhcr/intranet/protection-operations/prog-hub/program-cycle/indictors/core/outcome/Core%20outcome%2016.2%20Proportion%20of%20people%20covered%20by%20national%20social%20protection%20systems.pdf)
+
+Petra- as you mentioned the other day, we can check how to best cite the guidance pieces but the way it is looks good to me
 
 ```{r}
 table(main$ScProtec01) #In the past 12 months while in the host country, have you or anyone in your household received support from any assistance programme?
@@ -1676,7 +1690,7 @@ programme_columns <- grep("^Programme\\d+_ScProtec04$", names(main), value = TRU
 
 ```
 ```{r}
-#Step 2.3: Create a new varibale checking if the household recived any assistance programme from the government
+#Step 2.3: Create a new varibale checking if the household received any assistance programme from the government
 main <- main %>%
   mutate(Social_assistance = case_when(
     ScProtec01 == 1 & apply(main[programme_columns], 1, function(row) any(row == 1, na.rm = TRUE)) ~ 1, # Assigns 1 if assistance is received from the government 
@@ -1707,3 +1721,4 @@ main <- main %>%
 table(main$outcome16_2)
 ```
 
+Petra - it does not find the 'Government_assistance' variable seems like here is an issue
