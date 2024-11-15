@@ -23,6 +23,7 @@ Date: Last revision was on November 2024
 2. Confirm that your datasets are cleaned and weighted as required for accurate results!
 
 Petra - I was checking MICS and they have 6 datasets so not sure how to go with datasets - to merge them or not as they different weights and maybe either way let's find another name then hhroster as it's more than hhroster that we have in the dataset 
+Ilgi: Noted. Lets discuss on Monday. In any case, we should make a decision soon so that we can adjust the scripts based on the number of datasets and also incorporate this aspects into the data preparation. 
 
 # RBM Core Impact and Outcome Indicators
 
