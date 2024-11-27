@@ -22,9 +22,6 @@ Date: Last revision was on November 2024
 1. For correct calculations, ensure you have two datasets named 'main' and 'hhroster'. 
 2. Confirm that your datasets are cleaned and weighted as required for accurate results!
 
-Petra - I was checking MICS and they have 6 datasets so not sure how to go with datasets - to merge them or not as they different weights and maybe either way let's find another name then hhroster as it's more than hhroster that we have in the dataset 
-Ilgi: Noted. Lets discuss on Monday. In any case, we should make a decision soon so that we can adjust the scripts based on the number of datasets and also incorporate this aspects into the data preparation. 
-
 # RBM Core Impact and Outcome Indicators
 
 There is broad consensus around the key indicators used to measure, inform and monitor progress towards global development objectives, as exemplified by the Sustainable Development Goals and related efforts of the MICS, DHS, IHSN, together with national governments.
@@ -42,7 +39,6 @@ This document will guide you on how each and every indicator will be calculated 
 **How to calculate an indicator?** In the calculation of a percentage or rate, the denominator is often the total number of observations, events, or units in the population or sample being studied. The numerator, on the other hand, represents the specific part or subset of interest.
 
 Percentage = \(\left(\frac{\text{Numerator}}{\text{Denominator}}\right) \times 100\)
-
 
 
 At this step, you should already have **main** and **hhroster** datasets structured in a way that will allow you to calculate your indicators as you will be guided in this document. It's not recommended to clear your work space if your datasets are already loaded. 
@@ -90,8 +86,6 @@ This indicator aims to measure the proportion of forcibly displaced and stateles
 To facilitate measurement for UNHCR, four basic services are considered for this indicator: shelter, drinking water, energy (access to electricity) and health. All of these basic services must be available to people for it to be considered that they have access to basic services.
 
 
-Petra-should we link here the intranet? I saw that below you added; so we can add the same way everywhere
-Ilgi: Do you mean the RBM guidance? I have added it
 This indicator is linked to the SGD indicator [1] and [11](https://unstats.un.org/sdgs/metadata/?Text=&Goal=11&Target=).
 
 | Services       | Variables                                                     |
@@ -146,7 +140,7 @@ According to [The Sphere Handbook](https://spherestandards.org/wp-content/upload
 **Denominator**: Total number of individuals
 
 
-Petra - for the health indicator below, I think we use ind level so it codes a lot as they don't have access - can we maybe if someone from the HH needed access take it as for all HHs - or another option is put them into missing ( those who did not need access)
+Petra - for the health indicator below, I think we use ind level so it codes a lot as they don't have access - can we maybe if someone from the HH needed access take it as for all HHs - or another option is put them into missing ( those who did not need access) - No health component in this indicator - suggestion to I/L to add it for Zambia and onwards. 
 Ilgi: To discuss on Monday
 ```{r, eval=FALSE}
 
@@ -181,8 +175,6 @@ The FDS only measure access to at least basic drinking water services which need
 
 **Denominator**: Total number of individuals
 
-
-Petra- can we shorten the variable names for drinking water? some stat packages might cut them - Ilgi: Done
 
 ```{r, eval=FALSE}
 ##Step 1: Check all variables
@@ -284,10 +276,6 @@ table(main$habitablehousing)
 ```
 
 
-Petra  - maybe we can call HH14_cat something else like crowdingab3 or crowding_cat - Ilgi: Done
-
-
-
 ```{r, eval=FALSE}
 
 
@@ -365,8 +353,6 @@ table(main$Landslides_flooding)
 
 Combine all binary variables as below to calculate the final impact2_2.
 
-Petra - when we calculate the indicator; can we name with your official names, once we have time, we can also change for RMS scripts. - Ilgi: Here you mean the official names as in codes, example: RBM10202?
-
 Petra - I think also we need to add table as pop groups; the one Thomas provide gives values at the end but I think it's important to check all indicators one by one with disaggregation variables - let's discuss - the table is not enough especially that we have different pop groups. Ilgi: Sure, no problem. I wasn't sure what part Thomas is doing. The table() that I have added was more for me to check if the results makes sense overall, apologies I should have mentioned this. 
 
 ```{r, eval=FALSE}
@@ -431,10 +417,6 @@ Healthcare can be delivered through a combination of community level, mobile and
 **Sources**
 1. [RBM 2.3 Outcome Indicator Guidance](https://intranet.unhcr.org/content/dam/unhcr/intranet/protection-operations/prog-hub/program-cycle/indictors/core/impact/Core%20impact%202.3%20Proportion%20of%20people%20with%20access%20to%20health%20services.pdf)
 
-
-Petra - maybe we can give the official name that you have when we calculate the final indicator? so final indicator is called RBM10203 and to align with RBM we need to use either 1 2 or 1 0 both for RMS and FDS - Ilgi: Ok, I can change the names once/if they are finalized and accepted generally? For 0/1 or 1/2 - I agree, but I think this should also be reflected in the answer options in the data collection form itself, otherwise it can be confusing in my opinion. 
-
-
 ```{r}
 table(main$H01_1) # need to see a health professional for any reason
 table(main$H02)   # reasons to see a health professional
@@ -461,7 +443,7 @@ main <- main %>%
    # H01_1==1 & H04== 1 & H06==2 ~ 2 ))
 ```
 
-Petra - the access is suspiciously high; it's because H08 is missing? Ilgi: Possibly yes, I would say there can be many cases when someone would need to see a health professional but doesn't try due to various reasons, and not in all cases this would mean they have access. There are 416 cases when someone needed to see a hp, but did not try. 
+
 ```{r}
 main <- main %>%
  mutate(impact2_3=labelled(impact2_3,
@@ -541,7 +523,6 @@ Petra - this indicator needs a table as the denom and num are a bit more tricky 
 ## 3.2b Core Impact Indicator
 
 
-Petra - readd here the definitions for secondary erolment as it's a dropdown menu; it's good to have in both indicators - Ilgi: I added the definitions (apologies an overshight on my side).
 **3.2b Proportion of children and young people enrolled in secondary education**
 *Indicator Code*: RBM10302B
 
@@ -634,8 +615,6 @@ main <- main %>%
 ```
 
 
-Petra - above should we put 5 ( never walk alone and 98 into missing instead of no?) assuming 98 is refused to answer - Ilgi: 98 is don't know. In the meeting we discussed that 5 and 98 should be coded as 2 (No). This was also done like this in SSD. Let's rediscuss. 
-
 Petra - same as above to add systematic tables to check results after each calculation - Ilgi: to discuss
 
 ```{r}
@@ -684,7 +663,6 @@ Operations are encouraged to track both the number of birth notifications and bi
 [UNICEF SDG 16.9.1 Guidance](https://data.unicef.org/wp-content/uploads/2018/04/SDG-briefing-note-15_birth-registration.pdf).
 [Core Outcome 1.2 Guidance](https://intranet.unhcr.org/content/dam/unhcr/intranet/protection-operations/prog-hub/program-cycle/indictors/core/outcome/Core%20outcome%201.2%20Proportion%20of%20children%20under%205%20years%20of%20age%20whose%20births%20have%20been%20registered%20with%20a%20civil%20authority.pdf).
 
-Petra - I like as below showing the value and label as below before calculation? - Ilgi: Not sure I understand what you mean, should something be adjusted? 
 
 ```{r}
 hhroster$HH_07a # Does [name] have a birth certificate?
@@ -1433,7 +1411,7 @@ mutate(outcome12_2 = case_when(
 ```{r}
 table(main$outcome12_2)
 ```
-Petra - is it normal that very few people has access to safe toilet? Ilgi: Based on the field observation while in Pak, in rural areas many household shared their toilet with other households, and the toilet was just a hole in the ground. We can do a bit more digging into this to check. 
+
 
 ## 13.1 Core Outcome Indicator
 
@@ -1467,9 +1445,9 @@ table(main$FI10) #In the past 12 months, have you personally used a mobile phone
 ```{r}
 main <- main %>%
   mutate(outcome13_1 = case_when(
-    age_selected > 18 & (FI01 == 1 | FI02 == 1 | FI03 == 1 | FI10 == 1) ~ 1,
-    age_selected > 18 & FI01 == 2 & FI02 == 2 & FI03 == 2 & FI10 %in% c(2,3) ~ 2,
-    TRUE ~ NA # For individuals under 18 and all other cases, assigns NA
+   FI01 == 1 | FI02 == 1 | FI03 == 1 | FI10 == 1 ~ 1,
+   FI01 == 2 & FI02 == 2 & FI03 == 2 & FI10 %in% c(2,3) ~ 2,
+    TRUE ~ NA # For all other cases, assigns NA
   ))
 
 ```
@@ -1486,19 +1464,13 @@ main <- main %>%
 ```{r}
 table(main$outcome13_1)
 ```
-Ilgi: For FI10 we also have a response option: I don't know what mobile money is. Can be assume that if someone doesn't know what it is they also don't use it? 
-Moreover, in all other cases, where respondents are below 18, or respond with don't know or refuse to answer, this has been put to NA. 
-Petra- agreed that if they don't know what it is, we can put the options into NA, I know that we can include above 15 so I wonder if it makes sense for FDS
-Ilgi: For when they don't know what mobile money is, I proposed to put it in 2 as if they don't use it. Let's re discuss on Monday. For the age component - since the working age is 15 or above it could  make sense to also look at the bank account/mobile money from 15 onwards. And also since we collect this information for 15+. 
+
 
 ## 13.2 Core Outcome Indicator 
 
 **13.2 Proportion of people who self-report positive changes in their income compared to the previous year**
 
 *Indicator Code*:RBM21302
-
-Petra - the below calculation is 0 1 - would be good to align all script also with RMS scripts ( I know I said this before :()) 
-Ilgi - It was a typo on my side in only one line. I have changed it to 2. The final calculation was already set to 2. 
 
 This indicator measures the proportion of forcibly displaced and stateless people who self-report positive changes in their income compared to the previous year. It aims to track changes in income levels compared to the previous year. According to FAO and ILO, income is defined as the value of resources flowing towards the household from their engagement in wage- or self-employment comprising of both income in money (profits, wage, interest, social benefits etc.) and in kind (goods and services). It is equal to the value of goods and services produced by the wage- or self-employed, net of operating expenses (such as salaries paid, raw materials used, depreciation of machines and instruments and taxes paid), plus any salary received and social security benefits (net of contributions).Income also includes benefits received by employed persons who are no longer in employment, such as unemployment benefits, pensions, invalidity benefits. As with income related to paid employment, all these social benefits will be part of income from employment only insofar as workers received them as a result of their participation in work activities.’ (ILO)The indicator includes income from self-employment and/or wage-employment in both agricultural and non-agricultural activities.
 
@@ -1649,8 +1621,6 @@ main <- main %>%
 
 ```
 
-Petra- I love the structure above! We should also add table here
-Ilgi: Great! Noted, lets discuss more on tables on Monday
 
 ## 14.1 Core Outcome Indicator
 
@@ -1691,7 +1661,6 @@ To calculate the indicator value, the standard RMS methodology considers in the 
 **Sources**
 1. [RBM 16.2 Outcome Indicator Guidance](https://intranet.unhcr.org/content/dam/unhcr/intranet/protection-operations/prog-hub/program-cycle/indictors/core/outcome/Core%20outcome%2016.2%20Proportion%20of%20people%20covered%20by%20national%20social%20protection%20systems.pdf)
 
-Petra- as you mentioned the other day, we can check how to best cite the guidance pieces but the way it is looks good to me
 
 ```{r}
 table(main$ScProtec01) #In the past 12 months while in the host country, have you or anyone in your household received support from any assistance programme?
@@ -1758,6 +1727,3 @@ main <- main %>%
 ```{r}
 table(main$outcome16_2)
 ```
-
-Petra - it does not find the 'Government_assistance' variable seems like here is an issue - 
-Ilgi: it was due to a spelling mistake, I fixed it. 
