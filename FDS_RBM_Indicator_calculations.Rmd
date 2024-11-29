@@ -1761,9 +1761,9 @@ This indicator measures the proportion of people that have secure tenure rights 
 
 *Perceived security of tenure:* Perception of tenure security refers to an individual’s perception of the likelihood of involuntary loss of land, such as disagreement of the ownership rights over land or ability to use it, regardless of the formal status and can be more optimistic or pessimistic.
 
-| Standard Questions                                                                                                                          |
-|:-------------------------------------------------------------------------------------------------------------------------------------------:|
-| Land01, Land02, Land03, Land04, Land05, Land07, Land06, Land09, Land10, Land11, Land12a,Land15, House01, House02, House04, House05, House06, House10|
+| Standard Questions                                                                                        |
+|:---------------------------------------------------------------------------------------------------------:|
+| Land01, Land02, Land03, Land04, Land05, Land07, Land09, Land10, Land15, House01, House02, House04, House10|
 
 **Unit of observation:** Individual
 
@@ -1771,6 +1771,158 @@ This indicator measures the proportion of people that have secure tenure rights 
 
 **Denominator:**  Total number individuals 
 
+To calculate the indicator value, the standard RMS methodology considers in the numerator only individuals in households with official documentation for both their housing and land and who are unlikely to experience losing their right to this housing and/or land in the next 12 months.
+*Note that in FDS, the likelihood for loosing the rights to housing/land is evaluated for the next 5 years. 
+***Sources***
+[Core Outcome 16.1 Guidance](https://intranet.unhcr.org/content/dam/unhcr/intranet/protection-operations/prog-hub/program-cycle/indictors/core/outcome/Core%20outcome%2016.1%20Proportion%20of%20people%20with%20secure%20tenure%20rights%20to%20housing%20and-or%20land.pdf).
+
+```{r, eval=FALSE}
+table(main$Land01) #Do you or does any member of your household own any plot of land in the host country, either alone or with someone else ?  
+table(main$Land02) #Do you or does any member of your household own the plot you live on?
+table(main$Land03) #Do you or does any member of your household hold use right for any plot of land in ${hostcountry}, either alone or with someone else?
+table(main$Land04) #Do you or does any member of your household use any plot of land, either alone or with someone else?
+table(main$Land05_1) #Do you or does any member of your household have ownership rights for this plot?
+table(main$Land07_1) #Do you or does any member of your household have use rights for this plot?
+table(main$Land09A_1) #Residential use of this plot
+table(main$Land10_1) #Does your household have a document for this plot from any government Agency, which formally recognizes the use/ownership rights?
+table(main$Land15_1) #How likely is it that someone would take this plot from your household in the next 5 years? Very unlikely, somewhat unlikely, somewhat likely, or very likely?
+table(main$House01) #Do you or does any member of your household own the housing your household live in, either alone or jointly with someone else?
+table(main$House02) #You just said that you and your household members do not own the housing you live in. Do you or does any member of your household have any agreement to stay in the housing you live in, either alone or jointly with someone else?
+table(main$House04) #Does your household have a document for the housing you live in from any government Agency [or the UN], which formally recognizes your ownership right or use right?
+table(main$House10) #How likely is your household to be expelled from the housing you live in in the next 5 years? Very unlikely, somewhat unlikely, somewhat likely, or very likely?
+
+```
+
+
+```{r, eval=FALSE}
+#First - Assess secure tenure rights for land
+#Step 1: Ownership of the plot they live on 
+main <- main %>%
+  mutate(ownership_plot = case_when(
+    Land02 == 1 ~ 1, #Assigns 1 if the HH owns the plot they currently live on
+    Land02 == 2 ~ 2, #Assigns 2 if the HH does not own the plot they currently live on
+    TRUE ~ NA_real_ )) #Assigns NA if the answer is "don't know" or "refuse to answer". 
+```
+```{r, eval=FALSE}
+
+#Step 2. - Check if the HH currently uses, owns or holds use rights for any plot of land
+main <- main %>%
+  mutate(use_own_any_plot = case_when(
+    Land01 == 1 | Land03 == 1 | Land04 == 1 ~ 1, #Assigns 1 if they use, own or hold use rights for any plot of land
+    Land01 == 2 & Land03 == 2 & Land04 == 2 ~ 2, #Assigns 2 if they don't use, own or hold use rights for any plot of land
+    TRUE ~ NA_real_ )) #Assigns NA if the answer is "don't know" or "refuse to answer".
+    
+```
+```{r, eval=FALSE}
+#Step 3: For HH that do not own the plot they live on, but have ownership/use rights of a plot in the host country, we need to check if they have legal documents for this plot, if the use of the plot is residential, and if the likelihood of them loosing the plot is low. 
+#In FDS, HH can specify up to 5 plots they might own or have the use rights to. We are only checking plot 1, as enumerators are instructed to start the plot roster with the plot where the family currently lives. 
+```
+```{r, eval=FALSE}
+#Step 3.1: Check that the use of plot 1 is indeed residential
+main <- main %>%
+  mutate(residental_plot = case_when(
+    grepl("A", Land09_1) ~ 1,#Assigns 1 if the use of plot 1 is residential
+    !grepl("A", Land09_1) ~ 2)) #Assigns 2 if the use of plot 1 is not residential
+```
+
+```{r, eval=FALSE}
+#Step 3.2: Check that the HH has ownership or use rights for the plot they currently live on
+main <- main %>%
+  mutate(use_own_current_plot = case_when(
+    Land05_1 == 1 | Land07_1 == 1 ~ 1, #Assigns 1 if the HH has ownership or use rights of the plot they live on
+    Land05_1 == 2 & Land07_1 == 2 ~ 2,  #Assigns 2 if the HH does not have ownership nor use rights of the plot they live on
+    Land05_1 %in% c(98,99) & Land07_1 == 2 ~ 2, #Assigns 2 if the HH does not have use rights of the plot they live on & they don't know/refuse      to answer to ownership rights
+    TRUE ~ NA_real_ )) #Assigns NA if the answer is "don't know" or "refuse to answer".
+#Ilgi, what do we do with cases where they don't have ownership rights, and they don't know/refuse to answer on use rights? 
+```
+```{r, eval=FALSE}
+#Step 3.3: Check that the HH has legal ownership or use right documents for the plot they live on
+main <- main %>%
+  mutate(legal_documents = case_when(
+    Land10_1 == 1 ~ 1, #Assigns 2 if the HH has legal ownership or use right documents for the plot they live on
+    Land10_1 == 2 ~ 2, #Assigns 2 if the HH does not have legal ownership or use right documents for the plot they live on
+    TRUE ~ NA_real_ )) #Assigns NA if the answer is "don't know" or "refuse to answer".
+```
+
+
+```{r, eval=FALSE}
+#Step 3.4: Check the likelihood of loosing the plot the HH live on
+main <- main %>%
+  mutate(plot_security = case_when(
+    Land15_1 %in% c(1,2) ~ 1, #Assigns 1 when the likelihood is "Very unlikely" and "Somewhat unlikely"
+    Land15_1 %in% c(3,4) ~ 2)) #Assigns 2 when the likelihood is "Somewhat likely" and "Very likely"
+    
+```
+```{r, eval=FALSE}
+#Step 4: Combine the above conditions to assess secure tenure rights for land
+main <- main %>%
+  mutate(tenure_land = case_when(
+    use_own_any_plot == 1 & residental_plot == 1 & use_own_current_plot == 1 & legal_documents == 1 & plot_security == 1  ~ 1, 
+    use_own_any_plot == 1 & (residental_plot == 2 | use_own_current_plot == 2 | legal_documents == 2 | plot_security == 2) ~ 2, 
+    use_own_any_plot == 2 ~ 2, 
+    TRUE ~ NA_real_ )) #Assigns NA in all other cases
+    
+```
+```{r, eval=FALSE}
+#Second - Assess secure tenure rights for housing
+#Step 1: Assess ownership and use rights of the house
+main <- main %>%
+  mutate(own_use_house = case_when(
+    House01 == 1 | House02 == 1 ~ 1, #Assigns 1 if the HH has ownership or use rights of the house they live in
+    House01 == 2 & House02 == 2 ~ 2, #Assigns 2 if the HH does not have ownership or use rights of the house they live in
+    House01 %in% c(99,98) & House02 == 2 ~ 2, #Assigns 2 if the HH does not have use rights and does not know/refuses to answer for ownership         rights
+    TRUE ~ NA_real_ ))
+#Ilgi, what do we do with cases where they don't have ownership rights, and they don't know/refuse to answer on use rights?     
+
+```
+```{r, eval=FALSE}
+#Step 2: Assess legal documents for households
+main <- main %>%
+  mutate(documents_house = case_when(
+    House04 == 1 ~ 1, #Assigns 1 if the HH has legal documents for the ownership or use of the house
+    House04 == 2 ~ 2, #Assigns 2 if the HH does not have legal documents for the ownership or use of the house
+    TRUE ~ NA_real_ )) #Assigns NA in the case of "Refuse to answer" or "Don't know". 
+```
+```{r, eval=FALSE}
+#Step 3: Assess likelihood to be expelled from the house 
+main <- main %>%
+  mutate(expelled_house = case_when(
+    House10 %in% c(1,2) ~ 1, #Assigns 1 when the likelihood is "Very unlikely" and "Somewhat unlikely"
+    House10 %in% c(3,4) ~ 2)) #Assigns 2 when the likelihood is "Somewhat likely" and "Very likely"
+
+```
+```{r, eval=FALSE}
+#Step 4: Combine all conditions for housing 
+main <- main %>%
+  mutate(tenure_house = case_when(
+    own_use_house == 1 & documents_house == 1 & expelled_house == 1 ~ 1, 
+    own_use_house == 2 | documents_house == 2 | expelled_house == 2 ~ 2, 
+    TRUE ~ NA_real_ )) #Assigns NA in all other cases
+```
+```{r, eval=FALSE}
+#Third: Combine conditions on land and housing
+main <- main %>%
+  mutate(outcome16_1= case_when(
+    ownership_plot == 1 ~ 1, #Assigns 1 if the HH owns the plot of land where they live
+    ownership_plot != 1 & tenure_land == 1 & tenure_house == 1  ~ 1, #Assigns 1 if HH does not own the plot of land they live on, but they have     secure land and household tenure through use/ownership rights, documentation, and low likelihood of loosing the plot/housing. 
+    ownership_plot != 1 & (tenure_land == 2 | tenure_house == 2)  ~ 2, #Assigns 2 if HH does not own the plot of land they live on, and they don'    have secure land or household tenure.
+    TRUE ~ NA_real_ )) #Assigns NA in all other cases
+    
+```
+```{r, eval=FALSE}
+# Add labels to the new variable 'outcome16_1'
+main <- main %>%
+  mutate(outcome16_1 = labelled(outcome16_1,
+                                labels = c(
+                                  'Yes' = 1,
+                                  'No' = 2
+                                ),
+                                label = "Proportion of people with secure tenure rights and/or property rights to housing and/or land"))
+
+```
+```{r}
+table(main$outcome16_1)
+```
 
 ## 16.2 Core Outcome Indicator
 
