@@ -272,27 +272,15 @@ table(main$habitablehousing)
 
 ```
 
-
 ```{r, eval=FALSE}
 
 
 #Step 4: Calculate condition 2
 
 ####Calculate crowding index - overcrowded when more than 3 persons share one room to sleep
-###
 
 ##Need to calculate the number of household members in each household. 
-##Here we are using the variable "member" which assigned a 1 for each person that passes the check for actually being a household member. This check done automatically in the data collection form. 
-
-household_counts <- hhroster %>%
-  group_by(`_uuid`) %>%
-  summarise(HHmembersize = sum(member == 1, na.rm = TRUE))
-##Join with the main data set
-main <- main %>%
-  left_join(household_counts, by = "_uuid")
-##Calculate crowding
 table(main$HH14) ##How many separate structures or buildings do the members of your household occupy? 
-
 
 main <- main %>%
   mutate(crowding=HHmembersize/HH14
@@ -303,8 +291,6 @@ main <- main %>%
 
 table(main$crowding_cat)
 ```
-
-
 
 
 ```{r}
@@ -772,7 +758,7 @@ table(hhroster$Legal_passport) #If the person has a passport?
 hhroster <- hhroster %>% 
   mutate(outcome1_3 = case_when(
     ID_09 %in% c(2,3,4,5,6,7,10,15) | ID_13 %in% c("B","C","D","E","F","G","J","P") | Legal_birth_certificate == 1 | Legal_ID_card == 1 | Legal_passport == 1 ~ 1, #Assigns 1 if the person has a work visa or a permanent residency or birth certificate or a Proof of registration card or civil/government ID, or passport. 
-    ID_09 == 1 & ID_13 == "A" & Legal_birth_certificate == 2 & Legal_ID_card == 2 & Legal_passport == 2 ~ 2, #Assigns 2 if the person has no primary and no other documents), 
+    ID_09 == 1 & ID_13 == "A" & Legal_birth_certificate == 2 & Legal_ID_card == 2 & Legal_passport == 2 ~ 2, #Assigns 2 if the person has no primary, secondary and no other legal documents), 
     TRUE ~ NA))
   
 ```
@@ -1715,6 +1701,7 @@ table(hhroster$Legal_passport) #If the person has a passport?
 #table(hhroster$Legal_work_permit) #If the person has a work permit?
 #table(hhroster$Legal_socsec_card) #If the person has a social security card? 
 #table(hhroster$Legal_marriage_cert) #If the person has a marriage certificate?
+#table(hhroster$ID_VAR) #ID_VAR == 4 identifies a returnee
 ```
 
 ```{r, eval=FALSE}
