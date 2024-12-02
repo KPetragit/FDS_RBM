@@ -138,16 +138,26 @@ According to [The Sphere Handbook](https://spherestandards.org/wp-content/upload
 
 
 Petra - for the health indicator below, I think we use ind level so it codes a lot as they don't have access - can we maybe if someone from the HH needed access take it as for all HHs - or another option is put them into missing ( those who did not need access) - No health component in this indicator - suggestion to I/L to add it for Zambia and onwards. 
-Ilgi: To discuss on Monday
+Ilgi: I changed the calculation here to also include the need to see a health professional. Lets discuss 
+
 ```{r, eval=FALSE}
 
 
 ##Access to healthcare if household has any facility available within one hour distance (cannot be > 60) (walking or any other type of transport)
+table(main$H01_1)##In the past 30 days, did you need to see a health profesionnal for any reason?
 table(main$H11)  ##What place did you go first to try to see a health professional or healer?
 table(main$H15d) ##Approximately, how long did it take to travel in one direction to that place for your first visit?
 
 main <- main %>%
-  mutate(healthcare = ifelse(H11 %in% c(1, 2, 3, 4, 5, 6, 7, 8, 9, 12) & H15d == 1, 1, 2)) %>%
+  mutate(
+    healthcare = case_when(
+      H01_1 == 1 & H11 %in% c(1, 2, 3, 4, 5, 6, 7, 8, 9, 12) & H15d == 1 ~ 1, #Assigns 1 if they needed to see a health professional, and reached one in one hour or less. 
+      H01_1 == 2 ~ NA_real_, #Assigns 2 if they did not need to see a health professional
+      H01_1 == 1 & (H11 %in% c(10, 11) | H15d == 2) ~ 2, #Assigns 2 if they saw a traditional health or spiritual healer, or if they needed more than 1 hour to reach the health professional. 
+      H01_1 == 1 & H15d %in% c(3, 98) ~ NA_real_, #Assigns NA if they didn't know or can't recall how long they needed to reach the health facility. 
+      TRUE ~ NA_real_  # Default case for other conditions
+    )
+  ) %>%
   mutate(healthcare = labelled(healthcare,
                                labels = c(
                                  "Yes" = 1,
