@@ -768,7 +768,7 @@ table(hhroster$Legal_passport) #If the person has a passport?
 hhroster <- hhroster %>% 
   mutate(outcome1_3 = case_when(
     ID_09 %in% c(2,3,4,5,6,7,10,15) | ID_13 %in% c("B","C","D","E","F","G","J","P") | Legal_birth_certificate == 1 | Legal_ID_card == 1 | Legal_passport == 1 ~ 1, #Assigns 1 if the person has a work visa or a permanent residency or birth certificate or a Proof of registration card or civil/government ID, or passport. 
-    ID_09 == 1 & ID_13 == "A" & Legal_birth_certificate == 2 & Legal_ID_card == 2 & Legal_passport == 2 ~ 2, #Assigns 2 if the person has no primary, secondary and no other legal documents), 
+    ID_09 %in% c(1, 8, 9, 11, 12, 13, 14) & ID_13 %in% c("A","H","I","K","L","M","N","OT")  & Legal_birth_certificate == 2 & Legal_ID_card == 2 & Legal_passport == 2 ~ 2, #Assigns 2 if the person has no primary, secondary and no other legal documents), 
     TRUE ~ NA))
   
 ```
@@ -784,7 +784,7 @@ hhroster <- hhroster %>%
 ```{r, eval=FALSE}
 table(hhroster$outcome1_3)
 ```
-Ilgi: This needs to re-done. There is a mistake in how the legal variables were incorporated. Magrith will double check and let me know once she updates it. Additionally, we should discuss on which answers from ID_09 and ID_13 would be considered as a legal document. 
+Ilgi: We should discuss on which answers from ID_09 and ID_13 would be considered as a legal document. 
 ## 4.1 Core Outcome Indicator
 
 **4.1 Proportion of people who know where to access available GBV service**
@@ -1698,7 +1698,6 @@ This indicator measures the proportion of returned refugees who possess legally 
 ***Sources***
 [Core Outcome 14.1 Guidance](https://intranet.unhcr.org/content/dam/unhcr/intranet/protection-operations/prog-hub/program-cycle/indictors/core/outcome/Core%20outcome%2014.1%20Proportion%20of%20returnees%20with%20legally%20recognized%20identity%20documents%20or%20credentials.pdf).
 
-Ilgi: I am missing the ID_VAR variable in the dataset, which gives us the information is someone is a returnee. Magrith will incorporate it to the datatset. 
 
 ```{r, eval=FALSE}
 #table(hhroster$ID_VAR) #Identification of returnees
@@ -1717,14 +1716,14 @@ table(hhroster$Legal_passport) #If the person has a passport?
 ```{r, eval=FALSE}
 hhroster <- hhroster %>% 
   mutate(outcome14_1 = case_when(
-    ID_VAR == 4 & ID_09 %in% c(2,3,4,5,6,7,10,15) | ID_13 %in% c("B","C","D","E","F","G","J","P") | Legal_birth_certificate == 1 | Legal_ID_card == 1 | Legal_passport == 1 ~ 1, #Assigns 1 if the person has a work visa or a permanent residency or birth certificate or a Proof of registration card or civil/government ID, or passport. 
-    ID_VAR == 4 & ID_09 == 1 & ID_13 == "A" & Legal_birth_certificate == 2 & Legal_ID_card == 2 & Legal_passport == 2 ~ 2, #Assigns 2 if the person has no primary and no other documents), 
-    TRUE ~ NA_real_))
+    ID_VAR == 4 & (ID_09 %in% c(2,3,4,5,6,7,10,15) | ID_13 %in% c("B","C","D","E","F","G","J","P") | Legal_birth_certificate == 1 | Legal_ID_card == 1 | Legal_passport == 1) ~ 1, #Assigns 1 if the person has a work visa or a permanent residency or birth certificate or a Proof of registration card or civil/government ID, or passport. 
+    ID_VAR == 4 & (ID_09 %in% c(1, 8, 9, 11, 12, 13, 14) & ID_13 %in% c("A","H","I","K","L","M","N","OT")  & Legal_birth_certificate == 2 & Legal_ID_card == 2 & Legal_passport == 2) ~ 2, #Assigns 2 if the person has no primary, secondary and no other legal documents), 
+    TRUE ~ NA))
   
 ```
 ```{r, eval=FALSE}
 hhroster <- hhroster %>% 
-  mutate(outcome14_1 = labelled(outcome1_3,
+  mutate(outcome14_1 = labelled(outcome14_1,
                                labels = c(
                                  'Yes' = 1,
                                  'No' = 2

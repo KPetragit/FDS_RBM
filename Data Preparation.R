@@ -75,8 +75,8 @@ HoH <- HoH %>%
 
 
 #Disintegration variables 
-##1. Roster 
-### Population Groups - Population group variable is available in the HoH dataset. Here we pull it to the roster dataset. 
+## Roster 
+## 1. Population Groups - Population group variable is available in the HoH dataset. Here we pull it to the roster dataset. 
 roster <- roster %>%
   left_join(
     HoH %>% select(uuid, Intro_07), # Select relevant columns from HoH
@@ -204,7 +204,97 @@ roster <- roster %>%
   ) 
 
 
+## Head of the Household (HoH dataset)
+#1. Age
+# Age with no categories 
+HoH <- HoH %>%
+  left_join(
+    roster %>% select(uuid, rosterposition, HH_04), # Select relevant columns from hhroster
+    by = c("uuid" = "uuid", "HHposinfo" = "rosterposition") # Match on uuid and position
+  ) %>%
+  rename(HH_04_HoH = HH_04) # Rename HH_04 to HH_04_hOh
 
 
+# 2 categories 
+HoH <- HoH %>%
+  left_join(
+    roster %>% select(uuid, rosterposition, HH_04_cat2), # Select relevant columns from roster
+    by = c("uuid" = "uuid", "HHposinfo" = "rosterposition") # Match on uuid and position 
+  ) 
+HoH <- HoH %>%
+  rename(HH_04_HoH_cat2 = HH_04_cat2) #HH_04_HoH_cat2
+
+# 4 categories 
+HoH <- HoH %>%
+  left_join(
+    roster %>% select(uuid,rosterposition, HH_04_cat4), # Select relevant columns from roster
+    by = c("uuid" = "uuid", "HHposinfo" = "rosterposition") # Match on uuid  and position 
+  ) 
+HoH <- HoH %>%
+  rename(HH_04_HoH_cat4 = HH_04_cat4) #HH_04_HoH_cat4
+
+#2. Gender
+
+HoH <- HoH %>%
+  left_join(
+    roster %>% select(uuid, rosterposition, HH_02), # Select relevant columns from roster
+    by = c("uuid" = "uuid", "HHposinfo" = "rosterposition") # Match on uuid and position 
+  ) 
+HoH <- HoH %>%
+  rename(HH_02_HoH = HH_02) #Rename to HH_02_HoH
+
+#3. Disability 
+
+HoH <- HoH %>%
+  left_join(
+    roster %>% select(uuid, rosterposition, disability), # Select relevant columns from roster
+    by = c("uuid" = "uuid", "HHposinfo" = "rosterposition") # Match on uuid and position 
+  ) 
+HoH <- HoH %>%
+  rename(disability_HoH = disability) #Rename to disability_HoH
+
+#4. Country of Origin 
+
+HoH <- HoH %>%
+  left_join(
+    roster %>% select(uuid,rosterposition, COO), # Select relevant columns from roster
+    by = c("uuid" = "uuid", "HHposinfo" = "rosterposition") # Match on uuid and position 
+  ) 
+HoH <- HoH %>%
+  rename(COO_HoH = COO) #Rename to COO_HoH
 
 
+## Randomly Selected Adult (RA_adult dataset)
+
+#1. Age
+# 2 categories 
+RA_adult$age_selected <- as.numeric(as.character(RA_adult$age_selected))
+
+RA_adult$RA_HH_04_cat2 <- cut(RA_adult$age_selected, breaks = c(-1, 17, Inf), 
+                              labels = c("0-17", "18-60+"))
+
+# 4 categories 
+RA_adult$age_selected <- as.numeric(as.character(RA_adult$age_selected))
+
+RA_adult$RA_HH_04_cat4 <- cut(RA_adult$age_selected, breaks = c(-1, 4, 17, 59, Inf), 
+                         labels = c("0-4", "5-17", "18-59", "60+"))
+
+#2. Population Group 
+
+RA_adult <- RA_adult %>%
+  left_join(
+    HoH %>% select(uuid, Intro_07), # Select relevant columns from roster
+    by = c("uuid" = "uuid") # Match on uuid 
+  ) 
+RA_adult <- RA_adult %>%
+  rename(Intro_07_RA = Intro_07) #Rename to Intro_07_RA
+
+#3, Country of origin
+
+RA_adult <- RA_adult %>%
+  left_join(
+    roster %>% select(uuid, COO, rosterposition), # Select relevant columns from roster
+    by = c("uuid" = "uuid", "rosterposition") # Match on uuid and roster position
+  ) 
+RA_adult <- RA_adult %>%
+  rename(COO_RA = COO) #Rename to COO_RA
