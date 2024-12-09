@@ -13,7 +13,7 @@ output:
 knitr::opts_chunk$set(eval=FALSE)
 ```
 
-Date: Last revision was on November 2024
+Date: Last revision was in December 2024
 
 *For any issues please contact Ilgi Bozdag at bozdag@unhcr.org or Petra Kaps at kaps@unhcr.org*
 
@@ -57,20 +57,8 @@ pacman::p_load(
 ## Standardized Disaggregation Variables
 
 
-```{r, eval=FALSE}
-
-##Upload cleaned and weighted datasets 
-
-hhroster <- read_dta("FDS_PAK_2024_Roster_complete.dta")
-
-main <- read_dta("FDS_PAK_2024_Allrespondents_complete.dta")
-
-
-
 ###Add variable names for disaggregation variables
 
-
-```
 
 ## 2.2 Core Impact Indicator
 
@@ -85,12 +73,12 @@ To facilitate measurement for UNHCR, four basic services are considered for this
 
 This indicator is linked to the SGD indicator [1] and [11](https://unstats.un.org/sdgs/metadata/?Text=&Goal=11&Target=).
 
-| Services       | Variables                                                     |
-|----------------|:--------------------------------------------------------:     |
-| Electricity    |HL01, HL03|
-| Health care    |H11, H15d, H15d_1, H15d_2, H15d_3, H21, H21_1, H21_2, H21_3    |
-| Drinking water |BD21,BD22, BD01, BD01a, BD20_1,BD20_2,BD20_3,BD20_4,BD20_5     |
-| Shelter        |HH04, HH05, HH10,HH08,HH09, HH11,HH20, ExpShock02              |
+| Services       | Variables                                                            |
+|----------------|:--------------------------------------------------------:            |
+| Electricity    |HL01, HL03                                                            |
+| Health care    |H01_1, H11, H15d                                                      |
+| Drinking water |BD01, BD01a, BD20_2, BD22                                             |
+| Shelter        |HH04, HH05,HH08,HH09, HH10, HH11,HH14, ExpShock02                     |
 
 ### Calculate binary variables for access to four basic services {.tabset}
 
@@ -144,7 +132,7 @@ Ilgi: I changed the calculation here to also include the need to see a health pr
 
 
 ##Access to healthcare if household has any facility available within one hour distance (cannot be > 60) (walking or any other type of transport)
-table(main$H01_1)##In the past 30 days, did you need to see a health profesionnal for any reason?
+table(main$H01_1)##In the past 30 days, did you need to see a health professional for any reason?
 table(main$H11)  ##What place did you go first to try to see a health professional or healer?
 table(main$H15d) ##Approximately, how long did it take to travel in one direction to that place for your first visit?
 
@@ -188,6 +176,7 @@ The FDS only measure access to at least basic drinking water services which need
 table(main$BD01)   ##What is the main source of drinking water used by members of your household?
 table(main$BD01a)  ##Where is this main drinking water source located? In your own dwelling, in your own yard or plot , or elsewhere?
 table(main$BD20_2) ##How long does it take for members of your household to go to the main source of drinking water, stay in a queue, get water, and come back? Please do not include time spent socializing. 
+table(main$BD20_3) ##Specifying minutes on how long it takes to collect water 
 table(main$BD22)   ##Does it take more or less than 30 minutes?
 
 
@@ -212,7 +201,7 @@ mutate(Improved_dw_Loc = labelled(Improved_dw_Loc,
                                label = "Improved drinking water source in own dwelling, yard or plot"))
 
 ##Step 4: Add a coloumn specifying if it takes more or less than 30 min to the improved drinking water source. If the improved drinking water source is located in own dwelling, yard or plot, it is considered that it takes less than 30 minutes to reach. 
-## BD20-3 - Minutes
+## BD20_3 - Minutes
 main <- main %>%
   mutate(
     Improved_dw_access= ifelse(
@@ -737,11 +726,11 @@ This indicator measures the proportion of people who possess legally recognized 
 
 *An identity credential* is a document, object, or data structure that vouches for the identity of a person through some method of trust and authentication. Common types of identity credentials include, but are not limited to, identity cards, certificates or unique identity numbers. A biometric identifier can also be used as a credential if it has been registered with the identity system.
 
-| Standard Questions                                                                                                                |
-|:---------------------------------------------------------------------------------------------------------------------------------:|
+| Standard Questions                                                                                                                              |
+|:-----------------------------------------------------------------------------------------------------------------------------------------------:|
 | ID_09, ID_13, Legal_birth_certificate, Legal_ID_card, Legal_passport, Legal_residency, Legal_work_permit, Legal_socsec_card, Legal_marriage_cert|
 
-*Note that the availability of the above standard questions will differ from FDS country to country. Ensure to check your data set and indentifu which variables are present. 
+*Note that the availability of the above standard questions will differ from FDS country to country. Ensure to check your data set and identify which variables are present. 
 
 *Unit of observation:* Individual
 
@@ -765,6 +754,7 @@ table(hhroster$Legal_passport) #If the person has a passport?
 ```
 
 ```{r, eval=FALSE}
+#Important! Prior to running the script, ensure to check if your dataset includes the variables mentioned in the below script. Your dataset might have less or more variables. Ensure to adjust the script by adding or removing variables. 
 hhroster <- hhroster %>% 
   mutate(outcome1_3 = case_when(
     ID_09 %in% c(2,3,4,5,6,7,10,15) | ID_13 %in% c("B","C","D","E","F","G","J","P") | Legal_birth_certificate == 1 | Legal_ID_card == 1 | Legal_passport == 1 ~ 1, #Assigns 1 if the person has a work visa or a permanent residency or birth certificate or a Proof of registration card or civil/government ID, or passport. 
@@ -1013,7 +1003,7 @@ This indicator measures the proportion of people living in habitable and afforda
 
 |    Standard Questions                       |
 |:-------------------------------------------:|
-| DWE01 – SHEL01-SHEL06 – DWE05 – DWE08-DWE09 |
+| HH04, HH05, HH10,HH08,HH09, HH11,HH14       |
 
 **Unit of observation**: Individual
 
@@ -1084,19 +1074,19 @@ table(main$HH14) ##How many separate structures or buildings do the members of y
 main <- main %>%
   mutate(crowding=HHmembersize/HH14
   ) %>%
-  mutate(HH14_cat=case_when( ##if crowding <= 3, not overcrowded 
+  mutate(crowding_cat=case_when( ##if crowding <= 3, not overcrowded 
     crowding <= 3 ~ 1, TRUE ~ 2)
   )
 ```
 ```{r, eval=FALSE}
-table(main$HH14_cat)
+table(main$crowding_cat)
 
 ```
 ```{r, eval=FALSE}
 #Step 5: ###Combine both conditions for habitable housing
 main <- main %>%
   mutate(shelter=case_when(
-    HH14_cat==1 & habitablehousing==1 ~ 1,
+    crowding_cat==1 & habitablehousing==1 ~ 1,
     TRUE ~ 2
   ))
 
@@ -1305,9 +1295,9 @@ table(main$outcome10_2)
 
 This indicator is defined as the percentage of people using at least basic water services. Basic drinking water services is defined as drinking water from an improved source, provided collection time is not more than 30 minutes for a round trip, including queuing. 
 
-| Standard Questions    |
-|:---------------------:|
-| BD01, BD01a, BD20_2   |
+| Standard Questions                |
+|:---------------------------------:|
+| BD01, BD01a, BD20_2, BD20_3, BD22 |
 
 **Unit of observation**: Individual
 
@@ -1327,6 +1317,7 @@ The FDS only measure access to at least basic drinking water services which need
 table(main$BD01)   ##What is the main source of drinking water used by members of your household?
 table(main$BD01a)  ##Where is this main drinking water source located? In your own dwelling, in your own yard or plot , or elsewhere?
 table(main$BD20_2) ##How long does it take for members of your household to go to the main source of drinking water, stay in a queue, get water, and come back? Please do not include time spent socializing. 
+table(main$BD20_3) ## Specify minutes on how long it takes?
 table(main$BD22)   ##Does it take more or less than 30 minutes?
 
 
@@ -1468,6 +1459,7 @@ table(main$outcome12_2)
 
 This indicator measures the percentage of people (age 18+) who report having an account (by themselves or together with someone else) at a bank or another type of financial institution or personally using a mobile money service in the past 12 months in the country of asylum or habitual residence (for returnees, countries of origin are included).
 Personal mobile and bank accounts are defined as accounts that are fully owned by the person, where they can transact freely as per the country’s rules and regulations. UNHCR or any other third party does not have access to the account details (such as movements on the account) and cannot withdraw money.
+Note that in standard FDS methodology, we measure the percentage of people (age 15+). 
 
 | Standard Questions           |
 |:----------------------------:|
@@ -1475,9 +1467,9 @@ Personal mobile and bank accounts are defined as accounts that are fully owned b
 
 **Unit of observation*: Individual
 
-**Numerator**: Number of individuals above 18 having a personal mobile or bank account 
+**Numerator**: Number of individuals above 18 (above 15 in FDS) having a personal mobile or bank account 
 
-**Denominator**: Total number of individuals above 18
+**Denominator**: Total number of individuals above 18 (above 15 in FDS)
 
 **Sources**
 1. [RBM 13.1 Outcome Indicator Guidance](https://intranet.unhcr.org/content/dam/unhcr/intranet/protection-operations/prog-hub/program-cycle/indictors/core/outcome/Core%20outcome%213.1.%20Proportion%20of%20people%20with%20an%20account%20at%20a%20bank%20or%20other%20financial%20institution%20or%20mobile%20money.pdf)
@@ -1574,9 +1566,9 @@ The labour force, also known as workforce, refers to the total number of people 
 
 The 7 days recall period is in alignment with ILO standard methodology as well as with UNHCR Socioeconomic assessment standard. 
 
-| Standard Questions                                                                           |
-|:--------------------------------------------------------------------------------------------:|
-| EMP01, EMP02, EMP03, EMP04, EMP05, EMP06a, EMP06b, EMP06c, EMP06d, EMP25a, EMP25aa, EMP29    |
+| Standard Questions                                                                   |
+|:------------------------------------------------------------------------------------:|
+| EMP01, EMP02, EMP03, EMP04, EMP05, EMP06a, EMP06b, EMP06c, EMP25a, EMP25aa, EMP29    |
 
 **Unit of observation:** Individual
 
@@ -1599,7 +1591,6 @@ table(main$EMP05) #Even though you did not work, during the past 7 days, did you
 table(main$EMP06a) #During the past 7 days, did you do any work in farming or rearing farm animals, fishing or fish farming, or none of these?
 table(main$EMP06b) #Was this work that you mentioned in farming or rearing farming animals, fishing or fish farming, or none of these?
 table(main$EMP06c) #Thinking about this work, are the products intended only for sale, mainly for sale, only for family use, or mainly for family use?
-table(main$EMP06d) #How many hours did you spend doing this work during the past 7 days?
 table(main$EMP25a) #During the past 30 days, did you do anything to find a paid job?
 table(main$EMP25aa)#During the past 30 days, did you do anything to start a business?
 table(main$EMP29)  #Could you start working within the next 14 days if you were offered a job?
