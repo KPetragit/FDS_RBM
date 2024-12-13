@@ -19,7 +19,7 @@ Date: Last revision was in December 2024
 
 **Important Instructions**
 
-1. For correct calculations, ensure you have two datasets named 'main' and 'hhroster'. 
+1. For correct calculations, ensure you have five datasets named: 'roster', 'HoH', 'RA_adult', 'RA_caregiver', 'RA_woman'. 
 2. Confirm that your datasets are cleaned and weighted as required for accurate results!
 
 # RBM Core Impact and Outcome Indicators
@@ -41,7 +41,7 @@ This document will guide you on how each and every indicator will be calculated 
 Percentage = \(\left(\frac{\text{Numerator}}{\text{Denominator}}\right) \times 100\)
 
 
-At this step, you should already have **main** and **hhroster** datasets structured in a way that will allow you to calculate your indicators as you will be guided in this document. It's not recommended to clear your work space if your datasets are already loaded. 
+At this step, you should already have all five datasets structured in a way that will allow you to calculate your indicators as you will be guided in this document. It's not recommended to clear your work space if your datasets are already loaded. 
 
 ```{r, eval=FALSE}
 ## Install pacman if not already installed
@@ -56,8 +56,61 @@ pacman::p_load(
 
 ## Standardized Disaggregation Variables
 
+**Population Group**
+```{r, eval=FALSE}
 
-###Add variable names for disaggregation variables
+table(roster$Intro_07_roster)   #in dataset "roster". 
+table(HoH$Intro_07)             #in dataset "HoH". 
+table(RA_adult$Intro_07_RA)     #in dataset "RA_adult". 
+table(RA_woman$Intro_07_RW)     #in dataset "RA_woman". 
+table(RA_caregiver$Intro_07_RC) #in dataset "RA_caregiver". 
+```
+
+**Age**
+```{r}
+#2 categories (<18, >18)
+table(roster$HH_04_cat2) #in dataset "roster".
+
+#4 categories (0-4, 5-17, 18-59, 60+)
+table(roster$HH_04_cat4) #in dataset "roster".
+
+#We look at age categories only indicators for which data is pulled from the "roster" dataset, which holds the individual data for all members of the household. For other four datasets (Headh of the household, randomly selected adult, randomly selected woman, and randomly selected caregiver) the respondent is always => 15 years of age. 
+
+table(HOH$HH_04_HoH)           #in dataset "HoH".
+table(RA_adult$age_selected)   #in dataset "RA_adult".
+table(RA_woman$agerandomwoman) #in dataset "RA_woman".
+table(RA_caregiver$HH_04_RC)   #in dataset "RA_caregiver".
+```
+
+**Gender**
+```{r}
+table(roster$HH_02)          #in dataset "roster".
+table(HoH$HH_02_HoH)         #in dataset "HoH". 
+table(RA_adult$HH_02_RA)     #in dataset "RA_adult".
+table(RA_caregiver$HH_02_RC) #in dataset "RA_caregiver".
+```
+
+
+**Disability**
+```{r}
+table(roster$disability)          #in dataset "roster".
+table(HoH$disability_HoH)         #in dataset "HoH". 
+table(RA_adult$disability_RA)     #in dataset "RA_adult".
+table(RA_woman$disability_RW)     #in dataset "RA_woman".
+table(RA_caregiver$disability_RC) #in dataset "RA_caregiver".
+```
+
+
+**Country of origin**
+```{r}
+table(roster$COO)          #in dataset "roster".
+table(HoH$COO_HoH)         #in dataset "HoH".
+table(RA_adult$COO_RA)     #in dataset "RA_adult".
+table(RA_woman$COO_RW)     #in dataset "RA_woman".
+table(RA_caregiver$COO_RC) #in dataset "RA_caregiver".
+
+```
+
 
 
 ## 2.2 Core Impact Indicator
@@ -1674,8 +1727,8 @@ This indicator measures the proportion of returned refugees who possess legally 
 
 *An identity credential* is a document, object, or data structure that vouches for the identity of a person through some method of trust and authentication. Common types of identity credentials include, but are not limited to, identity cards, certificates or unique identity numbers. A biometric identifier can also be used as a credential if it has been registered with the identity system.
 
-| Standard Questions                                                                                                                |
-|:---------------------------------------------------------------------------------------------------------------------------------:|
+| Standard Questions                                                                                                                                      |
+|:-------------------------------------------------------------------------------------------------------------------------------------------------------:|
 | ID_VAR, ID_09, ID_13, Legal_birth_certificate, Legal_ID_card, Legal_passport, Legal_residency, Legal_work_permit, Legal_socsec_card, Legal_marriage_cert|
 
 *Note that the availability of the above standard questions will differ from FDS country to country. Ensure to check your data set and indentifu which variables are present. 

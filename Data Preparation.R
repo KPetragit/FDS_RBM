@@ -103,7 +103,9 @@ table(roster$HH_04_cat2)
 ### 3. Disability 
 
 ### Washington Group Index
-#Disability status identifiers are calculated based on guidelines by the [Washington Group on Disability Statistics](https://www.washingtongroup-disability.com/fileadmin/uploads/wg/WG_Document__6C_-_Analytic_Guidelines_for_the_WG-ES__Stata_.pdf) for over 5-year-olds. Note that in FDS we have five levels of disability level (some difficulty, a lot of difficulty, cannot do at all, don't know, refuse to answer).
+#Disability status identifiers are calculated based on guidelines by the [Washington Group on Disability Statistics](https://www.washingtongroup-disability.com/fileadmin/uploads/wg/WG_Document__6C_-_Analytic_Guidelines_for_the_WG-ES__Stata_.pdf) for over 5-year-olds. Note that in FDS we have three levels of disability level (some difficulty, a lot of difficulty, cannot do at all, + don't know, refuse to answer).
+
+#Disability is specified as at least one domain/question coded A LOT OF DIFFICULTY or CANNOT DO AT ALL. 
 
 ###Step 1: Add the level 0 - no difficulty, for those members above 5 years of age who were not identified as having disabilities. 
 #Vision
@@ -125,7 +127,7 @@ roster <- roster %>%
 roster <- roster %>% 
   mutate(Dis_18 = if_else(is.na(Dis_18) & HH_04 > 5, 0, Dis_18))
 
-###Step 2: Generate frequency distributions on each of the five WG-SS domain variables
+###Step 2: Generate frequency distributions on each of the WG-SS domain variables
 
 ### 0 No difficulty 
 ### 1	Some difficulty
@@ -164,18 +166,18 @@ roster <- roster %>%
 
 roster <- roster %>%
   mutate(disability = case_when(
-    Dis_03 %in% c(3, 4) |
-      Dis_06 %in% c(3, 4) |
-      Dis_09 %in% c(3, 4) |
-      Dis_12 %in% c(3, 4) |
-      Dis_15 %in% c(3, 4) |
-      Dis_18 %in% c(3, 4) ~ 1,
-    Dis_03 %in% c(0, 1, 2) |
-      Dis_06 %in% c(0, 1, 2)|
-      Dis_09 %in% c(0, 1, 2)|
-      Dis_12 %in% c(0, 1, 2)|
-      Dis_15 %in% c(0, 1, 2)|
-      Dis_18 %in% c(0, 1, 2) ~ 2, 
+    Dis_03 %in% c(2, 3) |
+      Dis_06 %in% c(2, 3) |
+      Dis_09 %in% c(2, 3) |
+      Dis_12 %in% c(2, 3) |
+      Dis_15 %in% c(2, 3) |
+      Dis_18 %in% c(2, 3) ~ 1,
+    Dis_03 %in% c(0, 1) |
+      Dis_06 %in% c(0, 1)|
+      Dis_09 %in% c(0, 1)|
+      Dis_12 %in% c(0, 1)|
+      Dis_15 %in% c(0, 1)|
+      Dis_18 %in% c(0, 1) ~ 2, 
     TRUE ~ NA_real_
   ))
 
@@ -283,18 +285,111 @@ RA_adult$RA_HH_04_cat4 <- cut(RA_adult$age_selected, breaks = c(-1, 4, 17, 59, I
 
 RA_adult <- RA_adult %>%
   left_join(
-    HoH %>% select(uuid, Intro_07), # Select relevant columns from roster
+    HoH %>% select(uuid, Intro_07), # Select relevant columns from HoH dataset
     by = c("uuid" = "uuid") # Match on uuid 
   ) 
 RA_adult <- RA_adult %>%
   rename(Intro_07_RA = Intro_07) #Rename to Intro_07_RA
 
-#3, Country of origin
+#3. Country of origin
 
 RA_adult <- RA_adult %>%
   left_join(
     roster %>% select(uuid, COO, rosterposition), # Select relevant columns from roster
-    by = c("uuid" = "uuid", "rosterposition") # Match on uuid and roster position
+    by = c("uuid" = "uuid", "rosterposition" = "rosterposition") # Match on uuid and roster position
   ) 
 RA_adult <- RA_adult %>%
   rename(COO_RA = COO) #Rename to COO_RA
+
+#4. Disability 
+RA_adult <- RA_adult %>%
+  left_join(
+    roster %>% select(uuid, disability, rosterposition), # Select relevant columns from roster
+    by = c("uuid" = "uuid", "rosterposition") # Match on uuid and roster position
+  ) 
+RA_adult <- RA_adult %>%
+  rename(disability_RA = disability) #Rename to disability_RA
+
+#5. Gender 
+
+RA_adult <- RA_adult %>%
+  rename(HH_02_RA = `HH_02_selected`)
+
+## Randomly Selected Women (RA_woman dataset)
+
+RA_woman$agerandomwoman <- as.numeric(as.character(RA_woman$agerandomwoman))
+
+RA_woman$RW_HH_04_cat2 <- cut(RA_woman$agerandomwoman, breaks = c(-1, 17, Inf), 
+                              labels = c("0-17", "18-60+"))
+
+# 4 categories 
+RA_woman$RW_HH_04_cat4 <- cut(RA_woman$agerandomwoman, breaks = c(-1, 4, 17, 59, Inf), 
+                              labels = c("0-4", "5-17", "18-59", "60+"))
+
+#2. Population Group 
+
+RA_woman <- RA_woman %>%
+  left_join(
+    HoH %>% select(uuid, Intro_07), # Select relevant columns from HoH dataset
+    by = c("uuid" = "uuid") # Match on uuid 
+  ) 
+RA_woman <- RA_woman %>%
+  rename(Intro_07_RW = Intro_07) #Rename to Intro_07_RW
+
+#3. Country of origin
+
+RA_woman <- RA_woman %>%
+  left_join(
+    roster %>% select(uuid, COO, rosterposition), # Select relevant columns from roster
+    by = c("uuid" = "uuid", "rosterposition" = "rosterposition") # Match on uuid and roster position
+  ) 
+RA_woman <- RA_woman %>%
+  rename(COO_RW = COO) #Rename to COO_RW
+
+#4. Disability 
+RA_woman <- RA_woman %>%
+  left_join(
+    roster %>% select(uuid, disability, rosterposition), # Select relevant columns from roster
+    by = c("uuid" = "uuid", "rosterposition" = "rosterposition") # Match on uuid and roster position
+  ) 
+RA_woman <- RA_woman %>%
+  rename(disability_RW = disability) #Rename to disability_RW
+
+## Randomly Selected caregiver (RA_caregiver dataset)
+
+#1. Population Group 
+
+RA_caregiver <- RA_caregiver %>%
+  left_join(
+    HoH %>% select(uuid, Intro_07), # Select relevant columns from HoH dataset
+    by = c("uuid" = "uuid") # Match on uuid 
+  ) 
+RA_caregiver <- RA_caregiver %>%
+  rename(Intro_07_RC = Intro_07) #Rename to Intro_07_RC
+
+#2. Disability 
+RA_caregiver <- RA_caregiver %>%
+  left_join(
+    roster %>% select(uuid, disability, rosterposition), # Select relevant columns from roster
+    by = c("uuid" = "uuid", "rosterposition_caregiver" = "rosterposition") # Match on uuid and roster position
+  ) 
+RA_caregiver <- RA_caregiver %>%
+  rename(disability_RC = disability) #Rename to disability_RC
+
+#3. Country of Origin
+
+RA_caregiver <- RA_caregiver %>%
+  left_join(
+    roster %>% select(uuid, COO, rosterposition), # Select relevant columns from roster
+    by = c("uuid" = "uuid", "rosterposition_caregiver" = "rosterposition") # Match on uuid and roster position
+  ) 
+RA_caregiver <- RA_caregiver %>%
+  rename(COO_RC = COO) #Rename to COO_RC
+
+#4. Gender 
+RA_caregiver <- RA_caregiver %>%
+  rename(HH_02_RC = `finalcaregiverSEX`)
+
+#5. Age
+RA_caregiver <- RA_caregiver %>%
+  rename(HH_04_RC = `finalcaregiverAGE`)
