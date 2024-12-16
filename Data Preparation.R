@@ -393,3 +393,19 @@ RA_caregiver <- RA_caregiver %>%
 #5. Age
 RA_caregiver <- RA_caregiver %>%
   rename(HH_04_RC = `finalcaregiverAGE`)
+
+
+#Crowding index
+
+####Calculate crowding index - overcrowded when more than 3 persons share one room to sleep
+
+table(HoH$HH14) ##How many separate structures or buildings do the members of your household occupy? 
+
+HoH <- HoH %>%
+  mutate(crowding=HHmembersize/HH14
+  ) %>%
+  mutate(crowding_cat=case_when( ##if crowding <= 3, not overcrowded 
+    crowding <= 3 ~ 1, TRUE ~ 2)
+  )
+
+table(HoH$crowding_cat)
