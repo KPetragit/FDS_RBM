@@ -182,12 +182,12 @@ table(HoH$HL01) ##Does this household use anything for lighting?
 table(HoH$HL03) ##What does this household use most of the time as energy for lighting, or as a light source? 
 
 HoH <- HoH %>%
-  mutate(electricity = ifelse(HL01 == 1 & HL03 == 1, 1, 2)
+  mutate(electricity = ifelse(HL01 == 1 & HL03 == 1, 1, 0)
   ) %>%
   mutate( electricity = labelled(electricity,
                                  labels = c(
                                    "Yes" = 1,
-                                   "No" = 2
+                                   "No" = 0
                                  ),
                                  label = "Access to electricity"))
 table(HoH$electricity)
@@ -221,7 +221,7 @@ RA_adult <- RA_adult %>%
     healthcare = case_when(
       H01_1 == 1 & H11 %in% c(1, 2, 3, 4, 5, 6, 7, 8, 9, 12) & H15d == 1 ~ 1, #Assigns 1 if they needed to see a health professional, and reached one in one hour or less. 
       H01_1 == 2 ~ NA_real_, #Assigns NA if they did not need to see a health professional
-      H01_1 == 1 & (H11 %in% c(10, 11) | H15d == 2) ~ 2, #Assigns 2 if they saw a traditional health or spiritual healer, or if they needed more than 1 hour to reach the health professional. 
+      H01_1 == 1 & (H11 %in% c(10, 11) | H15d == 2) ~ 0, #Assigns 0 if they saw a traditional health or spiritual healer, or if they needed more than 1 hour to reach the health professional. 
       H01_1 == 1 & H15d %in% c(3, 98) ~ NA_real_, #Assigns NA if they didn't know or can't recall how long they needed to reach the health facility. 
       TRUE ~ NA_real_  # Default case for other conditions
     )
@@ -229,7 +229,7 @@ RA_adult <- RA_adult %>%
   mutate(healthcare = labelled(healthcare,
                                labels = c(
                                  "Yes" = 1,
-                                 "No" = 2
+                                 "No" = 0
                                ),
                                label = "Access to healthcare"))
 
@@ -264,21 +264,21 @@ table(HoH$BD22)   ##Does it take more or less than 30 minutes?
 
 ## Step 2: Add a coloumn specifying is the household uses improved or unimproved source of drinking water 
 HoH <- HoH %>%
-mutate(Improved_dw_Loc = ifelse(BD01 %in% c(11, 12) | (((BD01 %in% c(13, 14, 21, 31, 41, 51, 61, 71, 72, 91, 92))) & BD01a %in% c(1, 2)),1,2))%>%
-mutate(Improved_dw_Loc = labelled(Improved_dw_Loc,
+mutate(Improved_dw = ifelse(BD01 %in% c(11, 12, 13, 14, 21, 31, 41, 51, 61, 71, 72, 91, 92), 1, 0)) %>%
+  mutate(Improved_dw = labelled(Improved_dw,
                                labels = c(
                                  "Yes" = 1,
-                                 "No" = 2
+                                 "No" = 0
                                ),
-                               label = "Improved drinking water source in own dwelling, yard or plot"))
+                               label = "Improved drinking water source"))
 
 ##Step 3: Add a coloumn specifying if the improved water source is located in own dwelling/yard/plot or elsewhere. 
 HoH <- HoH %>%
-mutate(Improved_dw_Loc = ifelse(Improved_dw == 1 & BD01a %in% c(1, 2),1,2))%>%
+mutate(Improved_dw_Loc = ifelse(BD01 %in% c(11, 12) | (((BD01 %in% c(13, 14, 21, 31, 41, 51, 61, 71, 72, 91, 92))) & BD01a %in% c(1, 2)),1,0))%>%
 mutate(Improved_dw_Loc = labelled(Improved_dw_Loc,
                                labels = c(
                                  "Yes" = 1,
-                                 "No" = 2
+                                 "No" = 0
                                ),
                                label = "Improved drinking water source in own dwelling, yard or plot"))
 
@@ -288,16 +288,16 @@ HoH <- HoH %>%
   mutate(
     Improved_dw_access= ifelse(
       (Improved_dw_Loc == 1 )|
-      (Improved_dw_Loc == 2 & BD20_2 == 1 & BD20_3 < 30) |
-      (Improved_dw_Loc == 2 & BD20_2 == 98 & BD22 == 1),
+      (Improved_dw_Loc == 0 & BD20_2 == 1 & BD20_3 < 30) |
+      (Improved_dw_Loc == 0 & BD20_2 == 98 & BD22 == 1),
       1,
-      2
+      0
     )
   )%>%
 mutate(Improved_dw_access = labelled(Improved_dw_access,
                                labels = c(
                                  "Yes" = 1,
-                                 "No" = 2
+                                 "No" = 0
                                ),
                                label = "Access to clean drinking water services"))
 
@@ -346,7 +346,7 @@ HoH <- HoH %>%
     (HH04 == "1") & (HH05 == "1") & (HH10 == "1") & 
       (HH08 == "2") & (HH09 == "2") & (HH11 == "2") ~ 1,
     HH01 %in% c(4, 5) | HH04 == "2"| HH05 == "2" | 
-      HH10 %in% c(2, 3) | HH08 %in% c(1, 3) | HH09 %in% c(1, 3) | HH11 %in% c(1, 3) ~ 2,
+      HH10 %in% c(2, 3) | HH08 %in% c(1, 3) | HH09 %in% c(1, 3) | HH11 %in% c(1, 3) ~ 0,
     TRUE ~ NA_integer_
   ))
 
@@ -362,7 +362,7 @@ table(HoH$habitablehousing)
 HoH <- HoH %>%
   mutate(shelter=case_when(
     crowding_cat==1 & habitablehousing==1 ~ 1,
-    TRUE ~ 2
+    TRUE ~ 0
   ))
 
 table(HoH$shelter)
@@ -383,10 +383,10 @@ After computing the four basic services, we will include an assessment of whethe
 ##Step 1.1 - Identify coloumns that contain information on shocks: 
 shock_columns <- grep("^Shock\\d+_ExpShock02$", names(HoH), value = TRUE)
 
-##Step 1.2 - Assign 2 if any shock column has value 2, otherwise assign 1 
+##Step 1.2 - Assign 0 if any shock column has value 2, otherwise assign 1 
 HoH$Landslides_flooding <- apply(HoH[shock_columns], 1, function(row) {
   if (any(row == 2, na.rm = TRUE)) {
-    2  # Not secure
+    0  # Not secure
   } else {
     1  # Secure
   }
@@ -408,34 +408,41 @@ Ilgi: I removed the aspect of health from the below until we finalize it.
 
 HoH <-HoH %>%
   mutate(RBM10202=case_when(
-    shelter==2 | electricity==2 | Improved_dw_access==2 | Landslides_flooding==2 ~ 2,
+    shelter==0 | electricity==0 | Improved_dw_access==0 | Landslides_flooding==0 ~ 0,
     shelter==1 & electricity==1 & Improved_dw_access==1 & Landslides_flooding==1 ~ 1)
   ) %>% 
   mutate(RBM10202=labelled(RBM10202,
                             labels =c(
                               "Yes"=1,
-                              "No"=2
+                              "No"=0
                             ),
                             label="Proportion of people residing in physically safe and secure settlements with access to basic facilities"))
 
 table(HoH$RBM10202)
-
-  
-##Table by population groups
-
-#impact2_2 <- RMS_XXX_202X_main %>%
-  #filter(!is.na(pop_groups)) %>%                     # Exclude if pop groups is NA
-  #group_by(pop_groups) %>%                           # Show results disaggregated by pop groups
-  #summarise(                                         # put all variables here
-    #var_name = "impact2_2",                          # name of the variable
-    #num_obs_uw = unweighted(n()),                    # unweighted total count
-    #denominator = survey_total(),                      # weighted total count
-    #mean_value = survey_mean(impact2_2, vartype = c("ci", "se"), , na.rm = TRUE),  ## indicator value ( weighted) with CI and SE
-  #)
-  
 ```
 
+```{r, eval=FALSE}
+FDS_PAK_2024_HoH <- HoH %>%
+  as_survey_design(
+    ids = NULL,           # Specify the column with cluster IDs
+    weights = NULL, # Specify the column with survey weights
+    nest = TRUE              # Use TRUE if PSUs are nested within clusters (optional, based on your survey design)
+  )
+```
 
+```{r, eval=FALSE}
+#Table by population groups 
+#This table is done as an example on the FDS PAK dataset. Ensure to re-name your table if you are working on a different datatset. 
+RBM10202 <- FDS_PAK_2024_HoH %>%    
+  filter(!is.na(Intro_07)) %>%      # Exclude if pop groups is NA
+  group_by(Intro_07) %>%            # how results disaggregated by pop groups
+  summarise(                        # put all variables here
+    var_name = "RBM10202",          # name of the variable
+    num_obs_uw = unweighted(n()),   # unweighted total count
+    denominator = survey_total(),   # weighted total count
+    mean_value = survey_mean(RBM10202, vartype = c("ci", "se"), na.rm = TRUE)  ## indicator value ( weighted) with CI and SE
+  )
+```
 
 ## 2.3 Core Impact Indicator
 
@@ -481,16 +488,16 @@ RA_adult <- RA_adult %>%
     H01_1==1 & H04== 1 & H06==1 ~ 1,
     H01_1==1 & H04== 2 ~ 1,
     H01_1==2 ~ NA,
-    H01_1==1 & H04== 1 & H06==2 ~ 2 ))
+    H01_1==1 & H04== 1 & H06==2 ~ 0 ))
 
 #Option 2: Use this option in cases when H08 is present in the data set.
 #RA_adult<- RA_adult %>%
  # mutate(RBM10203=case_when(
    # H01_1==1 & H04== 1 & H06==1 ~ 1,
    # H01_1==1 & H04== 2 & (H08 == "E" |H08 == "H" |H08 == "X" | |H08 == "Y") ~ 1, #Individuals who needed to see a health professional, and didn't try due to lack of time, fear of coronavirus, other reasons, or don't know why they didn't try are deemed as having access to health services. 
-   # H01_1==1 & H04== 2 & H08 %in% c("A", "B","C", "D", "F", "G") ~ 2, #Individuals who needed to see a health professional, and didn't try due to non personal reasons/choices are deemed as not having access to health services. 
+   # H01_1==1 & H04== 2 & H08 %in% c("A", "B","C", "D", "F", "G") ~ 0, #Individuals who needed to see a health professional, and didn't try due to non personal reasons/choices are deemed as not having access to health services. 
    # H01_1==2 ~ NA,
-   # H01_1==1 & H04== 1 & H06==2 ~ 2 ))
+   # H01_1==1 & H04== 1 & H06==2 ~ 0 ))
 ```
 
 
@@ -499,7 +506,7 @@ RA_adult <- RA_adult %>%
  mutate(RBM10203=labelled(RBM10203,
                             labels =c(
                               "Yes"=1,
-                              "No"=2
+                              "No"=0
                             ),
                             label="Proportion of people with access to health services"))
 
@@ -555,7 +562,7 @@ roster <- roster %>%
   mutate(edu_primary = case_when(
     HH_Educ02a == 1 & HH_Educ03 %in% 1:8 ~ 1, # Ensure to check possible grade levels. In these example answers 1 - 8 were considered for primary grade level. 
     HH_Educ02a %in% c(99, 98) ~ NA_real_, #When respondent answers with 99 - refuse to answer, or 98 - Don't know this is treated as NA. 
-    HH_Educ02a == 2 ~ 2
+    HH_Educ02a == 2 ~ 0
   ))
 ```
 ```{r, eval=FALSE}
@@ -564,7 +571,7 @@ roster <- roster %>%
   mutate(
     age_primary = case_when(
       HH_04 >= 6 & HH_04 <= 14 ~ 1,  #Remember to adjust age levels based on the primary education age per country
-      TRUE ~ 2
+      TRUE ~ 0
     )
   )
 ```
@@ -612,7 +619,7 @@ roster <- roster %>%
   mutate(edu_secondary = case_when(
     HH_Educ02a == 1 & HH_Educ03 %in% 9:12 ~ 1, # Ensure to check possible grade levels in the country specific questionnaire. In this example answers 1 - 8 were considered for secondary grade level. 
     HH_Educ02a %in% c(99, 98) ~ NA_real_, #When respondent answers with 99 - refuse to answer, or 98 - Don't know this is treated as NA. 
-    HH_Educ02a == 2 ~ 2
+    HH_Educ02a == 2 ~ 0
   ))
 
 
@@ -621,7 +628,7 @@ roster <- roster %>%
   mutate(
     age_secondary = case_when(
       HH_04 >= 13 & HH_04 <= 16 ~ 1,  #Remember to adjust age levels based on the secondary education age per country
-      TRUE ~ 2
+      TRUE ~ 0
     )
   )
 ```
@@ -666,7 +673,7 @@ RA_adult <- RA_adult %>%
   mutate(
   RBM10303 = case_when(
     FS01 == 1 | FS01 == 2 ~ 1,     # Assign 1 for Yes (feels safe)
-    FS01 == 3 | FS01 == 4 | FS01 == 5 | FS01 == 98 ~ 2,  # Assign 2 for No (does not feel safe)
+    FS01 == 3 | FS01 == 4 | FS01 == 5 | FS01 == 98 ~ 0,  # Assign 2 for No (does not feel safe)
     TRUE ~ NA_real_                 # Assign NA for any other values (if needed)
   )
 )
@@ -680,7 +687,7 @@ RA_adult <- RA_adult %>%
       RBM10303,
       labels = c(
         "Yes" = 1,  # Label for Yes (1)
-        "No" = 2    # Label for No (2)
+        "No" = 0    # Label for No (0)
       ),
       label = "Proportion of people that feel safe walking alone in their neighbourhood after dark"  # Assign the variable label
     )
@@ -737,7 +744,7 @@ table(roster$HH_07b) # Has [name]’s birth been registered with the [civil auth
 roster <- roster %>%
   mutate(birthCertificate = case_when(
     HH_07a == 1 ~ 1, # Assigns 1 for yes
-    HH_07a == 2 ~ 2, # Assigns 2 for no
+    HH_07a == 2 ~ 0, # Assigns 2 for no
     HH_07a %in% c(98, 99) ~ NA_real_,  # Assign NA for 98 and 99
     TRUE ~ NA_real_  # Handle any other missing or unexpected values
   )) %>%
@@ -745,7 +752,7 @@ roster <- roster %>%
     birthCertificate,
     labels = c(
       'Yes' = 1,
-      'No' = 2
+      'No' = 0
     ),
     label = "Children under 5 with a birth certificate"
   ))
@@ -757,7 +764,7 @@ roster <- roster %>%
 roster <- roster %>%
   mutate(birthRegistered = case_when(
     HH_07b == 1 ~ 1, # Assigns 1 for yes
-    HH_07b == 2 ~ 2, # Assigns 2 for no
+    HH_07b == 2 ~ 0, # Assigns 2 for no
     HH_07b %in% c(98, 99) ~ NA_real_,  # Assign NA for 98 and 99
     TRUE ~ NA_real_  # Handle any other missing or unexpected values
   )) %>%
@@ -765,7 +772,7 @@ roster <- roster %>%
     birthRegistered,
     labels = c(
       'Yes' = 1,
-      'No' = 2
+      'No' = 0
     ),
     label = "Children under 5 birth registered with civil authorities"
   ))
@@ -776,15 +783,15 @@ roster <- roster %>%
 roster <- roster %>%
   mutate(RBM20102 = case_when(
     (birthRegistered == 1 | birthCertificate == 1) ~ 1,  # Child has been registered or has birth certificate
-    (birthRegistered == 2 & birthCertificate == 2) ~ 2,  # Child not registered and has no birth certificate
-    (is.na(birthRegistered) & birthCertificate == 2) | (birthRegistered == 2 & is.na(birthCertificate)) ~ 2,  # One is NA, the other is No
+    (birthRegistered == 0 & birthCertificate == 0) ~ 0,  # Child not registered and has no birth certificate
+    (is.na(birthRegistered) & birthCertificate == 0) | (birthRegistered == 0 & is.na(birthCertificate)) ~ 0,  # One is NA, the other is No
     TRUE ~ NA_real_  # Handle cases where data is missing or unknown
   )) %>%
   mutate(RBM20102 = labelled(
     RBM20102,
     labels = c(
       'Yes' = 1,
-      'No' = 2
+      'No' = 0
     ),
     label = "Proportion of children under 5 years of age whose births have been registered with a civil authority"
   ))
@@ -843,7 +850,7 @@ table(roster$Legal_passport) #If the person has a passport?
 roster <- roster %>% 
   mutate(RBM20103 = case_when(
     ID_09 %in% c(2,3,4,5,6,7,10,15) | ID_13 %in% c("B","C","D","E","F","G","J","P") | Legal_birth_certificate == 1 | Legal_ID_card == 1 | Legal_passport == 1 ~ 1, #Assigns 1 if the person has a work visa or a permanent residency or birth certificate or a Proof of registration card or civil/government ID, or passport. 
-    ID_09 %in% c(1, 8, 9, 11, 12, 13, 14) & ID_13 %in% c("A","H","I","K","L","M","N","OT")  & Legal_birth_certificate == 2 & Legal_ID_card == 2 & Legal_passport == 2 ~ 2, #Assigns 2 if the person has no primary, secondary and no other legal documents), 
+    ID_09 %in% c(1, 8, 9, 11, 12, 13, 14) & ID_13 %in% c("A","H","I","K","L","M","N","OT")  & Legal_birth_certificate == 2 & Legal_ID_card == 2 & Legal_passport == 2 ~ 0, #Assigns 0 if the person has no primary, secondary and no other legal documents), 
     TRUE ~ NA))
   
 ```
@@ -852,7 +859,7 @@ roster <- roster %>%
   mutate(RBM20103 = labelled(RBM20103,
                                labels = c(
                                  'Yes' = 1,
-                                 'No' = 2
+                                 'No' = 0
                                ),
                                label = "Proportion of people with legally recognized identity documents or credentials"))
 ```
@@ -914,12 +921,12 @@ RA_adult <- RA_adult %>%
   mutate(RBM20401 = case_when(
     AS01_1 == 1 | AS01_2 == 1 ~ 1,  # If AS01_1 or AS01_2 is "1", set to 1 (numeric)
     across(c(AS01_1, AS01_2, AS01_3a, AS01_3b,AS01_4,AS01_5), ~ . == 98) %>% rowSums() == 4 ~ NA_real_,  # If all selected columns are "98", set to NA_real_
-    TRUE ~ 2  # For all other cases, set to 2 (numeric)
+    TRUE ~ 0  # For all other cases, set to 0 (numeric)
   )) %>%
   mutate(RBM20401 = labelled(RBM20401,
                                labels = c(
                                  'Yes' = 1,
-                                 'No' = 2
+                                 'No' = 0
                                ),
                                label = "Proportion of people who know where to access available GBV service"))
 ```
@@ -989,7 +996,7 @@ Based on the country context, some of the questions might not be included. Check
 RA_adult <- RA_adult %>%
   mutate(
     RBM20402 = case_when(
-      VW01_1 == 1 | VW01_2 == 1 | VW01_4 == 1 | VW01_6 == 1 | VW01_8 == 1 ~ 2,  # Any "1" results in 2
+      VW01_1 == 1 | VW01_2 == 1 | VW01_4 == 1 | VW01_6 == 1 | VW01_8 == 1 ~ 0,  # Any "1" results in 0
       VW01_1 == 2 & VW01_2 == 2 & VW01_4 == 2 & VW01_6 == 2 & VW01_8 == 2 ~ 1,  # All "2"s result in 1
       TRUE ~ NA_real_  # Missing or other cases result in NA
     )
@@ -999,7 +1006,7 @@ RA_adult <- RA_adult %>%
       RBM20402,
       labels = c(
         'Yes' = 1,  # Numeric label for "Yes"
-        'No' = 2    # Numeric label for "No"
+        'No' = 0    # Numeric label for "No"
       ),
       label = "Proportion of people who do not accept violence against women"
     )
@@ -1060,15 +1067,15 @@ HoH <- HoH %>%
       (HC01 == 1 & (HC02 %in% c(1, 2, 3, 4, 5)) | (HC01 == 1 & HC02 == 8 & HC04 == 2)
       ) ~ 1,  # First condition for clean cooking
       (HC01 == 1 & (HC02 %in% c(6,7,9,10,11,96)) | (HC02 == 8 & !(HC04== 2)
-      )) ~ 2,  # Condition for unclean cooking or incomplete clean technology
-      HC01 == 2 ~ 2,  # HC01 is "2"
+      )) ~ 0,  # Condition for unclean cooking or incomplete clean technology
+      HC01 == 2 ~ 0,  # HC01 is "2"
       TRUE ~ NA_real_  # Handle missing or other cases
     )
   ) %>%
   mutate(
     RBM20802 = labelled(RBM20802,
                           labels = c(
-                            "No" = 2,
+                            "No" = 0,
                             "Yes" = 1
                           ),
                           label = "Proportion of people with primary reliance on clean (cooking) fuels and technology"
@@ -1145,7 +1152,7 @@ HoH <- HoH %>%
     (HH04 == "1") & (HH05 == "1") & (HH10 == "1") & 
       (HH08 == "2") & (HH09 == "2") & (HH11 == "2") ~ 1,
     HH01 %in% c(4, 5) | HH04 == "2"| HH05 == "2" | 
-      HH10 %in% c(2, 3) | HH08 %in% c(1, 3) | HH09 %in% c(1, 3) | HH11 %in% c(1, 3) ~ 2,
+      HH10 %in% c(2, 3) | HH08 %in% c(1, 3) | HH09 %in% c(1, 3) | HH11 %in% c(1, 3) ~ 0,
     TRUE ~ NA_integer_
   ))
 
@@ -1160,12 +1167,12 @@ table(HoH$habitablehousing)
 HoH <- HoH %>%
   mutate(RBM20901=case_when(
     crowding_cat==1 & habitablehousing==1 ~ 1,
-    TRUE ~ 2
+    TRUE ~ 0
   ))%>%
   mutate(
     RBM20901 = labelled(RBM20901,
                           labels = c(
-                            "No" = 2,
+                            "No" = 0,
                             "Yes" = 1
                           ),
                           label = "Proportion of people living in habitable and affordable housing"
@@ -1222,12 +1229,12 @@ To calculate the indicator value, the standard survey methodology considers in t
 HoH <- HoH %>%
   mutate(RBM20902 = case_when(
     HL01 == 1 & HL03 %in% c(1,2,3,4,5,6) ~ 1,  # Conditions for "Yes" (1)
-    TRUE ~ 2  # Default to "No" (2)
+    TRUE ~ 0  # Default to "No" (0)
   )) %>%
   mutate(RBM20902 = labelled(RBM20902,
                                labels = c(
                                  "Yes" = 1,
-                                 "No" = 2
+                                 "No" = 0
                                ),
                                label = "Proportion of people that have energy to ensure lighting"
   ))
@@ -1279,7 +1286,7 @@ RA_caregiver <- RA_caregiver %>%
   mutate(
     RBM21001 = case_when(
       child_age_immunization >= 9 & MV2 %in% c(1, 2) & MV3 > 0 & MV3 != 98 ~ 1, #1 for yes
-      child_age_immunization >= 9 & MV2 == 3 ~ 2,  # 2 for No
+      child_age_immunization >= 9 & MV2 == 3 ~ 0,  # 2 for No
       TRUE ~ NA_real_  # Assign NA for MV2 == 98 or any other conditions
     )
   )
@@ -1290,7 +1297,7 @@ RA_caregiver <- RA_caregiver %>%
 mutate(RBM21001 = labelled(RBM21001,
                                  labels = c(
                                    "Yes" = 1,
-                                   "No" = 2
+                                   "No" = 0
                                  ),
                                  label = "Proportion of children aged 9 months to five years who have received measles vaccination*"))
 
@@ -1344,7 +1351,7 @@ RA_woman <- RA_woman %>%
   mutate(
     RBM21002 = case_when(
       BA10 %in% c("A", "B", "C") ~ 1,           # Assign 1 for skilled personnel
-      BA10 %in% c("D", "E", "F") ~ 2,           # Assign 2 for unskilled personnel
+      BA10 %in% c("D", "E", "F") ~ 0,           # Assign 2 for unskilled personnel
       BA10 == "X" ~ NA_real_,                   # Set NA for X(Other, specify)
       TRUE ~ NA_real_                           # Set NA for any other values not specified
     )
@@ -1356,7 +1363,7 @@ RA_woman <- RA_woman %>%
 mutate(RBM21002 = labelled(RBM21002,
                                 labels = c(
                                   "Yes" = 1,  # Yes for skilled personnel
-                                  "No" = 2    # No for unskilled personnel
+                                  "No" = 0    # No for unskilled personnel
                                 ),
                                 label = "Proportion of births attended by skilled health personnel"
   ))
@@ -1405,48 +1412,50 @@ table(HoH$BD22)   ##Does it take more or less than 30 minutes?
 
 ## Step 2: Add a coloumn specifying is the household uses improved or unimproved source of drinking water 
 HoH <- HoH %>%
-  mutate(drinkingWaterImproved = ifelse(BD01 %in% c(11, 12, 13, 14, 21, 31, 41, 51, 61, 71, 72, 91, 92), 1, 2)) %>%
-  mutate(drinkingWaterImproved = labelled(drinkingWaterImproved,
+    mutate(Improved_dw = ifelse(BD01 %in% c(11, 12, 13, 14, 21, 31, 41, 51, 61, 71, 72, 91, 92), 1, 0)) %>%
+  mutate(Improved_dw = labelled(Improved_dw,
                                labels = c(
                                  "Yes" = 1,
-                                 "No" = 2
+                                 "No" = 0
                                ),
                                label = "Improved drinking water source"))
 ```
 
-```{r}
+```{r, eval=FALSE}
 ##Step 3: Add a coloumn specifying if the improved water source is located in own dwelling/yard/plot or elsewhere. 
 HoH <- HoH %>%
-mutate(ImprovedDrinkingWaterLocation = ifelse(BD01 %in% c(11, 12) | (((BD01 %in% c(13, 14, 21, 31, 41, 51, 61, 71, 72, 91, 92))) & BD01a %in% c(1, 2)),1,2))%>%
-mutate(ImprovedDrinkingWaterLocation = labelled(ImprovedDrinkingWaterLocation,
+mutate(Improved_dw_Loc = ifelse(BD01 %in% c(11, 12) | (((BD01 %in% c(13, 14, 21, 31, 41, 51, 61, 71, 72, 91, 92))) & BD01a %in% c(1, 2)),1,0))%>%
+mutate(Improved_dw_Loc = labelled(Improved_dw_Loc,
                                labels = c(
                                  "Yes" = 1,
-                                 "No" = 2
+                                 "No" = 0
                                ),
                                label = "Improved drinking water source in own dwelling, yard or plot"))
+
 
 ```
 ```{r, eval=FALSE}
 ##Step 4: Add a column specifying if it takes more or less than 30 min to the improved drinking water source. If the improved drinking water source is located in own dwelling, yard or plot, it is considered that it takes less than 30 minutes to reach. 
 ## BD20-3 - Minutes
 HoH <- HoH %>%
-  mutate(
-    RBM21201 = ifelse(
-      (ImprovedDrinkingWaterLocation == 1 )|
-      (ImprovedDrinkingWaterLocation == 2 & BD20_2 == 1 & BD20_3 < 30) |
-      (ImprovedDrinkingWaterLocation == 2 & BD20_2 == 98 & BD22 == 1),
+mutate(
+    Improved_dw_access= ifelse(
+      (Improved_dw_Loc == 1 )|
+      (Improved_dw_Loc == 0 & BD20_2 == 1 & BD20_3 < 30) |
+      (Improved_dw_Loc == 0 & BD20_2 == 98 & BD22 == 1),
       1,
       2
     )
   )%>%
-mutate(RBM21201 = labelled(RBM21201,
+mutate(Improved_dw_access = labelled(Improved_dw_access,
                                labels = c(
                                  "Yes" = 1,
-                                 "No" = 2
+                                 "No" = 0
                                ),
-                               label = "Basic drinking water services"))
+                               label = "Access to clean drinking water services"))
 
 
+table(HoH$Improved_dw_access)
 ```
 
 ```{r, eval=FALSE}
@@ -1492,7 +1501,7 @@ table(HoH$SAN05) #Do you share this toilet facility with others who are not memb
 HoH <- HoH %>%
   mutate(type_san_facility = case_when(
     SAN01 %in% c("11", "12", "13", "14", "18", "21", "22", "31") ~ 1,  # Improved sanitation facility
-    SAN01 %in% c("23", "41", "51", "95", "96") ~ 2,  # Unimproved sanitation facility
+    SAN01 %in% c("23", "41", "51", "95", "96") ~ 0,  # Unimproved sanitation facility
     TRUE ~ NA_real_ 
     ))# Missing or invalid
 ```
@@ -1500,17 +1509,17 @@ HoH <- HoH %>%
 #Step 2: Create a variable to check if the contents of the toilet are safely disposed
 HoH <- HoH %>%
  mutate(disposal_san_facility = case_when(
-    SAN02 == 1 & SAN03 %in% c("5", "96", "98") ~ 2,  # Unsafe disposal
+    SAN02 == 1 & SAN03 %in% c("5", "96", "98") ~ 0,  # Unsafe disposal
     SAN02 == 1 & SAN03 %in% c("1", "2", "3", "4") ~ 1,  # Safe disposal
-    SAN02 == 2 ~ 2,  # Unsafe if no toilet
-    SAN02 == 98 ~ 2,  # Unavailable information
+    SAN02 == 2 ~ 0,  # Unsafe if no toilet
+    SAN02 == 98 ~ 0,  # Unavailable information
     TRUE ~ NA_real_ )) # Missing or invalid
 ```
 ```{r, eval=FALSE}
 #Step 3: Create a variable to check if the household shares the toilet facility with other households 
 HoH <- HoH %>%
   mutate(shared_san_facility = case_when(
-    SAN05 == 1 ~ 2,             # Shared toilet
+    SAN05 == 1 ~ 0,             # Shared toilet
     SAN05 == 2 ~ 1,             # Not shared
     SAN05 %in% c("98", "99") ~ NA # NA for 98 or 99
   ))
@@ -1521,14 +1530,14 @@ HoH <- HoH %>%
 HoH <- HoH %>%
 mutate(RBM21202 = case_when(
     type_san_facility == 1 & disposal_san_facility == 1 & shared_san_facility == 1 ~ 1,  # Basic sanitation service
-    TRUE ~ 2  # If any condition fails
+    TRUE ~ 0  # If any condition fails
   )) %>%
   mutate(RBM21202 = labelled(RBM21202,
                                 labels = c(
                                   "Yes" = 1,
-                                  "No" = 2
+                                  "No" = 0
                                 ),
-                                label = "This indicator measures the proportion of people with access to at least basic sanitation services."
+                                label = "Proportion of people with access to at least basic sanitation services."
   ))
 ```
 ```{r, eval=FALSE}
@@ -1573,7 +1582,7 @@ table(RA_adult$FI10) #In the past 12 months, have you personally used a mobile p
 RA_adult <- RA_adult %>%
   mutate(RBM21301 = case_when(
    FI01 == 1 | FI02 == 1 | FI03 == 1 | FI10 == 1 ~ 1,
-   FI01 == 2 & FI02 == 2 & FI03 == 2 & FI10 %in% c(2,3) ~ 2,
+   FI01 == 2 & FI02 == 2 & FI03 == 2 & FI10 %in% c(2,3) ~ 0,
     TRUE ~ NA_real_ # For all other cases, assigns NA
   ))
 
@@ -1583,7 +1592,7 @@ RA_adult <- RA_adult %>%
    mutate(RBM21301 = labelled(RBM21301,
                                 labels = c(
                                   "Yes" = 1,  # Label for Yes
-                                  "No" = 2    # Label for No
+                                  "No" = 0    # Label for No
                                 ),
                                 label = "Proportion of people above with an account at a bank or other financial institution or with a mobile-money-service provider"
   ))
@@ -1629,14 +1638,14 @@ HoH <- HoH %>%
   mutate(RBM21302 = case_when(
     CH01b == 1 & CH02b == 1 ~ 1,  # Income increased and can afford more
      (CH01b == 2 | CH01b == 3) & CH02b == 1 ~ 1,  # Income decreased/same and can afford more
-    TRUE ~ 2)) # Default to 2
+    TRUE ~ 0)) # Default to 2
 ```
 ```{r, eval=FALSE}
 HoH <- HoH %>%
    mutate(RBM21302 = labelled(RBM21302,
                                 labels = c(
                                   "Yes" = 1,  # Label for Yes
-                                  "No" = 2    # Label for No
+                                  "No" = 0    # Label for No
                                 ),
                                 label = "Proportion of people who self-report positive changes in their income compared to previous year"
   ))
@@ -1710,7 +1719,7 @@ RA_adult <- RA_adult %>%
     (EMP05 == 1 & EMP06a == 3) & working_age == 1 ~ 1,  # Absent but self-employed
     (EMP02 == 1 & EMP06b %in% c(1, 2) & EMP06c %in% c(1, 2)) & working_age == 1 ~ 1,  # Farming/rearing/fishing for sale
     (EMP05 == 1 & EMP06a %in% c(1, 2) & EMP06c %in% c(1, 2)) & working_age == 1 ~ 1,  # Absent but farming for sale
-    working_age == 1 ~ 2,  # If working age but none of the above, mark as not employed
+    working_age == 1 ~ 0,  # If working age but none of the above, mark as not employed
     TRUE ~ NA_real_  # Set to NA for those not in the working age group
   ))
 ```
@@ -1718,8 +1727,8 @@ RA_adult <- RA_adult %>%
 #Step 3: Define unemployed: those not employed but actively looking for work
 RA_adult <- RA_adult %>%
   mutate(unemployed = case_when(
-    (employed == 2 & (EMP25a == 1 | EMP25aa == 1) & EMP29 == 1) & working_age == 1 ~ 1,  # Actively looking for work
-    working_age == 1 ~ 2,  # Not unemployed if not actively looking or employed
+    (employed == 0 & (EMP25a == 1 | EMP25aa == 1) & EMP29 == 1) & working_age == 1 ~ 1,  # Actively looking for work
+    working_age == 1 ~ 0,  # Not unemployed if not actively looking or employed
     TRUE ~ NA_real_  # Set to NA for those not in the working age group
   ))
 ```
@@ -1728,7 +1737,7 @@ RA_adult <- RA_adult %>%
 RA_adult <- RA_adult %>%
   mutate(labour_force = case_when(
     (employed == 1 | unemployed == 1) & working_age == 1 ~ 1,  # Employed or actively seeking work
-    working_age == 1 ~ 2,  # Not in labour force but 18+
+    working_age == 1 ~ 0,  # Not in labour force but 18+
     TRUE ~ NA_real_  # Set to NA for those not in the working age group
   ))
 ```
@@ -1737,7 +1746,7 @@ RA_adult <- RA_adult %>%
 #Step 5: Outcome - unemployment status among those in the labor force (numeric outcome)
 RA_adult <- RA_adult %>%
   mutate(RBM21303 = case_when(
-    employed == 1 & labour_force == 1 ~ 2,  # If employed, outcome is 2 (not unemployed)
+    employed == 1 & labour_force == 1 ~ 0,  # If employed, outcome is 0 (not unemployed)
     unemployed == 1 & labour_force == 1 ~ 1,  # If unemployed, outcome is 1
     TRUE ~ NA_real_  # Catch-all for cases not in the labor force or with missing data
   ))
@@ -1747,7 +1756,7 @@ RA_adult <- RA_adult %>%
    mutate(RBM21303 = labelled(RBM21303,
                                 labels = c(
                                   "Unemployed" = 1,  # Label for Yes
-                                  "Not unemployed" = 2   # Label for No
+                                  "Not unemployed" = 0   # Label for No
                                 ),
                                 label = "Proportion of people (working age) who are unemployed"))
 
@@ -1808,7 +1817,7 @@ table(roster$Legal_passport) #If the person has a passport?
 roster <- roster %>% 
   mutate(RBM21401 = case_when(
     ID_VAR == 4 & (ID_09 %in% c(2,3,4,5,6,7,10,15) | ID_13 %in% c("B","C","D","E","F","G","J","P") | Legal_birth_certificate == 1 | Legal_ID_card == 1 | Legal_passport == 1) ~ 1, #Assigns 1 if the person has a work visa or a permanent residency or birth certificate or a Proof of registration card or civil/government ID, or passport. 
-    ID_VAR == 4 & (ID_09 %in% c(1, 8, 9, 11, 12, 13, 14) & ID_13 %in% c("A","H","I","K","L","M","N","OT")  & Legal_birth_certificate == 2 & Legal_ID_card == 2 & Legal_passport == 2) ~ 2, #Assigns 2 if the person has no primary, secondary and no other legal documents), 
+    ID_VAR == 4 & (ID_09 %in% c(1, 8, 9, 11, 12, 13, 14) & ID_13 %in% c("A","H","I","K","L","M","N","OT")  & Legal_birth_certificate == 2 & Legal_ID_card == 2 & Legal_passport == 2) ~ 0, #Assigns 2 if the person has no primary, secondary and no other legal documents), 
     TRUE ~ NA))
   
 ```
@@ -1817,7 +1826,7 @@ roster <- roster %>%
   mutate(RBM21401 = labelled(RBM21401,
                                labels = c(
                                  'Yes' = 1,
-                                 'No' = 2
+                                 'No' = 0
                                ),
                                label = "Proportion of returnees with legally recognized identity documents or credential"))
 ```
@@ -1891,7 +1900,7 @@ table(HoH$House10) #How likely is your household to be expelled from the housing
 HoH <- HoH %>%
   mutate(ownership_plot = case_when(
     Land02 == 1 ~ 1, #Assigns 1 if the HH owns the plot they currently live on
-    Land02 == 2 ~ 2, #Assigns 2 if the HH does not own the plot they currently live on
+    Land02 == 2 ~ 0, #Assigns 2 if the HH does not own the plot they currently live on
     TRUE ~ NA_real_ )) #Assigns NA if the answer is "don't know" or "refuse to answer". 
 ```
 ```{r, eval=FALSE}
@@ -1900,20 +1909,18 @@ HoH <- HoH %>%
 HoH <- HoH %>%
   mutate(use_own_any_plot = case_when(
     Land01 == 1 | Land03 == 1 | Land04 == 1 ~ 1, #Assigns 1 if they use, own or hold use rights for any plot of land
-    Land01 == 2 & Land03 == 2 & Land04 == 2 ~ 2, #Assigns 2 if they don't use, own or hold use rights for any plot of land
+    Land01 == 2 & Land03 == 2 & Land04 == 2 ~ 0, #Assigns 2 if they don't use, own or hold use rights for any plot of land
     TRUE ~ NA_real_ )) #Assigns NA if the answer is "don't know" or "refuse to answer".
     
 ```
 ```{r, eval=FALSE}
 #Step 3: For HH that do not own the plot they live on, but have ownership/use rights of a plot in the host country, we need to check if they have legal documents for this plot, if the use of the plot is residential, and if the likelihood of them loosing the plot is low. 
 #In FDS, HH can specify up to 5 plots they might own or have the use rights to. We are only checking plot 1, as enumerators are instructed to start the plot roster with the plot where the family currently lives. 
-```
-```{r, eval=FALSE}
 #Step 3.1: Check that the use of plot 1 is indeed residential
 HoH <- HoH %>%
   mutate(residental_plot = case_when(
     grepl("A", Land09_1) ~ 1,#Assigns 1 if the use of plot 1 is residential
-    !grepl("A", Land09_1) ~ 2)) #Assigns 2 if the use of plot 1 is not residential
+    !grepl("A", Land09_1) ~ 0)) #Assigns 2 if the use of plot 1 is not residential
 ```
 
 ```{r, eval=FALSE}
@@ -1921,8 +1928,8 @@ HoH <- HoH %>%
 HoH <- HoH %>%
   mutate(use_own_current_plot = case_when(
     Land05_1 == 1 | Land07_1 == 1 ~ 1, #Assigns 1 if the HH has ownership or use rights of the plot they live on
-    Land05_1 == 2 & Land07_1 == 2 ~ 2,  #Assigns 2 if the HH does not have ownership nor use rights of the plot they live on
-    Land05_1 %in% c(98,99) & Land07_1 == 2 ~ 2, #Assigns 2 if the HH does not have use rights of the plot they live on & they don't know/refuse      to answer to ownership rights
+    Land05_1 == 2 & Land07_1 == 2 ~ 0,  #Assigns 2 if the HH does not have ownership nor use rights of the plot they live on
+    Land05_1 %in% c(98,99) & Land07_1 == 2 ~ 0, #Assigns 2 if the HH does not have use rights of the plot they live on & they don't know/refuse      to answer to ownership rights
     TRUE ~ NA_real_ )) #Assigns NA if the answer is "don't know" or "refuse to answer".
 #Ilgi, what do we do with cases where they don't have ownership rights, and they don't know/refuse to answer on use rights? 
 ```
@@ -1931,7 +1938,7 @@ HoH <- HoH %>%
 HoH <- HoH %>%
   mutate(legal_documents = case_when(
     Land10_1 == 1 ~ 1, #Assigns 2 if the HH has legal ownership or use right documents for the plot they live on
-    Land10_1 == 2 ~ 2, #Assigns 2 if the HH does not have legal ownership or use right documents for the plot they live on
+    Land10_1 == 2 ~ 0, #Assigns 2 if the HH does not have legal ownership or use right documents for the plot they live on
     TRUE ~ NA_real_ )) #Assigns NA if the answer is "don't know" or "refuse to answer".
 ```
 
@@ -1941,7 +1948,7 @@ HoH <- HoH %>%
 HoH <- HoH %>%
   mutate(plot_security = case_when(
     Land15_1 %in% c(1,2) ~ 1, #Assigns 1 when the likelihood is "Very unlikely" and "Somewhat unlikely"
-    Land15_1 %in% c(3,4) ~ 2)) #Assigns 2 when the likelihood is "Somewhat likely" and "Very likely"
+    Land15_1 %in% c(3,4) ~ 0)) #Assigns 2 when the likelihood is "Somewhat likely" and "Very likely"
     
 ```
 ```{r, eval=FALSE}
@@ -1949,8 +1956,8 @@ HoH <- HoH %>%
 HoH <- HoH %>%
   mutate(tenure_land = case_when(
     use_own_any_plot == 1 & residental_plot == 1 & use_own_current_plot == 1 & legal_documents == 1 & plot_security == 1  ~ 1, 
-    use_own_any_plot == 1 & (residental_plot == 2 | use_own_current_plot == 2 | legal_documents == 2 | plot_security == 2) ~ 2, 
-    use_own_any_plot == 2 ~ 2, 
+    use_own_any_plot == 1 & (residental_plot == 0 | use_own_current_plot == 0 | legal_documents == 0 | plot_security == 0) ~ 0, 
+    use_own_any_plot == 0 ~ 0, 
     TRUE ~ NA_real_ )) #Assigns NA in all other cases
     
 ```
@@ -1960,8 +1967,8 @@ HoH <- HoH %>%
 HoH <- HoH %>%
   mutate(own_use_house = case_when(
     House01 == 1 | House02 == 1 ~ 1, #Assigns 1 if the HH has ownership or use rights of the house they live in
-    House01 == 2 & House02 == 2 ~ 2, #Assigns 2 if the HH does not have ownership or use rights of the house they live in
-    House01 %in% c(99,98) & House02 == 2 ~ 2, #Assigns 2 if the HH does not have use rights and does not know/refuses to answer for ownership         rights
+    House01 == 2 & House02 == 2 ~ 0, #Assigns 2 if the HH does not have ownership or use rights of the house they live in
+    House01 %in% c(99,98) & House02 == 2 ~ 0, #Assigns 2 if the HH does not have use rights and does not know/refuses to answer for ownership         rights
     TRUE ~ NA_real_ ))
 #Ilgi, what do we do with cases where they don't have ownership rights, and they don't know/refuse to answer on use rights?     
 
@@ -1971,7 +1978,7 @@ HoH <- HoH %>%
 HoH <- HoH %>%
   mutate(documents_house = case_when(
     House04 == 1 ~ 1, #Assigns 1 if the HH has legal documents for the ownership or use of the house
-    House04 == 2 ~ 2, #Assigns 2 if the HH does not have legal documents for the ownership or use of the house
+    House04 == 2 ~ 0, #Assigns 2 if the HH does not have legal documents for the ownership or use of the house
     TRUE ~ NA_real_ )) #Assigns NA in the case of "Refuse to answer" or "Don't know". 
 ```
 ```{r, eval=FALSE}
@@ -1979,7 +1986,7 @@ HoH <- HoH %>%
 HoH <- HoH %>%
   mutate(expelled_house = case_when(
     House10 %in% c(1,2) ~ 1, #Assigns 1 when the likelihood is "Very unlikely" and "Somewhat unlikely"
-    House10 %in% c(3,4) ~ 2)) #Assigns 2 when the likelihood is "Somewhat likely" and "Very likely"
+    House10 %in% c(3,4) ~ 0)) #Assigns 2 when the likelihood is "Somewhat likely" and "Very likely"
 
 ```
 ```{r, eval=FALSE}
@@ -1987,7 +1994,7 @@ HoH <- HoH %>%
 HoH <- HoH %>%
   mutate(tenure_house = case_when(
     own_use_house == 1 & documents_house == 1 & expelled_house == 1 ~ 1, 
-    own_use_house == 2 | documents_house == 2 | expelled_house == 2 ~ 2, 
+    own_use_house == 0 | documents_house == 0 | expelled_house == 0 ~ 0, 
     TRUE ~ NA_real_ )) #Assigns NA in all other cases
 ```
 ```{r, eval=FALSE}
@@ -1996,7 +2003,7 @@ HoH <- HoH %>%
   mutate(RBM21601= case_when(
     ownership_plot == 1 ~ 1, #Assigns 1 if the HH owns the plot of land where they live
     ownership_plot != 1 & tenure_land == 1 & tenure_house == 1  ~ 1, #Assigns 1 if HH does not own the plot of land they live on, but they have     secure land and household tenure through use/ownership rights, documentation, and low likelihood of loosing the plot/housing. 
-    ownership_plot != 1 & (tenure_land == 2 | tenure_house == 2)  ~ 2, #Assigns 2 if HH does not own the plot of land they live on, and they don'    have secure land or household tenure.
+    ownership_plot != 1 & (tenure_land == 0 | tenure_house == 0)  ~ 0, #Assigns 2 if HH does not own the plot of land they live on, and they don'    have secure land or household tenure.
     TRUE ~ NA_real_ )) #Assigns NA in all other cases
     
 ```
@@ -2006,7 +2013,7 @@ HoH <- HoH %>%
   mutate(RBM21601 = labelled(RBM21601,
                                 labels = c(
                                   'Yes' = 1,
-                                  'No' = 2
+                                  'No' = 0
                                 ),
                                 label = "Proportion of people with secure tenure rights and/or property rights to housing and/or land"))
 
@@ -2064,8 +2071,8 @@ HoH <- HoH %>%
   rowwise() %>%
   mutate(Social_Benefit = case_when(
     any(c_across(starts_with("ScProtec16")) == 1, na.rm = TRUE) ~ 1,  # If any column has 1
-    all(c_across(starts_with("ScProtec16")) == 2, na.rm = TRUE) ~ 2,  # If all columns are 2
-    TRUE ~ 2                                                   # Default to NA
+    all(c_across(starts_with("ScProtec16")) == 2, na.rm = TRUE) ~ 0,  # If all columns are 2
+    TRUE ~ 0                                                   # Default to NA
   )) %>%
   ungroup()
 
@@ -2081,9 +2088,9 @@ programme_columns <- grep("^Programme\\d+_ScProtec04$", names(HoH), value = TRUE
 HoH <- HoH %>%
   mutate(Government_assistance = case_when(
     ScProtec01 == 1 & apply(HoH[programme_columns], 1, function(row) any(row == 1, na.rm = TRUE)) ~ 1, # Assigns 1 if assistance is received from the government 
-    ScProtec01 == 2 ~ 2,  # Assigns a 2 if no assistance is received 
-    ScProtec01 == 1 & apply(HoH[programme_columns], 1, function(row) all(row != 1, na.rm = TRUE)) ~ 2, # Assignes a 2 if assistance received is not from the government
-    TRUE ~ 2  # Condition 4: Default case
+    ScProtec01 == 2 ~ 0,  # Assigns a 0 if no assistance is received 
+    ScProtec01 == 1 & apply(HoH[programme_columns], 1, function(row) all(row != 1, na.rm = TRUE)) ~ 0, # Assignes a 0 if assistance received is not from the government
+    TRUE ~ 0  # Condition 4: Default case
   ))
 ```
 ```{r, eval=FALSE}
@@ -2091,15 +2098,15 @@ HoH <- HoH %>%
 HoH <- HoH %>%
   mutate(RBM21602 = case_when(
     Social_Benefit == 1 | Government_assistance == 1 ~ 1,  # If either variable is 1, assign 1
-    Social_Benefit == 2 & Government_assistance == 2 ~ 2,  # If both variables are 2, assign 2
-    TRUE ~ 2  # Default case: assign 2 for any other cases
+    Social_Benefit == 0 & Government_assistance == 0 ~ 0,  # If both variables are 2, assign 0
+    TRUE ~ 0  # Default case: assign 2 for any other cases
   )) %>%
   
   # Add labels to the new variable 'RBM21602'
   mutate(RBM21602 = labelled(RBM21602,
                                 labels = c(
                                   'Yes' = 1,
-                                  'No' = 2
+                                  'No' = 0
                                 ),
                                 label = "Proportion of people covered by national social protection systems"))
 
