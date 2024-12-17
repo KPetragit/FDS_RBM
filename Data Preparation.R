@@ -14,6 +14,11 @@ RA_adult <- read_dta("FDS_PAK_2024_Random_Member_complete.dta")
 RA_woman <- read_dta("FDS_PAK_2024_Random_Woman_complete.dta")
 RA_caregiver <- read_dta ("FDS_PAK_2024_Random_Child_complete.dta")
 
+#roster <- read_dta("C:/Users/KAPS/OneDrive - UNHCR/300 - ST - Survey Team - Main/Survey Programme Team/Projects/FDS/Countries/Pakistan/Data Management/4 Analysis/FDS_PAK_2024_Roster_complete.dta")
+#HoH <- read_dta("C:/Users/KAPS/OneDrive - UNHCR/300 - ST - Survey Team - Main/Survey Programme Team/Projects/FDS/Countries/Pakistan/Data Management/4 Analysis/FDS_PAK_2024_HoH_complete.dta")
+#RA_adult <- read_dta("C:/Users/KAPS/OneDrive - UNHCR/300 - ST - Survey Team - Main/Survey Programme Team/Projects/FDS/Countries/Pakistan/Data Management/4 Analysis/FDS_PAK_2024_Random_Member_complete.dta")
+#RA_woman <- read_dta("C:/Users/KAPS/OneDrive - UNHCR/300 - ST - Survey Team - Main/Survey Programme Team/Projects/FDS/Countries/Pakistan/Data Management/4 Analysis/FDS_PAK_2024_Random_Woman_complete.dta")
+#RA_caregiver <- read_dta ("C:/Users/KAPS/OneDrive - UNHCR/300 - ST - Survey Team - Main/Survey Programme Team/Projects/FDS/Countries/Pakistan/Data Management/4 Analysis/FDS_PAK_2024_Random_Child_complete.dta")
 
 # Rename _uuid to uuid in all datasets
 HoH <- HoH %>%
@@ -399,10 +404,10 @@ RA_caregiver <- RA_caregiver %>%
 ####Calculate crowding index - overcrowded when more than 3 persons share one room to sleep
 
 table(HoH$HH14) ##How many separate structures or buildings do the members of your household occupy? 
-table(HoH$HHmembersize.x)
+table(HoH$HHmembersize)
 
 HoH <- HoH %>%
-  mutate(crowding=HHmembersize.x/HH14
+  mutate(crowding=HHmembersize/HH14
   ) %>%
   mutate(crowding_cat=case_when( ##if crowding <= 3, not overcrowded 
     crowding <= 3 ~ 1, TRUE ~ 2)
