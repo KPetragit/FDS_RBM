@@ -414,3 +414,69 @@ HoH <- HoH %>%
   )
 
 table(HoH$crowding_cat)
+
+
+
+#### ADD LABELS ----
+
+# Define labels for population groups
+popgroup_labels <- c(
+  "1" = "Refugees and Asylum Seekers",
+  "3" = "Host Community"
+)
+
+roster <- roster %>%
+  mutate(Intro_07_roster = recode_factor(Intro_07_roster, !!!popgroup_labels))
+
+HoH <- HoH %>%
+  mutate(Intro_07 = recode_factor(Intro_07, !!!popgroup_labels))
+
+RA_adult <- RA_adult %>%
+  mutate(Intro_07_RA = recode_factor(Intro_07_RA, !!!popgroup_labels))
+
+RA_woman <- RA_woman %>%
+  mutate(Intro_07_RW = recode_factor(Intro_07_RW, !!!popgroup_labels))
+
+RA_caregiver <- RA_caregiver %>%
+  mutate(Intro_07_RC = recode_factor(Intro_07_RC, !!!popgroup_labels))
+
+#### Define labels for gender
+gender_labels <- c(
+  "1" = "Male",
+  "2" = "Female"
+)
+
+# Apply labels to all gender variables in one block
+roster <- roster %>%
+  mutate(HH_02 = recode_factor(HH_02, !!!gender_labels))
+
+HoH <- HoH %>%
+  mutate(HH_02_HoH = recode_factor(HH_02_HoH, !!!gender_labels))
+
+RA_adult <- RA_adult %>%
+  mutate(HH_02_RA = recode_factor(HH_02_RA, !!!gender_labels))
+
+RA_caregiver <- RA_caregiver %>%
+  mutate(HH_02_RC = recode_factor(HH_02_RC, !!!gender_labels))
+
+# Define labels for disability
+disability_labels <- c(
+  "1" = "Disabled",
+  "2" = "Non-Disabled"
+)
+
+roster <- roster %>%
+  mutate(disability = recode_factor(disability, !!!disability_labels))
+
+HoH <- HoH %>%
+  mutate(disability_HoH = recode_factor(disability_HoH, !!!disability_labels))
+
+RA_adult <- RA_adult %>%
+  mutate(disability_RA = recode_factor(disability_RA, !!!disability_labels))
+
+RA_woman <- RA_woman %>%
+  mutate(disability_RW = recode_factor(disability_RW, !!!disability_labels))
+
+RA_caregiver <- RA_caregiver %>%
+  mutate(disability_RC = recode_factor(disability_RC, !!!disability_labels))
+
