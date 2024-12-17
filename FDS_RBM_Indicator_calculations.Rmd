@@ -44,7 +44,7 @@ Percentage = \(\left(\frac{\text{Numerator}}{\text{Denominator}}\right) \times 1
 
 The FDS consists of 4 questionnaires and an introduction section which together form the FDS interview. The 4 questionnaires are the following: 
 
--*Head of the Household questionnaire*, responded to by the Head of the household (>= 15 years of age). This questionnaire also includes the roster, where the head of the household responds to individual level questions about all household members. 
+-*Head of the Household questionnaire*, responded to by the Head of the household (>= 15 years of age),it includes all household level questions such as access to services. This questionnaire also includes the roster, where the head of the household responds to individual level questions about all household members. 
 
 -*Random Adult questionnaire*, responded to by the randomly selected adult (>= 15 years of age) from the household. 
 
@@ -101,7 +101,7 @@ table(roster$HH_04_cat4) #in dataset "roster".
 
 #We look at age categories only indicators for which data is pulled from the "roster" dataset, which holds the individual data for all members of the household. For other four datasets (Headh of the household, randomly selected adult, randomly selected woman, and randomly selected caregiver) the respondent is always => 15 years of age. 
 
-table(HOH$HH_04_HoH)           #in dataset "HoH".
+table(HoH$HH_04_HoH)           #in dataset "HoH".
 table(RA_adult$age_selected)   #in dataset "RA_adult".
 table(RA_woman$agerandomwoman) #in dataset "RA_woman".
 table(RA_caregiver$HH_04_RC)   #in dataset "RA_caregiver".
@@ -144,7 +144,6 @@ table(RA_caregiver$COO_RC) #in dataset "RA_caregiver".
 
 *Indicator Code:* RBM10202
 
-Ilgi: For this indicator, the part of electricity, drinking water and shelter is asked to the HoH as a household level question. While the health care aspect is asked to the randomly selected adult on an individual level. How can we (or should we) specify this distinction? 
 
 This indicator aims to measure the proportion of forcibly displaced and stateless people that reside in safe and secure settlements with access to basic facilities such as shelter, WASH, energy and security from natural hazards.
 
@@ -206,7 +205,7 @@ According to [The Sphere Handbook](https://spherestandards.org/wp-content/upload
 
 **Dataset**: RA_adult
  
-Ilgi: I am still not 100% sure about the health aspect of this indicator. If we only consider those who needed healthcare and were then able to get it as 1, we can say that for example 15% of the sampled population have access to a healthcare facility, but that doesn't mean that the rest don't - we don't know if they do or not.Even when they are put into missing, we still don't really know what is their situation. If this was a stand alone indicator I think it would be fine, but since it is only one of the four components, I am afraid we won't pain the right picture. Lets discuss again on Wednesday. We are also mixing individual and household level in the final composite for this indicator. 
+ 
 ```{r, eval=FALSE}
 
 
@@ -574,8 +573,6 @@ roster <- roster %>%
 
 
 
-Petra - this indicator needs a table as the denom and num are a bit more tricky as in the standard RBM one - maybe we can add that table here? - Ilgi: To discuss
-
 ## 3.2b Core Impact Indicator
 
 
@@ -628,9 +625,6 @@ roster <- roster %>%
   )
 ```
 
-
-
-Petra - same as above - add the table from RBM one
 
 ## 3.3 Core Impact Indicator
 
@@ -928,7 +922,7 @@ table(RA_adult$RBM20401)
 ```
 
 
-## 4.2 Core Outcome Indicator<
+## 4.2 Core Outcome Indicator
 
 **4.2 Proportion of people who do not accept violence against women**
 
@@ -1107,7 +1101,6 @@ To calculate the indicator value, the standard survey methodology considers in t
 **Sources**  
 1.[RBM Core Outcome Indicator 9.1 Guidance](https://intranet.unhcr.org/content/dam/unhcr/intranet/protection-operations/prog-hub/program-cycle/indictors/core/outcome/Core%20outcome%209.1%20Proportion%20of%20people%20living%20in%20habitable%20and%20affordable%20housing.pdf)
 
-Ilgi: In FDS, this is a household level question. Should the numerator and denominator be rephrased? 
 
 ```{r, eval=FALSE}
 #The below script is the same as the script for the "shelter" aspect of RBM Impact 2.2. 
