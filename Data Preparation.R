@@ -7,16 +7,12 @@ pacman::p_load(
   scales, gt,webshot2, sjlabelled, waffle, writexl,remotes, haven )
 
 #Import 5 datasets. Here we are using FDS Pakistan dataset. 
-library(haven)
-roster <- read_dta("C:/Users/KAPS/OneDrive - UNHCR/300 - ST - Survey Team - Main/Survey Programme Team/Projects/FDS/Countries/Pakistan/Data Management/4 Analysis/FDS_PAK_2024_Roster_complete.dta")
-HoH <- read_dta("C:/Users/KAPS/OneDrive - UNHCR/300 - ST - Survey Team - Main/Survey Programme Team/Projects/FDS/Countries/Pakistan/Data Management/4 Analysis/FDS_PAK_2024_HoH_complete.dta"
-)
-RA_adult <- read_dta("C:/Users/KAPS/OneDrive - UNHCR/300 - ST - Survey Team - Main/Survey Programme Team/Projects/FDS/Countries/Pakistan/Data Management/4 Analysis/FDS_PAK_2024_Random_Member_complete.dta"
-)
-RA_woman <- read_dta("C:/Users/KAPS/OneDrive - UNHCR/300 - ST - Survey Team - Main/Survey Programme Team/Projects/FDS/Countries/Pakistan/Data Management/4 Analysis/FDS_PAK_2024_Random_Woman_complete.dta"
-)
-RA_caregiver <- read_dta ("C:/Users/KAPS/OneDrive - UNHCR/300 - ST - Survey Team - Main/Survey Programme Team/Projects/FDS/Countries/Pakistan/Data Management/4 Analysis/FDS_PAK_2024_Random_Child_complete.dta"
-)
+
+roster <- read_dta("FDS_PAK_2024_Roster_complete.dta")
+HoH <- read_dta("FDS_PAK_2024_HoH_complete.dta")
+RA_adult <- read_dta("FDS_PAK_2024_Random_Member_complete.dta")
+RA_woman <- read_dta("FDS_PAK_2024_Random_Woman_complete.dta")
+RA_caregiver <- read_dta ("FDS_PAK_2024_Random_Child_complete.dta")
 
 
 # Rename _uuid to uuid in all datasets
@@ -74,9 +70,10 @@ HoH <- HoH %>%
   left_join(household_counts, by = "uuid")
 
 
-#Disintegration variables 
-## Roster 
-## 1. Population Groups - Population group variable is available in the HoH dataset. Here we pull it to the roster dataset. 
+#Disaggregation variables 
+## Roster ----
+## 1. Population Groups ----
+##Population group variable is available in the HoH dataset. Here we pull it to the roster dataset. 
 roster <- roster %>%
   left_join(
     HoH %>% select(uuid, Intro_07), # Select relevant columns from HoH
@@ -85,7 +82,7 @@ roster <- roster %>%
 roster <- roster %>%
   rename(Intro_07_roster = Intro_07) #Rename to Intro_07_roster 
 
-##2. Age
+## 2. Age ----
 ### Create two new variables for different age categories
 ### 4 categories (0-4, 5-17, 18-59, 60+)
 
@@ -100,7 +97,7 @@ roster$HH_04_cat2 <- cut(roster$HH_04, breaks = c(-1, 17, Inf),
 table(roster$HH_04_cat4)
 table(roster$HH_04_cat2)
 
-### 3. Disability 
+## 3. Disability ----
 
 ### Washington Group Index
 #Disability status identifiers are calculated based on guidelines by the [Washington Group on Disability Statistics](https://www.washingtongroup-disability.com/fileadmin/uploads/wg/WG_Document__6C_-_Analytic_Guidelines_for_the_WG-ES__Stata_.pdf) for over 5-year-olds. Note that in FDS we have three levels of disability level (some difficulty, a lot of difficulty, cannot do at all, + don't know, refuse to answer).
@@ -182,7 +179,7 @@ roster <- roster %>%
   ))
 
 
-### 4. Country of Origin 
+## 4. Country of Origin ----
 #The individual information on the country of origin comes from the roster. To have one single variable for country of origin information, the country code for the country of enumeration (i.e. PAK for Pakistan) will be entered as below. This question is asked only to individuals older than 15. For individuals younger than 15, the value is equaled to the country of origin of the household (as responded by the Head of the Household)
 
 roster <- roster %>%
@@ -206,8 +203,8 @@ roster <- roster %>%
   ) 
 
 
-## Head of the Household (HoH dataset)
-#1. Age
+## Head of the Household (HoH dataset) ----
+#1. Age ----
 # Age with no categories 
 HoH <- HoH %>%
   left_join(
@@ -235,7 +232,7 @@ HoH <- HoH %>%
 HoH <- HoH %>%
   rename(HH_04_HoH_cat4 = HH_04_cat4) #HH_04_HoH_cat4
 
-#2. Gender
+#2. Gender ----
 
 HoH <- HoH %>%
   left_join(
@@ -245,7 +242,7 @@ HoH <- HoH %>%
 HoH <- HoH %>%
   rename(HH_02_HoH = HH_02) #Rename to HH_02_HoH
 
-#3. Disability 
+#3. Disability ----
 
 HoH <- HoH %>%
   left_join(
@@ -255,7 +252,7 @@ HoH <- HoH %>%
 HoH <- HoH %>%
   rename(disability_HoH = disability) #Rename to disability_HoH
 
-#4. Country of Origin 
+#4. Country of Origin ----
 
 HoH <- HoH %>%
   left_join(
@@ -266,9 +263,9 @@ HoH <- HoH %>%
   rename(COO_HoH = COO) #Rename to COO_HoH
 
 
-## Randomly Selected Adult (RA_adult dataset)
+## Randomly Selected Adult (RA_adult dataset) ----
 
-#1. Age
+#1. Age ----
 # 2 categories 
 RA_adult$age_selected <- as.numeric(as.character(RA_adult$age_selected))
 
@@ -281,7 +278,7 @@ RA_adult$age_selected <- as.numeric(as.character(RA_adult$age_selected))
 RA_adult$RA_HH_04_cat4 <- cut(RA_adult$age_selected, breaks = c(-1, 4, 17, 59, Inf), 
                          labels = c("0-4", "5-17", "18-59", "60+"))
 
-#2. Population Group 
+#2. Population Group ----
 
 RA_adult <- RA_adult %>%
   left_join(
@@ -291,7 +288,7 @@ RA_adult <- RA_adult %>%
 RA_adult <- RA_adult %>%
   rename(Intro_07_RA = Intro_07) #Rename to Intro_07_RA
 
-#3. Country of origin
+#3. Country of origin ----
 
 RA_adult <- RA_adult %>%
   left_join(
@@ -301,7 +298,7 @@ RA_adult <- RA_adult %>%
 RA_adult <- RA_adult %>%
   rename(COO_RA = COO) #Rename to COO_RA
 
-#4. Disability 
+#4. Disability ----
 RA_adult <- RA_adult %>%
   left_join(
     roster %>% select(uuid, disability, rosterposition), # Select relevant columns from roster
@@ -310,12 +307,14 @@ RA_adult <- RA_adult %>%
 RA_adult <- RA_adult %>%
   rename(disability_RA = disability) #Rename to disability_RA
 
-#5. Gender 
+#5. Gender ----
 
 RA_adult <- RA_adult %>%
   rename(HH_02_RA = `HH_02_selected`)
 
-## Randomly Selected Women (RA_woman dataset)
+## Randomly Selected Women (RA_woman dataset) ----
+
+#1. Age ----
 
 RA_woman$agerandomwoman <- as.numeric(as.character(RA_woman$agerandomwoman))
 
@@ -326,7 +325,7 @@ RA_woman$RW_HH_04_cat2 <- cut(RA_woman$agerandomwoman, breaks = c(-1, 17, Inf),
 RA_woman$RW_HH_04_cat4 <- cut(RA_woman$agerandomwoman, breaks = c(-1, 4, 17, 59, Inf), 
                               labels = c("0-4", "5-17", "18-59", "60+"))
 
-#2. Population Group 
+#2. Population Group  ----
 
 RA_woman <- RA_woman %>%
   left_join(
@@ -336,7 +335,7 @@ RA_woman <- RA_woman %>%
 RA_woman <- RA_woman %>%
   rename(Intro_07_RW = Intro_07) #Rename to Intro_07_RW
 
-#3. Country of origin
+#3. Country of origin ----
 
 RA_woman <- RA_woman %>%
   left_join(
@@ -346,7 +345,7 @@ RA_woman <- RA_woman %>%
 RA_woman <- RA_woman %>%
   rename(COO_RW = COO) #Rename to COO_RW
 
-#4. Disability 
+#4. Disability ----
 RA_woman <- RA_woman %>%
   left_join(
     roster %>% select(uuid, disability, rosterposition), # Select relevant columns from roster
@@ -355,9 +354,9 @@ RA_woman <- RA_woman %>%
 RA_woman <- RA_woman %>%
   rename(disability_RW = disability) #Rename to disability_RW
 
-## Randomly Selected caregiver (RA_caregiver dataset)
+## Randomly Selected caregiver (RA_caregiver dataset) ----
 
-#1. Population Group 
+#1. Population Group ----
 
 RA_caregiver <- RA_caregiver %>%
   left_join(
@@ -367,7 +366,7 @@ RA_caregiver <- RA_caregiver %>%
 RA_caregiver <- RA_caregiver %>%
   rename(Intro_07_RC = Intro_07) #Rename to Intro_07_RC
 
-#2. Disability 
+#2. Disability ----
 RA_caregiver <- RA_caregiver %>%
   left_join(
     roster %>% select(uuid, disability, rosterposition), # Select relevant columns from roster
@@ -376,7 +375,7 @@ RA_caregiver <- RA_caregiver %>%
 RA_caregiver <- RA_caregiver %>%
   rename(disability_RC = disability) #Rename to disability_RC
 
-#3. Country of Origin
+#3. Country of Origin ----
 
 RA_caregiver <- RA_caregiver %>%
   left_join(
@@ -386,11 +385,11 @@ RA_caregiver <- RA_caregiver %>%
 RA_caregiver <- RA_caregiver %>%
   rename(COO_RC = COO) #Rename to COO_RC
 
-#4. Gender 
+#4. Gender  ----
 RA_caregiver <- RA_caregiver %>%
   rename(HH_02_RC = `finalcaregiverSEX`)
 
-#5. Age
+#5. Age ----
 RA_caregiver <- RA_caregiver %>%
   rename(HH_04_RC = `finalcaregiverAGE`)
 
@@ -400,9 +399,10 @@ RA_caregiver <- RA_caregiver %>%
 ####Calculate crowding index - overcrowded when more than 3 persons share one room to sleep
 
 table(HoH$HH14) ##How many separate structures or buildings do the members of your household occupy? 
+table(HoH$HHmembersize.x)
 
 HoH <- HoH %>%
-  mutate(crowding=HHmembersize/HH14
+  mutate(crowding=HHmembersize.x/HH14
   ) %>%
   mutate(crowding_cat=case_when( ##if crowding <= 3, not overcrowded 
     crowding <= 3 ~ 1, TRUE ~ 2)
