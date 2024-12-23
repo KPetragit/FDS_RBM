@@ -19,7 +19,7 @@ Date: Last revision was in December 2024
 
 **Important Instructions**
 
-1. For correct calculations, ensure you have five datasets named: 'roster', 'HoH', 'RA_adult', 'RA_caregiver', 'RA_woman'. 
+1. For correct calculations, ensure you have five datasets named: 'HHroster', 'main', 'RA_adult', 'RA_caregiver', 'RA_woman'. 
 2. Confirm that your datasets are cleaned and weighted as required for accurate results!
 
 # RBM Core Impact and Outcome Indicators
@@ -42,22 +42,74 @@ Percentage = \(\left(\frac{\text{Numerator}}{\text{Denominator}}\right) \times 1
 
 **Description of the datasets**
 
-The FDS consists of 4 questionnaires and an introduction section which together form the FDS interview. The 4 questionnaires are the following: 
+The FDS consists of 4 questionnaires and an introduction section which together form the FDS interview. The 4 questionnaires and the respective modules in each are the following: 
 
--*Head of the Household questionnaire*, responded to by the Head of the household (>= 15 years of age),it includes all household level questions such as access to services. This questionnaire also includes the roster, where the head of the household responds to individual level questions about all household members. 
+**- Head of the Household questionnaire**, responded to by the head of the household (>= 15 years of age), it includes all household level questions such as access to services. This questionnaire also includes the household roster, where the head of the household responds to individual level questions about all household members.  
 
--*Random Adult questionnaire*, responded to by the randomly selected adult (>= 15 years of age) from the household. 
+***Head of the Household - Household Roster***
 
--*Random Woman questionnaire*, responded to by the randomly selected woman (>= 15 years of age) who gave birth in the last 2 years.
+HH definition  
+Identification module  
+HH Roster (including education & language)  
+Banking for HH Roster  
+Disability   
+Legal Status 2  
 
--*Caregiver questionnaire*, responded to by the caregiver of the randomly selected child (<5 years of age) from the household. 
+***Head of the Household***
 
+Displacement History  
+Shelter  
+WASH  
+Clean Energy  
+Assets  
+Mosquito Nets  
+Land and Property  
+Food and Nutrition  
+Objective Wellbeing   
+Experience of Shocks  
+Social Protection  
+Child Labor  
+
+
+**- Random Adult questionnaire**, responded to by the randomly selected adult (>= 15 years of age) from the household.
+
+Subjective and Mental Wellbeing  
+Aspiration   
+Healthcare   
+Mental Health  
+Mobility  
+Education 2  
+Skills   
+Employment  
+Job Search   
+Time Spent on Domestic Work   
+Trust - Political Participation  
+Financial Solutions  
+Remittances  
+Access to Information  
+Freedom of thought  
+Feel Safe Walking Alone  
+Access to Justice  
+Acceptance between communities  
+Discrimination  
+Victimization  
+
+**- Random Woman questionnaire**, responded to by the randomly selected woman (>= 15 years of age) who gave birth in the last 2 years.
+
+Women’s health - Birth attendance  
+Family Planning  
+Menstrual Hygiene  
+
+**- Caregiver questionnaire**, responded to by the caregiver of the randomly selected child (<5 years of age) from the household.
+
+Anthroppometrics  
+Immunization 
 
 Data is organized in 5 datasets, which are connected through an unique identifier "uuid". The 5 datasets are the following: 
 
-- *roster* = Roster section from questionnaire responded to by the head of the household 
+- *HHroster* = Roster section from questionnaire responded to by the head of the household 
 
-- *HoH* = Questionnaire responded to by head of the Household 
+- *main* = Questionnaire responded to by head of the Household 
 
 - *RA_adult* = Questionnaire responded to by the randomly selected adult 
 
@@ -84,8 +136,8 @@ pacman::p_load(
 **Population Group**
 ```{r, eval=FALSE}
 
-table(roster$Intro_07_roster)   #in dataset "roster". 
-table(HoH$Intro_07)             #in dataset "HoH". 
+table(HHroster$Intro_07_roster)   #in dataset "HHroster". 
+table(main$Intro_07)             #in dataset "main". 
 table(RA_adult$Intro_07_RA)     #in dataset "RA_adult". 
 table(RA_woman$Intro_07_RW)     #in dataset "RA_woman". 
 table(RA_caregiver$Intro_07_RC) #in dataset "RA_caregiver". 
@@ -94,14 +146,14 @@ table(RA_caregiver$Intro_07_RC) #in dataset "RA_caregiver".
 **Age**
 ```{r, eval=FALSE}
 #2 categories (<18, >18)
-table(roster$HH_04_cat2) #in dataset "roster".
+table(HHroster$HH_04_cat2) #in dataset "HHroster".
 
 #4 categories (0-4, 5-17, 18-59, 60+)
-table(roster$HH_04_cat4) #in dataset "roster".
+table(HHroster$HH_04_cat4) #in dataset "HHroster".
 
-#We look at age categories only indicators for which data is pulled from the "roster" dataset, which holds the individual data for all members of the household. For other four datasets (Headh of the household, randomly selected adult, randomly selected woman, and randomly selected caregiver) the respondent is always => 15 years of age. 
+#We look at age categories only indicators for which data is pulled from the "HHroster" dataset, which holds the individual data for all members of the household. For other four datasets (Headh of the household, randomly selected adult, randomly selected woman, and randomly selected caregiver) the respondent is always => 15 years of age. 
 
-table(HoH$HH_04_HoH)           #in dataset "HoH".
+table(main$HH_04_HoH)           #in dataset "main".
 table(RA_adult$age_selected)   #in dataset "RA_adult".
 table(RA_woman$agerandomwoman) #in dataset "RA_woman".
 table(RA_caregiver$HH_04_RC)   #in dataset "RA_caregiver".
@@ -109,8 +161,8 @@ table(RA_caregiver$HH_04_RC)   #in dataset "RA_caregiver".
 
 **Gender**
 ```{r, eval=FALSE}
-table(roster$HH_02)          #in dataset "roster".
-table(HoH$HH_02_HoH)         #in dataset "HoH". 
+table(HHroster$HH_02)          #in dataset "HHroster".
+table(main$HH_02_HoH)         #in dataset "main". 
 table(RA_adult$HH_02_RA)     #in dataset "RA_adult".
 table(RA_caregiver$HH_02_RC) #in dataset "RA_caregiver".
 ```
@@ -118,8 +170,8 @@ table(RA_caregiver$HH_02_RC) #in dataset "RA_caregiver".
 
 **Disability**
 ```{r, eval=FALSE}
-table(roster$disability)          #in dataset "roster".
-table(HoH$disability_HoH)         #in dataset "HoH". 
+table(HHroster$disability)          #in dataset "HHroster".
+table(main$disability_HoH)         #in dataset "main". 
 table(RA_adult$disability_RA)     #in dataset "RA_adult".
 table(RA_woman$disability_RW)     #in dataset "RA_woman".
 table(RA_caregiver$disability_RC) #in dataset "RA_caregiver".
@@ -128,8 +180,8 @@ table(RA_caregiver$disability_RC) #in dataset "RA_caregiver".
 
 **Country of origin**
 ```{r, eval=FALSE}
-table(roster$COO)          #in dataset "roster".
-table(HoH$COO_HoH)         #in dataset "HoH".
+table(HHroster$COO)          #in dataset "HHroster".
+table(main$COO_HoH)         #in dataset "main".
 table(RA_adult$COO_RA)     #in dataset "RA_adult".
 table(RA_woman$COO_RW)     #in dataset "RA_woman".
 table(RA_caregiver$COO_RC) #in dataset "RA_caregiver".
@@ -147,13 +199,12 @@ table(RA_caregiver$COO_RC) #in dataset "RA_caregiver".
 
 This indicator aims to measure the proportion of forcibly displaced and stateless people that reside in safe and secure settlements with access to basic facilities such as shelter, WASH, energy and security from natural hazards.
 
-To facilitate measurement for UNHCR, four basic services are considered for this indicator: shelter, drinking water, energy (access to electricity) and health. All of these basic services must be available to people for it to be considered that they have access to basic services.
+To facilitate measurement for UNHCR, three basic services are considered for this indicator: shelter, drinking water, energy (access to electricity) and health. All of these basic services must be available to people for it to be considered that they have access to basic services.
 
 
 | Services       | Variables                                                            |
 |----------------|:--------------------------------------------------------:            |
-| Electricity    |HL01, HL03                                                            |
-| Health care    |H01_1, H11, H15d                                                      |
+| Electricity    |HL01, HL03                                                            |                                                     
 | Drinking water |BD01, BD01a, BD20_2, BD22                                             |
 | Shelter        |HH04, HH05,HH08,HH09, HH10, HH11,HH14, ExpShock02                     |
 
@@ -169,17 +220,17 @@ If households lack access to electricity, especially for lighting and connectivi
 
 **Denominator**: Total number of individuals
 
-**Dataset**: HoH, RA_adult
+**Dataset**: main, RA_adult
 
 **Sources**  
 1.[RBM 2.2 Outcome Indicator Guidance](https://intranet.unhcr.org/content/dam/unhcr/intranet/protection-operations/prog-hub/program-cycle/indictors/core/impact/Core%20impact%202.2%20Proportion%20of%20people%20residing%20in%20physically%20safe%20and%20secure%20settlements%20with%20access%20to%20basic%20facilities.pdf)
 
 ```{r, eval=FALSE}
 
-table(HoH$HL01) ##Does this household use anything for lighting?
-table(HoH$HL03) ##What does this household use most of the time as energy for lighting, or as a light source? 
+table(main$HL01) ##Does this household use anything for lighting?
+table(main$HL03) ##What does this household use most of the time as energy for lighting, or as a light source? 
 
-HoH <- HoH %>%
+main <- main %>%
   mutate(electricity = ifelse(HL01 == 1 & HL03 == 1, 1, 0)
   ) %>%
   mutate( electricity = labelled(electricity,
@@ -188,51 +239,8 @@ HoH <- HoH %>%
                                    "No" = 0
                                  ),
                                  label = "Access to electricity"))
-table(HoH$electricity)
+table(main$electricity)
 
-
-```
-
-#### Healthcare
-
-Access to healthcare depends on availability of healthcare, including physical reach, acceptability and affordability for all.
-For this indicator, the focus is on the availability of healthcare system.
-According to [The Sphere Handbook](https://spherestandards.org/wp-content/uploads/Sphere-Handbook-2018-EN.pdf), primary healthcare facility should be accessible within one hour's walk from dwellings.
-
-**Numerator**: Individuals that can reach a primary healthcare facility within one hour from their dwelling
-
-**Denominator**: Total number of individuals
-
-**Dataset**: RA_adult
- 
- 
-```{r, eval=FALSE}
-
-
-##Access to healthcare if household has any facility available within one hour distance (cannot be > 60) (walking or any other type of transport)
-table(RA_adult$H01_1)##In the past 30 days, did you need to see a health professional for any reason?
-table(RA_adult$H11)  ##What place did you go first to try to see a health professional or healer?
-table(RA_adult$H15d) ##Approximately, how long did it take to travel in one direction to that place for your first visit?
-
-RA_adult <- RA_adult %>%
-  mutate(
-    healthcare = case_when(
-      H01_1 == 1 & H11 %in% c(1, 2, 3, 4, 5, 6, 7, 8, 9, 12) & H15d == 1 ~ 1, #Assigns 1 if they needed to see a health professional, and reached one in one hour or less. 
-      H01_1 == 2 ~ NA_real_, #Assigns NA if they did not need to see a health professional
-      H01_1 == 1 & (H11 %in% c(10, 11) | H15d == 2) ~ 0, #Assigns 0 if they saw a traditional health or spiritual healer, or if they needed more than 1 hour to reach the health professional. 
-      H01_1 == 1 & H15d %in% c(3, 98) ~ NA_real_, #Assigns NA if they didn't know or can't recall how long they needed to reach the health facility. 
-      TRUE ~ NA_real_  # Default case for other conditions
-    )
-  ) %>%
-  mutate(healthcare = labelled(healthcare,
-                               labels = c(
-                                 "Yes" = 1,
-                                 "No" = 0
-                               ),
-                               label = "Access to healthcare"))
-
-
-table(RA_adult$healthcare)
 
 ```
 
@@ -248,20 +256,20 @@ The FDS only measure access to at least basic drinking water services which need
 
 **Denominator**: Total number of individuals
 
-**Dataset**: HoH
+**Dataset**: main
 
 
 ```{r, eval=FALSE}
 ##Step 1: Check all variables
-table(HoH$BD01)   ##What is the main source of drinking water used by members of your household?
-table(HoH$BD01a)  ##Where is this main drinking water source located? In your own dwelling, in your own yard or plot , or elsewhere?
-table(HoH$BD20_2) ##How long does it take for members of your household to go to the main source of drinking water, stay in a queue, get water, and come back? Please do not include time spent socializing. 
-table(HoH$BD20_3) ##Specifying minutes on how long it takes to collect water 
-table(HoH$BD22)   ##Does it take more or less than 30 minutes?
+table(main$BD01)   ##What is the main source of drinking water used by members of your household?
+table(main$BD01a)  ##Where is this main drinking water source located? In your own dwelling, in your own yard or plot , or elsewhere?
+table(main$BD20_2) ##How long does it take for members of your household to go to the main source of drinking water, stay in a queue, get water, and come back? Please do not include time spent socializing. 
+table(main$BD20_3) ##Specifying minutes on how long it takes to collect water 
+table(main$BD22)   ##Does it take more or less than 30 minutes?
 
 
 ## Step 2: Add a coloumn specifying is the household uses improved or unimproved source of drinking water 
-HoH <- HoH %>%
+main <- main %>%
 mutate(Improved_dw = ifelse(BD01 %in% c(11, 12, 13, 14, 21, 31, 41, 51, 61, 71, 72, 91, 92), 1, 0)) %>%
   mutate(Improved_dw = labelled(Improved_dw,
                                labels = c(
@@ -271,7 +279,7 @@ mutate(Improved_dw = ifelse(BD01 %in% c(11, 12, 13, 14, 21, 31, 41, 51, 61, 71, 
                                label = "Improved drinking water source"))
 
 ##Step 3: Add a coloumn specifying if the improved water source is located in own dwelling/yard/plot or elsewhere. 
-HoH <- HoH %>%
+main <- main %>%
 mutate(Improved_dw_Loc = ifelse(BD01 %in% c(11, 12) | (((BD01 %in% c(13, 14, 21, 31, 41, 51, 61, 71, 72, 91, 92))) & BD01a %in% c(1, 2)),1,0))%>%
 mutate(Improved_dw_Loc = labelled(Improved_dw_Loc,
                                labels = c(
@@ -282,7 +290,7 @@ mutate(Improved_dw_Loc = labelled(Improved_dw_Loc,
 
 ##Step 4: Add a coloumn specifying if it takes more or less than 30 min to the improved drinking water source. If the improved drinking water source is located in own dwelling, yard or plot, it is considered that it takes less than 30 minutes to reach. 
 ## BD20_3 - Minutes
-HoH <- HoH %>%
+main <- main %>%
   mutate(
     Improved_dw_access= ifelse(
       (Improved_dw_Loc == 1 )|
@@ -300,7 +308,7 @@ mutate(Improved_dw_access = labelled(Improved_dw_access,
                                label = "Access to clean drinking water services"))
 
 
-table(HoH$Improved_dw_access)
+table(main$Improved_dw_access)
 
 
 ```
@@ -316,7 +324,7 @@ Overcrowded living conditions can facilitate the rapid transmission of infectiou
 
 **Denominator**: Total number of individuals
 
-**Dataset**: HoH
+**Dataset**: main
 
 ```{r, eval=FALSE}
 ##Condition 1
@@ -325,21 +333,21 @@ Overcrowded living conditions can facilitate the rapid transmission of infectiou
 
 ##Step 1: First check the variables
 
-table(HoH$HH04) ##Observe if door is lockable
-table(HoH$HH05) ##Observe if windows are lockable
-table(HoH$HH08) ##Shelter collapsed or partially collapsed?
-table(HoH$HH09) ##Damaged roof
-table(HoH$HH10) ##Are windows/doors sealed to natural elements?
-table(HoH$HH11) ##Leakage / rottenness in the walls / floors?
-table(HoH$crowding_cat) #Crowding index - overcrowded when more than 3 persons share one room to sleep
+table(main$HH04) ##Observe if door is lockable
+table(main$HH05) ##Observe if windows are lockable
+table(main$HH08) ##Shelter collapsed or partially collapsed?
+table(main$HH09) ##Damaged roof
+table(main$HH10) ##Are windows/doors sealed to natural elements?
+table(main$HH11) ##Leakage / rottenness in the walls / floors?
+table(main$crowding_cat) #Crowding index - overcrowded when more than 3 persons share one room to sleep
 
 
 ##Step 2: Classify 96 responses as NAs
-HoH <- HoH %>%
+main <- main %>%
   mutate_at(vars(HH04, HH05, HH08, HH09, HH10, HH11), ~ ifelse(. == 96, NA, .))
 
 #Step 3:  Add column to classify the provision of protection from cold, damp, heat, rain, wind, and other threats to health, structural hazards, and disease vectors.
-HoH <- HoH %>%
+main <- main %>%
   mutate(habitablehousing = case_when(
     (HH04 == "1") & (HH05 == "1") & (HH10 == "1") & 
       (HH08 == "2") & (HH09 == "2") & (HH11 == "2") ~ 1,
@@ -349,7 +357,7 @@ HoH <- HoH %>%
   ))
 
 
-table(HoH$habitablehousing)
+table(main$habitablehousing)
 
 
 ```
@@ -357,13 +365,13 @@ table(HoH$habitablehousing)
 ```{r}
 
 #Step 4: ###Combine both conditions for habitable housing
-HoH <- HoH %>%
+main <- main %>%
   mutate(shelter=case_when(
     crowding_cat==1 & habitablehousing==1 ~ 1,
     TRUE ~ 0
   ))
 
-table(HoH$shelter)
+table(main$shelter)
 ```
 
 After computing the four basic services, we will include an assessment of whether individuals reside in physically safe and secure environments. Safe and secure settlements are those with no risks and hazards like flooding, landslides, landmines, and close proximity to military installations and hazardous zones. In FDS, we only look at the risk of flooding and landslides. 
@@ -379,10 +387,10 @@ After computing the four basic services, we will include an assessment of whethe
 ##...
 
 ##Step 1.1 - Identify coloumns that contain information on shocks: 
-shock_columns <- grep("^Shock\\d+_ExpShock02$", names(HoH), value = TRUE)
+shock_columns <- grep("^Shock\\d+_ExpShock02$", names(main), value = TRUE)
 
 ##Step 1.2 - Assign 0 if any shock column has value 2, otherwise assign 1 
-HoH$Landslides_flooding <- apply(HoH[shock_columns], 1, function(row) {
+main$Landslides_flooding <- apply(main[shock_columns], 1, function(row) {
   if (any(row == 2, na.rm = TRUE)) {
     0  # Not secure
   } else {
@@ -391,19 +399,17 @@ HoH$Landslides_flooding <- apply(HoH[shock_columns], 1, function(row) {
 })
 
 
-table(HoH$Landslides_flooding)
+table(main$Landslides_flooding)
 ```
 
 ### Final calculation of the core impact 2.2 
 
 Combine all binary variables as below to calculate the final impact2_2.
 
-Ilgi: I removed the aspect of health from the below until we finalize it. 
-
 ```{r, eval=FALSE}
 #step 6: Combine all services and calculate impact indicator based on electricity, healthcare, drinkingwater, shelter and landslides_flooding. 
 
-HoH <-HoH %>%
+main <-main %>%
   mutate(RBM10202=case_when(
     shelter==0 | electricity==0 | Improved_dw_access==0 | Landslides_flooding==0 ~ 0,
     shelter==1 & electricity==1 & Improved_dw_access==1 & Landslides_flooding==1 ~ 1)
@@ -415,11 +421,11 @@ HoH <-HoH %>%
                             ),
                             label="Proportion of people residing in physically safe and secure settlements with access to basic facilities"))
 
-table(HoH$RBM10202)
+table(main$RBM10202)
 ```
 
 ```{r, eval=FALSE}
-FDS_PAK_2024_HoH <- HoH %>%
+FDS_PAK_2024_HoH <- main %>%
   as_survey_design(
     ids = NULL,           # Specify the column with cluster IDs
     weights = NULL, # Specify the column with survey weights
@@ -542,18 +548,18 @@ This is also referred to as Gross enrollment rate (GER).
 
 **Denominator**: Total number of individuals of primary school age
 
-**Dataset**: roster
+**Dataset**: HHroster
 
 **Sources**  
 1.[RBM 3.2.a Outcome Indicator Guidance](https://intranet.unhcr.org/content/dam/unhcr/intranet/protection-operations/prog-hub/program-cycle/indictors/core/impact/Core%20impact%203.2a%20Proportion%20of%20children%20and%20young%20people%20enrolled%20in%20primary%20education.pdf)
 
 ```{r, eval=FALSE}
-table(roster$HH_Educ02a) ## if the respondent is currently going to school
-table(roster$HH_Educ03)  ## grade the respondent is currently attending 
+table(HHroster$HH_Educ02a) ## if the respondent is currently going to school
+table(HHroster$HH_Educ03)  ## grade the respondent is currently attending 
 
 
 #Create a variable specifying when individual is enrolled in primary school. 
-roster <- roster %>%
+HHroster <- HHroster %>%
   mutate(edu_primary = case_when(
     HH_Educ02a == 1 & HH_Educ03 %in% 1:8 ~ 1, # Ensure to check possible grade levels. In these example answers 1 - 8 were considered for primary grade level. 
     HH_Educ02a %in% c(99, 98) ~ NA_real_, #When respondent answers with 99 - refuse to answer, or 98 - Don't know this is treated as NA. 
@@ -562,7 +568,7 @@ roster <- roster %>%
 ```
 ```{r, eval=FALSE}
 #Create a variable to adjust age groups for primary level 
-roster <- roster %>%
+HHroster <- HHroster %>%
   mutate(
     age_primary = case_when(
       HH_04 >= 6 & HH_04 <= 14 ~ 1,  #Remember to adjust age levels based on the primary education age per country
@@ -596,18 +602,18 @@ roster <- roster %>%
 
 **Denominator**: Total number of individuals of secondary school age
 
-**Dataset**: roster
+**Dataset**: HHroster
 
 **Sources**  
 1.[RBM 3.2.b Outcome Indicator Guidance](https://intranet.unhcr.org/content/dam/unhcr/intranet/protection-operations/prog-hub/program-cycle/indictors/core/impact/Core%20impact%203.2b%20Proportion%20of%20children%20and%20young%20people%20enrolled%20in%20secondary%20education.pdf)
 
 ```{r, eval=FALSE}
-table(roster$HH_Educ02a) ## if the respondent is currently going to school
-table(roster$HH_Educ03)  ## grade the respondent is currently attending 
+table(HHroster$HH_Educ02a) ## if the respondent is currently going to school
+table(HHroster$HH_Educ03)  ## grade the respondent is currently attending 
 
 
 #Create a variable specifying when individual is enrolled in secondary school.
-roster <- roster %>%
+HHroster <- HHroster %>%
   mutate(edu_secondary = case_when(
     HH_Educ02a == 1 & HH_Educ03 %in% 9:12 ~ 1, # Ensure to check possible grade levels in the country specific questionnaire. In this example answers 1 - 8 were considered for secondary grade level. 
     HH_Educ02a %in% c(99, 98) ~ NA_real_, #When respondent answers with 99 - refuse to answer, or 98 - Don't know this is treated as NA. 
@@ -616,7 +622,7 @@ roster <- roster %>%
 
 
 #Create a variable to adjust age groups for secondary level 
-roster <- roster %>%
+HHroster <- HHroster %>%
   mutate(
     age_secondary = case_when(
       HH_04 >= 13 & HH_04 <= 16 ~ 1,  #Remember to adjust age levels based on the secondary education age per country
@@ -715,7 +721,7 @@ Operations are encouraged to track both the number of birth notifications and bi
 
 **Denominator**: Total number of children under 5 years old
 
-**Dataset**: roster
+**Dataset**: HHroster
 
 ***Sources***  
 1.[UNICEF SDG 16.9.1 Guidance](https://data.unicef.org/wp-content/uploads/2018/04/SDG-briefing-note-15_birth-registration.pdf).
@@ -724,12 +730,12 @@ Operations are encouraged to track both the number of birth notifications and bi
 
 
 ```{r, eval=FALSE}
-table(roster$HH_07a) # Does [name] have a birth certificate?
-table(roster$HH_07b) # Has [name]’s birth been registered with the [civil authorities]?
+table(HHroster$HH_07a) # Does [name] have a birth certificate?
+table(HHroster$HH_07b) # Has [name]’s birth been registered with the [civil authorities]?
 ```
 ```{r, eval=FALSE}
 # Step 1:Identify children who have a birth certificate
-roster <- roster %>%
+HHroster <- HHroster %>%
   mutate(birthCertificate = case_when(
     HH_07a == 1 ~ 1, # Assigns 1 for yes
     HH_07a == 2 ~ 0, # Assigns 0 for no
@@ -749,7 +755,7 @@ roster <- roster %>%
 
 ```{r, eval=FALSE}
 # Step 2:Identify children whose birth has been registered with civil authorities
-roster <- roster %>%
+HHroster <- HHroster %>%
   mutate(birthRegistered = case_when(
     HH_07b == 1 ~ 1, # Assigns 1 for yes
     HH_07b == 2 ~ 0, # Assigns 0 for no
@@ -768,7 +774,7 @@ roster <- roster %>%
 
 ```{r, eval=FALSE}
 #Step 3:Create RBM20102 variable
-roster <- roster %>%
+HHroster <- HHroster %>%
   mutate(RBM20102 = case_when(
     (birthRegistered == 1 | birthCertificate == 1) ~ 1,  # Child has been registered or has birth certificate
     (birthRegistered == 0 & birthCertificate == 0) ~ 0,  # Child not registered and has no birth certificate
@@ -785,7 +791,7 @@ roster <- roster %>%
   ))
 
 # Display the table of outcome1_2
-table(roster$RBM20102)
+table(HHroster$RBM20102)
 ```
 
 
@@ -807,7 +813,7 @@ This indicator measures the proportion of people who possess legally recognized 
 |:-----------------------------------------------------------------------------------------------------------------------------------------------:|
 | ID_09, ID_13, Legal_birth_certificate, Legal_ID_card, Legal_passport, Legal_residency, Legal_work_permit, Legal_socsec_card, Legal_marriage_cert|
 
-*Note that the availability of the above standard questions will differ from FDS country to country. Ensure to check your data set and identify which variables are present. 
+*Note that the availability of the above standard questions will differ from FDS country to country. Ensure to check your data set and identify which variables are present. Moreover, ensure to check the response options of variables ID_09 and ID_13 to determine which response options are considerd as valid identity documents or credentials are recognized by the host state and/or UNHCR. 
 
 **Unit of observation:** Individual
 
@@ -815,34 +821,35 @@ This indicator measures the proportion of people who possess legally recognized 
 
 **Denominator:** Total number of individuals
 
-**Dataset**: roster
+**Dataset**: HHroster
 
 ***Sources***  
 1.[Core Outcome 1.3 Guidance](https://intranet.unhcr.org/content/dam/unhcr/intranet/protection-operations/prog-hub/program-cycle/indictors/core/outcome/Core%20outcome%201.3%20Proportion%20of%20people%20with%20legally%20recognized%20identity%20documents%20or%20credentials.pdf).
 
 ```{r, eval=FALSE}
-table(roster$ID_09) #What is the primary document that allows you to stay in the host country?
-table(roster$ID_13) #Do you have any other document that allow you to stay in the host country?
-table(roster$Legal_birth_certificate) #If the person has a birth certificate?  
-table(roster$Legal_ID_card) #If the person has a civil/government issued ID card?
-table(roster$Legal_passport) #If the person has a passport?
-#table(roster$Legal_residency) #If the person has a residency permit?
-#table(roster$Legal_work_permit) #If the person has a work permit?
-#table(roster$Legal_socsec_card) #If the person has a social security card? 
-#table(roster$Legal_marriage_cert) #If the person has a marriage certificate?
+table(HHroster$ID_09) #What is the primary document that allows you to stay in the host country?
+table(HHroster$ID_13) #Do you have any other document that allow you to stay in the host country?
+table(HHroster$Legal_birth_certificate) #If the person has a birth certificate?  
+table(HHroster$Legal_ID_card) #If the person has a civil/government issued ID card?
+table(HHroster$Legal_passport) #If the person has a passport?
+#table(HHroster$Legal_residency) #If the person has a residency permit?
+#table(HHroster$Legal_work_permit) #If the person has a work permit?
+#table(HHroster$Legal_socsec_card) #If the person has a social security card? 
+#table(HHroster$Legal_marriage_cert) #If the person has a marriage certificate?
 ```
 
 ```{r, eval=FALSE}
-#Important! Prior to running the script, ensure to check if your dataset includes the variables mentioned in the below script. Your dataset might have less or more variables. Ensure to adjust the script by adding or removing variables. 
-roster <- roster %>% 
+#Important! Prior to running the script, ensure to check your dataset and inclusion of variables ID_09 and ID_13. Additionally, check the response options of these variables to determine which ones are considered legal documents or credentials as recognized by the host country and/or UNHCR. Ensure to adjust the below script if needed. 
+
+HHroster <- HHroster %>% 
   mutate(RBM20103 = case_when(
-    ID_09 %in% c(2,3,4,5,6,7,10,15) | ID_13 %in% c("B","C","D","E","F","G","J","P") | Legal_birth_certificate == 1 | Legal_ID_card == 1 | Legal_passport == 1 ~ 1, #Assigns 1 if the person has a work visa or a permanent residency or birth certificate or a Proof of registration card or civil/government ID, or passport. 
-    ID_09 %in% c(1, 8, 9, 11, 12, 13, 14) & ID_13 %in% c("A","H","I","K","L","M","N","OT")  & Legal_birth_certificate == 2 & Legal_ID_card == 2 & Legal_passport == 2 ~ 0, #Assigns 0 if the person has no primary, secondary and no other legal documents), 
+    ID_09 %in% c(2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 15) | ID_13 %in% c("B", "C", "D", "E", "F","G","H","I","J","K","L","P") | Legal_birth_certificate == 1 | Legal_ID_card == 1 | Legal_passport == 1 ~ 1, #Assigns 1 if the person has valid legal documents or credentials as recognized by the host state and/or UNHCR. 
+    ID_09 %in% c(1, 13, 14, 98) & ID_13 %in% c("A","M","N","DK")  & Legal_birth_certificate == 2 & Legal_ID_card == 2 & Legal_passport == 2 ~ 0, #Assigns 0 if the person has no primary, secondary and no other legal documents, as recognized by the host state and/or UNHCR.  
     TRUE ~ NA))
   
 ```
 ```{r, eval=FALSE}
-roster <- roster %>% 
+HHroster <- HHroster %>% 
   mutate(RBM20103 = labelled(RBM20103,
                                labels = c(
                                  'Yes' = 1,
@@ -851,7 +858,7 @@ roster <- roster %>%
                                label = "Proportion of people with legally recognized identity documents or credentials"))
 ```
 ```{r, eval=FALSE}
-table(roster$RBM20103)
+table(HHroster$RBM20103)
 ```
 
 ## 4.1 Core Outcome Indicator
@@ -1025,7 +1032,7 @@ The standard questions are similar to MICS and the calculation of indicators are
 
 **Denominator**: Total number of individuals
 
-**Dataset**: HoH
+**Dataset**: main
 
 To calculate the indicator value, the standard survey methodology considers in the numerator only individuals in households that use one of the following most of the time as their source for cooking are considered in the numerator:
 
@@ -1041,11 +1048,11 @@ To calculate the indicator value, the standard survey methodology considers in t
 
 ```{r, eval=FALSE}
 ###Based on MICS calculation : TC4.1
-table(HoH$HC01) #Is any food or drink consumed by household members cooked or prepared at the household dwelling using a cookstove, fire or other cooking device?
-table(HoH$HC02) #What does this household use for cooking most of the time, including cooking food, making tea/ coffee, boiling drinking water?
-table(HoH$HC04) #What type of fuel or energy source does this household use most of the time in this ${HC02_response} for cooking food, making tea/coffee and boiling drinking water?
+table(main$HC01) #Is any food or drink consumed by household members cooked or prepared at the household dwelling using a cookstove, fire or other cooking device?
+table(main$HC02) #What does this household use for cooking most of the time, including cooking food, making tea/ coffee, boiling drinking water?
+table(main$HC04) #What type of fuel or energy source does this household use most of the time in this ${HC02_response} for cooking food, making tea/coffee and boiling drinking water?
 
-HoH <- HoH %>%
+main <- main %>%
   mutate(
     RBM20802 = case_when(
       (HC01 == 1 & (HC02 %in% c(1, 2, 3, 4, 5)) | (HC01 == 1 & HC02 == 8 & HC04 == 2)
@@ -1067,7 +1074,7 @@ HoH <- HoH %>%
   )
 ```
 ```{r, eval=FALSE}
-table(HoH$RBM20802)
+table(main$RBM20802)
 ```
 
 
@@ -1094,7 +1101,7 @@ This indicator measures the proportion of people living in habitable and afforda
 
 **Denominator**: Total number of individuals
 
-**Dataset**: HoH
+**Dataset**: main
 
 To calculate the indicator value, the standard survey methodology considers in the numerator only individuals in households with habitable housing, which is not overcrowded. 
 
@@ -1110,12 +1117,12 @@ To calculate the indicator value, the standard survey methodology considers in t
 
 ##Step 1: First check the variables
 
-table(HoH$HH04) ##OBSERVE IF DOOR is LOCKABLE
-table(HoH$HH05) ##OBSERVE IF WINDOWS ARE LOCKABLE
-table(HoH$HH08) ##Shelter collapsed or partially collapsed?
-table(HoH$HH09) ##Damaged roof
-table(HoH$HH10) ##Are windows/doors sealed to natural elements?
-table(HoH$HH11) ##Leakage / rottenness in the walls / floors?
+table(main$HH04) ##OBSERVE IF DOOR is LOCKABLE
+table(main$HH05) ##OBSERVE IF WINDOWS ARE LOCKABLE
+table(main$HH08) ##Shelter collapsed or partially collapsed?
+table(main$HH09) ##Damaged roof
+table(main$HH10) ##Are windows/doors sealed to natural elements?
+table(main$HH11) ##Leakage / rottenness in the walls / floors?
 table(main$crowding_cat) ## Crowding category - overcrowded when more than 3 persons share one room to sleep
 
 
@@ -1123,13 +1130,13 @@ table(main$crowding_cat) ## Crowding category - overcrowded when more than 3 per
 ```{r, eval=FALSE}
 ##Step 2: Classify 96 responses as NAs
 
-HoH <- HoH %>%
+main <- main %>%
   mutate_at(vars(HH04, HH05, HH08, HH09, HH10, HH11), ~ ifelse(. == 96, NA, .))
 
 ```
 ```{r, eval=FALSE}
 #Step 3:  Add coloumn to classify the provision of protection from cold, damp, heat, rain, wind, and other threats to health, structural hazards, and disease vectors.
-HoH <- HoH %>%
+main <- main %>%
   mutate(habitablehousing = case_when(
     (HH04 == "1") & (HH05 == "1") & (HH10 == "1") & 
       (HH08 == "2") & (HH09 == "2") & (HH11 == "2") ~ 1,
@@ -1140,13 +1147,13 @@ HoH <- HoH %>%
 
 ```
 ```{r, eval=FALSE}
-table(HoH$habitablehousing)
+table(main$habitablehousing)
 
 ```
 
 ```{r, eval=FALSE}
 #Step 5: ###Combine both conditions for habitable housing
-HoH <- HoH %>%
+main <- main %>%
   mutate(RBM20901=case_when(
     crowding_cat==1 & habitablehousing==1 ~ 1,
     TRUE ~ 0
@@ -1163,7 +1170,7 @@ HoH <- HoH %>%
 
 
 
-table(HoH$RBM20901)
+table(main$RBM20901)
 ```
   
 ## 9.2 Core Outcome Indicator
@@ -1188,7 +1195,7 @@ The indicator for lighting is constructed from the essential questions *HL01* an
 
 **Denominator**: Total number of individuals
 
-**Dataset** HoH
+**Dataset** main
 
 To calculate the indicator value, the standard survey methodology considers in the numerator only individuals in households that use one of the following as light source most of the time:
 
@@ -1207,7 +1214,7 @@ To calculate the indicator value, the standard survey methodology considers in t
 ###This basic service is calculated from the main data set answered by the Household head or the most knowledgeable person. 
 
 
-HoH <- HoH %>%
+main <- main %>%
   mutate(RBM20902 = case_when(
     HL01 == 1 & HL03 %in% c(1,2,3,4,5,6) ~ 1,  # Conditions for "Yes" (1)
     TRUE ~ 0  # Default to "No" (0)
@@ -1221,7 +1228,7 @@ HoH <- HoH %>%
   ))
 ```
 ```{r, eval=FALSE}
-table(HoH$RBM20902)
+table(main$RBM20902)
 ```
 
 
@@ -1369,7 +1376,7 @@ This indicator is defined as the percentage of people using at least basic water
 
 **Denominator**: Total number of individuals
 
-**Dataset**: HoH
+**Dataset**: main
 
 To calculate the indicator value, the standard survey methodology considers for the numerator only people using improved sources of drinking water either in their dwelling/yard/plot or within 30  minutes round trip collection time.
 
@@ -1380,15 +1387,15 @@ The FDS only measure access to at least basic drinking water services which need
 
 ```{r, eval=FALSE}
 ##Step 1: Check all variables
-table(HoH$BD01)   ##What is the main source of drinking water used by members of your household?
-table(HoH$BD01a)  ##Where is this main drinking water source located? In your own dwelling, in your own yard or plot , or elsewhere?
-table(HoH$BD20_2) ##How long does it take for members of your household to go to the main source of drinking water, stay in a queue, get water, and come back? Please do not include time spent socializing. 
-table(HoH$BD20_3) ## Specify minutes on how long it takes?
-table(HoH$BD22)   ##Does it take more or less than 30 minutes?
+table(main$BD01)   ##What is the main source of drinking water used by members of your household?
+table(main$BD01a)  ##Where is this main drinking water source located? In your own dwelling, in your own yard or plot , or elsewhere?
+table(main$BD20_2) ##How long does it take for members of your household to go to the main source of drinking water, stay in a queue, get water, and come back? Please do not include time spent socializing. 
+table(main$BD20_3) ## Specify minutes on how long it takes?
+table(main$BD22)   ##Does it take more or less than 30 minutes?
 
 
 ## Step 2: Add a coloumn specifying is the household uses improved or unimproved source of drinking water 
-HoH <- HoH %>%
+main <- main %>%
     mutate(Improved_dw = ifelse(BD01 %in% c(11, 12, 13, 14, 21, 31, 41, 51, 61, 71, 72, 91, 92), 1, 0)) %>%
   mutate(Improved_dw = labelled(Improved_dw,
                                labels = c(
@@ -1400,7 +1407,7 @@ HoH <- HoH %>%
 
 ```{r, eval=FALSE}
 ##Step 3: Add a coloumn specifying if the improved water source is located in own dwelling/yard/plot or elsewhere. 
-HoH <- HoH %>%
+main <- main %>%
 mutate(Improved_dw_Loc = ifelse(BD01 %in% c(11, 12) | (((BD01 %in% c(13, 14, 21, 31, 41, 51, 61, 71, 72, 91, 92))) & BD01a %in% c(1, 2)),1,0))%>%
 mutate(Improved_dw_Loc = labelled(Improved_dw_Loc,
                                labels = c(
@@ -1414,7 +1421,7 @@ mutate(Improved_dw_Loc = labelled(Improved_dw_Loc,
 ```{r, eval=FALSE}
 ##Step 4: Add a column specifying if it takes more or less than 30 min to the improved drinking water source. If the improved drinking water source is located in own dwelling, yard or plot, it is considered that it takes less than 30 minutes to reach. 
 ## BD20-3 - Minutes
-HoH <- HoH %>%
+main <- main %>%
 mutate(
     Improved_dw_access= ifelse(
       (Improved_dw_Loc == 1 )|
@@ -1432,11 +1439,11 @@ mutate(Improved_dw_access = labelled(Improved_dw_access,
                                label = "Access to clean drinking water services"))
 
 
-table(HoH$Improved_dw_access)
+table(main$Improved_dw_access)
 ```
 
 ```{r, eval=FALSE}
-table(HoH$RBM21201)
+table(main$RBM21201)
 ```
 
 
@@ -1460,20 +1467,20 @@ As this indicator measures 'at least basic sanitation services ' as defined by t
 
 **Denominator**: Total number of individuals
 
-**Dataset**: HoH
+**Dataset**: main
 
 **Sources**  
 1.[RBM 12.2 Outcome Indicator Guidance](https://intranet.unhcr.org/content/dam/unhcr/intranet/protection-operations/prog-hub/program-cycle/indictors/core/outcome/Core%20outcome%2012.2%20Proportion%20of%20people%20with%20access%20to%20a%20safe%20household%20toilet.pdf)
 
 ```{r, eval=FALSE}
-table(HoH$SAN01) #What kind of toilet facility do members of your household use most of the time?
-table(HoH$SAN02) #To the best of your knowledge, has this toilet ever been emptied?
-table(HoH$SAN03) #The last time it was emptied, where were the contents emptied to?
-table(HoH$SAN05) #Do you share this toilet facility with others who are not members of your household?
+table(main$SAN01) #What kind of toilet facility do members of your household use most of the time?
+table(main$SAN02) #To the best of your knowledge, has this toilet ever been emptied?
+table(main$SAN03) #The last time it was emptied, where were the contents emptied to?
+table(main$SAN05) #Do you share this toilet facility with others who are not members of your household?
 ```
 ```{r, eval=FALSE}
 #Step 1: Create a variable to check if the household uses an improved or unimproved sanitation facility 
-HoH <- HoH %>%
+main <- main %>%
   mutate(type_san_facility = case_when(
     SAN01 %in% c("11", "12", "13", "14", "18", "21", "22", "31") ~ 1,  # Improved sanitation facility
     SAN01 %in% c("23", "41", "51", "95", "96") ~ 0,  # Unimproved sanitation facility
@@ -1482,7 +1489,7 @@ HoH <- HoH %>%
 ```
 ```{r, eval=FALSE}
 #Step 2: Create a variable to check if the contents of the toilet are safely disposed
-HoH <- HoH %>%
+main <- main %>%
  mutate(disposal_san_facility = case_when(
     SAN02 == 1 & SAN03 %in% c("5", "96", "98") ~ 0,  # Unsafe disposal
     SAN02 == 1 & SAN03 %in% c("1", "2", "3", "4") ~ 1,  # Safe disposal
@@ -1492,7 +1499,7 @@ HoH <- HoH %>%
 ```
 ```{r, eval=FALSE}
 #Step 3: Create a variable to check if the household shares the toilet facility with other households 
-HoH <- HoH %>%
+main <- main %>%
   mutate(shared_san_facility = case_when(
     SAN05 == 1 ~ 0,             # Shared toilet
     SAN05 == 2 ~ 1,             # Not shared
@@ -1502,7 +1509,7 @@ HoH <- HoH %>%
 ```
 ```{r, eval=FALSE}
 #Step 4: Combine all three conditions
-HoH <- HoH %>%
+main <- main %>%
 mutate(RBM21202 = case_when(
     type_san_facility == 1 & disposal_san_facility == 1 & shared_san_facility == 1 ~ 1,  # Basic sanitation service
     TRUE ~ 0  # If any condition fails
@@ -1516,7 +1523,7 @@ mutate(RBM21202 = case_when(
   ))
 ```
 ```{r, eval=FALSE}
-table(HoH$RBM21202)
+table(main$RBM21202)
 ```
 
 
@@ -1557,6 +1564,7 @@ RA_adult <- RA_adult %>%
   mutate(RBM21301 = case_when(
    FI01 == 1 | FI02 == 1 | FI03 == 1 | FI10 == 1 ~ 1,
    FI01 == 2 & FI02 == 2 & FI03 == 2 & FI10 %in% c(2,3) ~ 0,
+   FI01 %in% c(98,99) & FI02 %in% c(98,99) & FI03 %in% c(98,99) & FI10 %in% c(3,98,99) ~ 0, #Assigns 0 if they don't know or refuse to answer in all 4 variables. 
     TRUE ~ NA_real_ # For all other cases, assigns NA
   ))
 
@@ -1594,7 +1602,7 @@ This indicator measures the proportion of forcibly displaced and stateless peopl
 
 **Denominator:** Total number of individuals of working age
 
-**Dataset**: HoH
+**Dataset**: main
 
 Note that the working age population is to be defined by each country context in line with legal definitions, this could be those aged between 18 and 65. To calculate the indicator value, the standard survey methodology considers for the numerator only individuals who state their income increased and who can also afford more goods and services, or those whose income remained the same or decreased but who can still afford more goods and services (to account for possible inflation).
 
@@ -1602,19 +1610,19 @@ Note that the working age population is to be defined by each country context in
 1.[RBM 13.2 Outcome Indicator Guidance](https://intranet.unhcr.org/content/dam/unhcr/intranet/protection-operations/prog-hub/program-cycle/indictors/core/outcome/Core%20outcome%2013.2%20Proportion%20of%20people%20who%20self-report%20positive%20changes%20in%20their%20income%20compared%20to%20previous%20year.pdf)
 
 ```{r, eval=FALSE}
-table(HoH$CH01b)  #Compared to this time last year, would you say that your personal income increased, remained the same, or decreased?
-table(HoH$CH02b)  #Compared to this time last year, do you think you personally can now afford more goods and services, the same, or less goods and services?
+table(main$CH01b)  #Compared to this time last year, would you say that your personal income increased, remained the same, or decreased?
+table(main$CH02b)  #Compared to this time last year, do you think you personally can now afford more goods and services, the same, or less goods and services?
 ```
 
 ```{r, eval=FALSE}
-HoH <- HoH %>%
+main <- main %>%
   mutate(RBM21302 = case_when(
     CH01b == 1 & CH02b == 1 ~ 1,  # Income increased and can afford more
      (CH01b == 2 | CH01b == 3) & CH02b == 1 ~ 1,  # Income decreased/same and can afford more
     TRUE ~ 0)) # Default to 2
 ```
 ```{r, eval=FALSE}
-HoH <- HoH %>%
+main <- main %>%
    mutate(RBM21302 = labelled(RBM21302,
                                 labels = c(
                                   "Yes" = 1,  # Label for Yes
@@ -1624,7 +1632,7 @@ HoH <- HoH %>%
   ))
 ```
 ```{r, eval=FALSE}
-table(HoH$RBM21302)
+table(main$RBM21302)
 ```
 
 ## 13.3 Core Outcome Indicator 
@@ -1756,7 +1764,7 @@ This indicator measures the proportion of returned refugees who possess legally 
 |:-------------------------------------------------------------------------------------------------------------------------------------------------------:|
 | ID_VAR, ID_09, ID_13, Legal_birth_certificate, Legal_ID_card, Legal_passport, Legal_residency, Legal_work_permit, Legal_socsec_card, Legal_marriage_cert|
 
-*Note that the availability of the above standard questions will differ from FDS country to country. Ensure to check your data set and indentifu which variables are present. 
+*Note that the availability of the above standard questions will differ from FDS country to country. Ensure to check your data set and identify which variables are present. Moreover, ensure to check the response options of variables ID_09 and ID_13 to determine which response options are considerd as valid identity documents or credentials are recognized by the host state and/or UNHCR. 
 
 **Unit of observation**: Individual
 
@@ -1764,35 +1772,38 @@ This indicator measures the proportion of returned refugees who possess legally 
 
 **Denominator**: Total number of individuals
 
-**Dataset**: roster
+**Dataset**: HHroster
 
 **Sources**
 1.[Core Outcome 14.1 Guidance](https://intranet.unhcr.org/content/dam/unhcr/intranet/protection-operations/prog-hub/program-cycle/indictors/core/outcome/Core%20outcome%2014.1%20Proportion%20of%20returnees%20with%20legally%20recognized%20identity%20documents%20or%20credentials.pdf).
 
 ```{r, eval=FALSE}
-#table(roster$ID_VAR) #Identification of returnees
-table(roster$ID_09) #What is the primary document that allows you to stay in the host country?
-table(roster$ID_13) #Do you have any other document that allow you to stay in the host country?
-table(roster$Legal_birth_certificate) #If the person has a birth certificate?  
-table(roster$Legal_ID_card) #If the person has a civil/government issued ID card?
-table(roster$Legal_passport) #If the person has a passport?
-#table(roster$Legal_residency) #If the person has a residency permit?
-#table(roster$Legal_work_permit) #If the person has a work permit?
-#table(roster$Legal_socsec_card) #If the person has a social security card? 
-#table(roster$Legal_marriage_cert) #If the person has a marriage certificate?
-#table(roster$ID_VAR) #ID_VAR == 4 identifies a returnee
+#table(HHroster$ID_VAR) #Identification of returnees
+table(HHroster$ID_09) #What is the primary document that allows you to stay in the host country?
+table(HHroster$ID_13) #Do you have any other document that allow you to stay in the host country?
+table(HHroster$Legal_birth_certificate) #If the person has a birth certificate?  
+table(HHroster$Legal_ID_card) #If the person has a civil/government issued ID card?
+table(HHroster$Legal_passport) #If the person has a passport?
+#table(HHroster$Legal_residency) #If the person has a residency permit?
+#table(HHroster$Legal_work_permit) #If the person has a work permit?
+#table(HHroster$Legal_socsec_card) #If the person has a social security card? 
+#table(HHroster$Legal_marriage_cert) #If the person has a marriage certificate?
+#table(HHroster$ID_VAR) #ID_VAR == 4 identifies a returnee
 ```
 
 ```{r, eval=FALSE}
-roster <- roster %>% 
+
+#Important! Prior to running the script, ensure to check your dataset and inclusion of variables ID_09 and ID_13. Additionally, check the response options of these variables to determine which ones are considered legal documents or credentials as recognized by the host country and/or UNHCR. Ensure to adjust the below script if needed.
+
+HHroster <- HHroster %>% 
   mutate(RBM21401 = case_when(
-    ID_VAR == 4 & (ID_09 %in% c(2,3,4,5,6,7,10,15) | ID_13 %in% c("B","C","D","E","F","G","J","P") | Legal_birth_certificate == 1 | Legal_ID_card == 1 | Legal_passport == 1) ~ 1, #Assigns 1 if the person has a work visa or a permanent residency or birth certificate or a Proof of registration card or civil/government ID, or passport. 
-    ID_VAR == 4 & (ID_09 %in% c(1, 8, 9, 11, 12, 13, 14) & ID_13 %in% c("A","H","I","K","L","M","N","OT")  & Legal_birth_certificate == 2 & Legal_ID_card == 2 & Legal_passport == 2) ~ 0, #Assigns 0 if the person has no primary, secondary and no other legal documents), 
+    ID_VAR == 4 & (ID_09 %in% c(2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 15) | ID_13 %in% c("B", "C", "D", "E", "F","G","H","I","J","K","L","P") | Legal_birth_certificate == 1 | Legal_ID_card == 1 | Legal_passport == 1 ~ 1, #Assigns 1 if the person has valid legal documents or credentials as recognized by the host state and/or UNHCR. 
+    ID_09 %in% c(1, 13, 14, 98) & ID_13 %in% c("A","M","N","DK")  & Legal_birth_certificate == 2 & Legal_ID_card == 2 & Legal_passport == 2 ~ 0, #Assigns 0 if the person has no primary, secondary and no other legal documents, as recognized by the host state and/or UNHCR.  
     TRUE ~ NA))
   
 ```
 ```{r, eval=FALSE}
-roster <- roster %>% 
+HHroster <- HHroster %>% 
   mutate(RBM21401 = labelled(RBM21401,
                                labels = c(
                                  'Yes' = 1,
@@ -1801,9 +1812,8 @@ roster <- roster %>%
                                label = "Proportion of returnees with legally recognized identity documents or credential"))
 ```
 ```{r, eval=FALSE}
-table(roster$RBM21401)
+table(HHroster$RBM21401)
 ```
-
 
 ## 16.1 Core Outcome Indicator
 
@@ -1837,7 +1847,7 @@ This indicator measures the proportion of people that have secure tenure rights 
 
 **Denominator:**  Total number individuals 
 
-**Dataset**: HoH
+**Dataset**: main
 
 To calculate the indicator value, the standard methodology considers in the numerator only individuals in households with official documentation for both their housing and land and who are unlikely to experience losing their right to this housing and/or land in the next 12 months.
 *Note that in FDS, the likelihood for loosing the rights to housing/land is evaluated for the next 5 years. 
@@ -1846,19 +1856,19 @@ To calculate the indicator value, the standard methodology considers in the nume
 1.[Core Outcome 16.1 Guidance](https://intranet.unhcr.org/content/dam/unhcr/intranet/protection-operations/prog-hub/program-cycle/indictors/core/outcome/Core%20outcome%2016.1%20Proportion%20of%20people%20with%20secure%20tenure%20rights%20to%20housing%20and-or%20land.pdf).
 
 ```{r, eval=FALSE}
-table(HoH$Land01) #Do you or does any member of your household own any plot of land in the host country, either alone or with someone else ?  
-table(HoH$Land02) #Do you or does any member of your household own the plot you live on?
-table(HoH$Land03) #Do you or does any member of your household hold use right for any plot of land in ${hostcountry}, either alone or with someone else?
-table(HoH$Land04) #Do you or does any member of your household use any plot of land, either alone or with someone else?
-table(HoH$Land05_1) #Do you or does any member of your household have ownership rights for this plot?
-table(HoH$Land07_1) #Do you or does any member of your household have use rights for this plot?
-table(HoH$Land09A_1) #Residential use of this plot
-table(HoH$Land10_1) #Does your household have a document for this plot from any government Agency, which formally recognizes the use/ownership rights?
-table(HoH$Land15_1) #How likely is it that someone would take this plot from your household in the next 5 years? Very unlikely, somewhat unlikely, somewhat likely, or very likely?
-table(HoH$House01) #Do you or does any member of your household own the housing your household live in, either alone or jointly with someone else?
-table(HoH$House02) #You just said that you and your household members do not own the housing you live in. Do you or does any member of your household have any agreement to stay in the housing you live in, either alone or jointly with someone else?
-table(HoH$House04) #Does your household have a document for the housing you live in from any government Agency [or the UN], which formally recognizes your ownership right or use right?
-table(HoH$House10) #How likely is your household to be expelled from the housing you live in in the next 5 years? Very unlikely, somewhat unlikely, somewhat likely, or very likely?
+table(main$Land01) #Do you or does any member of your household own any plot of land in the host country, either alone or with someone else ?  
+table(main$Land02) #Do you or does any member of your household own the plot you live on?
+table(main$Land03) #Do you or does any member of your household hold use right for any plot of land in ${hostcountry}, either alone or with someone else?
+table(main$Land04) #Do you or does any member of your household use any plot of land, either alone or with someone else?
+table(main$Land05_1) #Do you or does any member of your household have ownership rights for this plot?
+table(main$Land07_1) #Do you or does any member of your household have use rights for this plot?
+table(main$Land09A_1) #Residential use of this plot
+table(main$Land10_1) #Does your household have a document for this plot from any government Agency, which formally recognizes the use/ownership rights?
+table(main$Land15_1) #How likely is it that someone would take this plot from your household in the next 5 years? Very unlikely, somewhat unlikely, somewhat likely, or very likely?
+table(main$House01) #Do you or does any member of your household own the housing your household live in, either alone or jointly with someone else?
+table(main$House02) #You just said that you and your household members do not own the housing you live in. Do you or does any member of your household have any agreement to stay in the housing you live in, either alone or jointly with someone else?
+table(main$House04) #Does your household have a document for the housing you live in from any government Agency [or the UN], which formally recognizes your ownership right or use right?
+table(main$House10) #How likely is your household to be expelled from the housing you live in in the next 5 years? Very unlikely, somewhat unlikely, somewhat likely, or very likely?
 
 ```
 
@@ -1866,7 +1876,7 @@ table(HoH$House10) #How likely is your household to be expelled from the housing
 ```{r, eval=FALSE}
 #First - Assess secure tenure rights for land
 #Step 1: Ownership of the plot they live on 
-HoH <- HoH %>%
+main <- main %>%
   mutate(ownership_plot = case_when(
     Land02 == 1 ~ 1, #Assigns 1 if the HH owns the plot they currently live on
     Land02 == 2 ~ 0, #Assigns 0 if the HH does not own the plot they currently live on
@@ -1875,7 +1885,7 @@ HoH <- HoH %>%
 ```{r, eval=FALSE}
 
 #Step 2. - Check if the HH currently uses, owns or holds use rights for any plot of land
-HoH <- HoH %>%
+main <- main %>%
   mutate(use_own_any_plot = case_when(
     Land01 == 1 | Land03 == 1 | Land04 == 1 ~ 1, #Assigns 1 if they use, own or hold use rights for any plot of land
     Land01 == 2 & Land03 == 2 & Land04 == 2 ~ 0, #Assigns 0 if they don't use, own or hold use rights for any plot of land
@@ -1886,7 +1896,7 @@ HoH <- HoH %>%
 #Step 3: For HH that do not own the plot they live on, but have ownership/use rights of a plot in the host country, we need to check if they have legal documents for this plot, if the use of the plot is residential, and if the likelihood of them loosing the plot is low. 
 #In FDS, HH can specify up to 5 plots they might own or have the use rights to. We are only checking plot 1, as enumerators are instructed to start the plot roster with the plot where the family currently lives. 
 #Step 3.1: Check that the use of plot 1 is indeed residential
-HoH <- HoH %>%
+main <- main %>%
   mutate(residental_plot = case_when(
     grepl("A", Land09_1) ~ 1,#Assigns 1 if the use of plot 1 is residential
     !grepl("A", Land09_1) ~ 0)) #Assigns 0 if the use of plot 1 is not residential
@@ -1894,17 +1904,16 @@ HoH <- HoH %>%
 
 ```{r, eval=FALSE}
 #Step 3.2: Check that the HH has ownership or use rights for the plot they currently live on
-HoH <- HoH %>%
+main <- main %>%
   mutate(use_own_current_plot = case_when(
     Land05_1 == 1 | Land07_1 == 1 ~ 1, #Assigns 1 if the HH has ownership or use rights of the plot they live on
     Land05_1 == 2 & Land07_1 == 2 ~ 0,  #Assigns 0 if the HH does not have ownership nor use rights of the plot they live on
     Land05_1 %in% c(98,99) & Land07_1 == 2 ~ 0, #Assigns 0 if the HH does not have use rights of the plot they live on & they don't know/refuse      to answer to ownership rights
     TRUE ~ NA_real_ )) #Assigns NA if the answer is "don't know" or "refuse to answer".
-#Ilgi, what do we do with cases where they don't have ownership rights, and they don't know/refuse to answer on use rights? 
 ```
 ```{r, eval=FALSE}
 #Step 3.3: Check that the HH has legal ownership or use right documents for the plot they live on
-HoH <- HoH %>%
+main <- main %>%
   mutate(legal_documents = case_when(
     Land10_1 == 1 ~ 1, #Assigns 0 if the HH has legal ownership or use right documents for the plot they live on
     Land10_1 == 2 ~ 0, #Assigns 0 if the HH does not have legal ownership or use right documents for the plot they live on
@@ -1914,7 +1923,7 @@ HoH <- HoH %>%
 
 ```{r, eval=FALSE}
 #Step 3.4: Check the likelihood of loosing the plot the HH live on
-HoH <- HoH %>%
+main <- main %>%
   mutate(plot_security = case_when(
     Land15_1 %in% c(1,2) ~ 1, #Assigns 1 when the likelihood is "Very unlikely" and "Somewhat unlikely"
     Land15_1 %in% c(3,4) ~ 0)) #Assigns 0 when the likelihood is "Somewhat likely" and "Very likely"
@@ -1922,7 +1931,7 @@ HoH <- HoH %>%
 ```
 ```{r, eval=FALSE}
 #Step 4: Combine the above conditions to assess secure tenure rights for land
-HoH <- HoH %>%
+main <- main %>%
   mutate(tenure_land = case_when(
     use_own_any_plot == 1 & residental_plot == 1 & use_own_current_plot == 1 & legal_documents == 1 & plot_security == 1  ~ 1, 
     use_own_any_plot == 1 & (residental_plot == 0 | use_own_current_plot == 0 | legal_documents == 0 | plot_security == 0) ~ 0, 
@@ -1933,18 +1942,17 @@ HoH <- HoH %>%
 ```{r, eval=FALSE}
 #Second - Assess secure tenure rights for housing
 #Step 1: Assess ownership and use rights of the house
-HoH <- HoH %>%
+main <- main %>%
   mutate(own_use_house = case_when(
     House01 == 1 | House02 == 1 ~ 1, #Assigns 1 if the HH has ownership or use rights of the house they live in
     House01 == 2 & House02 == 2 ~ 0, #Assigns 0 if the HH does not have ownership or use rights of the house they live in
     House01 %in% c(99,98) & House02 == 2 ~ 0, #Assigns 0 if the HH does not have use rights and does not know/refuses to answer for ownership         rights
     TRUE ~ NA_real_ ))
-#Ilgi, what do we do with cases where they don't have ownership rights, and they don't know/refuse to answer on use rights?     
 
 ```
 ```{r, eval=FALSE}
 #Step 2: Assess legal documents for households
-HoH <- HoH %>%
+main <- main %>%
   mutate(documents_house = case_when(
     House04 == 1 ~ 1, #Assigns 1 if the HH has legal documents for the ownership or use of the house
     House04 == 2 ~ 0, #Assigns 0 if the HH does not have legal documents for the ownership or use of the house
@@ -1952,7 +1960,7 @@ HoH <- HoH %>%
 ```
 ```{r, eval=FALSE}
 #Step 3: Assess likelihood to be expelled from the house 
-HoH <- HoH %>%
+main <- main %>%
   mutate(expelled_house = case_when(
     House10 %in% c(1,2) ~ 1, #Assigns 1 when the likelihood is "Very unlikely" and "Somewhat unlikely"
     House10 %in% c(3,4) ~ 0)) #Assigns 0 when the likelihood is "Somewhat likely" and "Very likely"
@@ -1960,7 +1968,7 @@ HoH <- HoH %>%
 ```
 ```{r, eval=FALSE}
 #Step 4: Combine all conditions for housing 
-HoH <- HoH %>%
+main <- main %>%
   mutate(tenure_house = case_when(
     own_use_house == 1 & documents_house == 1 & expelled_house == 1 ~ 1, 
     own_use_house == 0 | documents_house == 0 | expelled_house == 0 ~ 0, 
@@ -1968,7 +1976,7 @@ HoH <- HoH %>%
 ```
 ```{r, eval=FALSE}
 #Third: Combine conditions on land and housing
-HoH <- HoH %>%
+main <- main %>%
   mutate(RBM21601= case_when(
     ownership_plot == 1 ~ 1, #Assigns 1 if the HH owns the plot of land where they live
     ownership_plot != 1 & tenure_land == 1 & tenure_house == 1  ~ 1, #Assigns 1 if HH does not own the plot of land they live on, but they have     secure land and household tenure through use/ownership rights, documentation, and low likelihood of loosing the plot/housing. 
@@ -1978,7 +1986,7 @@ HoH <- HoH %>%
 ```
 ```{r, eval=FALSE}
 # Add labels to the new variable 'RBM21601'
-HoH <- HoH %>%
+main <- main %>%
   mutate(RBM21601 = labelled(RBM21601,
                                 labels = c(
                                   'Yes' = 1,
@@ -1988,7 +1996,7 @@ HoH <- HoH %>%
 
 ```
 ```{r}
-table(HoH$RBM21601)
+table(main$RBM21601)
 ```
 
 ## 16.2 Core Outcome Indicator
@@ -2009,7 +2017,7 @@ This indicator measures the proportion of people who receive government social p
 
 **Denominator**: Total number of individuals 
 
-**Dataset**: HoH
+**Dataset**: main
 
 To calculate the indicator value, the standard RMS methodology considers in the numerator only individuals in households where any household member has received any benefits from the national or local government social protection system in the country in the last 12 months.
 
@@ -2018,24 +2026,24 @@ To calculate the indicator value, the standard RMS methodology considers in the 
 
 
 ```{r, eval=FALSE}
-table(HoH$ScProtec01) #In the past 12 months while in the host country, have you or anyone in your household received support from any assistance programme?
-table(HoH$ScProtec04) #From whom have you or anyone in your household received the assistance provided by this programme?
+table(main$ScProtec01) #In the past 12 months while in the host country, have you or anyone in your household received support from any assistance programme?
+table(main$ScProtec04) #From whom have you or anyone in your household received the assistance provided by this programme?
 #ScProtec16: In the last 12 months, have you or anyone in your household received any of the following payments from the host country government?  
-table(HoH$ScProtec16a)#Social protection cash benefit
-table(HoH$ScProtec16b)#Parental/Maternity benefit
-table(HoH$ScProtec16c)#Disability benefit
-table(HoH$ScProtec16d)#Unemployment benefit
-table(HoH$ScProtec16e)#Employment injury benefit
-table(HoH$ScProtec16f)#Sickness benefit
-table(HoH$ScProtec16g)#Old-age pension
-table(HoH$ScProtec16h)#Other vulnerability benefit
-table(HoH$ScProtec16i)#Social assistance cash benefit
+table(main$ScProtec16a)#Social protection cash benefit
+table(main$ScProtec16b)#Parental/Maternity benefit
+table(main$ScProtec16c)#Disability benefit
+table(main$ScProtec16d)#Unemployment benefit
+table(main$ScProtec16e)#Employment injury benefit
+table(main$ScProtec16f)#Sickness benefit
+table(main$ScProtec16g)#Old-age pension
+table(main$ScProtec16h)#Other vulnerability benefit
+table(main$ScProtec16i)#Social assistance cash benefit
 
 ```
 
 ```{r, eval=FALSE}
 #Step 1: Create a new variable to check if the household receives any social benefit from the government
-HoH <- HoH %>%
+main <- main %>%
   rowwise() %>%
   mutate(Social_Benefit = case_when(
     any(c_across(starts_with("ScProtec16")) == 1, na.rm = TRUE) ~ 1,  # If any column has 1
@@ -2048,22 +2056,22 @@ HoH <- HoH %>%
 ```{r, eval=FALSE}
 #Step 2: Create a new variable to check if the household received any support from a social assistance programme by the government
 #Step 2.2: ScProtec04 is a repeat group meaning that depending on how many social assistance programmes the respondent lists, for each of them they answer to ScProtec04. Therefore, we first need to identify all coloumns matching the pattern "ProgrammeX_ScProtec04". 
-programme_columns <- grep("^Programme\\d+_ScProtec04$", names(HoH), value = TRUE)
+programme_columns <- grep("^Programme\\d+_ScProtec04$", names(main), value = TRUE)
 
 ```
 ```{r, eval=FALSE}
 #Step 2.3: Create a new varibale checking if the household received any assistance programme from the government
-HoH <- HoH %>%
+main <- main %>%
   mutate(Government_assistance = case_when(
-    ScProtec01 == 1 & apply(HoH[programme_columns], 1, function(row) any(row == 1, na.rm = TRUE)) ~ 1, # Assigns 1 if assistance is received from the government 
+    ScProtec01 == 1 & apply(main[programme_columns], 1, function(row) any(row == 1, na.rm = TRUE)) ~ 1, # Assigns 1 if assistance is received from the government 
     ScProtec01 == 2 ~ 0,  # Assigns a 0 if no assistance is received 
-    ScProtec01 == 1 & apply(HoH[programme_columns], 1, function(row) all(row != 1, na.rm = TRUE)) ~ 0, # Assignes a 0 if assistance received is not from the government
+    ScProtec01 == 1 & apply(main[programme_columns], 1, function(row) all(row != 1, na.rm = TRUE)) ~ 0, # Assignes a 0 if assistance received is not from the government
     TRUE ~ 0  # Condition 4: Default case
   ))
 ```
 ```{r, eval=FALSE}
 #Step 3: Combine social benefit and social assistance 
-HoH <- HoH %>%
+main <- main %>%
   mutate(RBM21602 = case_when(
     Social_Benefit == 1 | Government_assistance == 1 ~ 1,  # If either variable is 1, assign 1
     Social_Benefit == 0 & Government_assistance == 0 ~ 0,  # If both variables are 2, assign 0
@@ -2080,5 +2088,5 @@ HoH <- HoH %>%
 
 ```
 ```{r, eval=FALSE}
-table(HoH$RBM21602)
+table(main$RBM21602)
 ```

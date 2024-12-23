@@ -8,23 +8,23 @@ pacman::p_load(
 
 #Import 5 datasets. Here we are using FDS Pakistan dataset. 
 
-roster <- read_dta("FDS_PAK_2024_Roster_complete.dta")
-HoH <- read_dta("FDS_PAK_2024_HoH_complete.dta")
+HHroster <- read_dta("FDS_PAK_2024_Roster_complete.dta")
+main <- read_dta("FDS_PAK_2024_HoH_complete.dta")
 RA_adult <- read_dta("FDS_PAK_2024_Random_Member_complete.dta")
 RA_woman <- read_dta("FDS_PAK_2024_Random_Woman_complete.dta")
 RA_caregiver <- read_dta ("FDS_PAK_2024_Random_Child_complete.dta")
 
-#roster <- read_dta("C:/Users/KAPS/OneDrive - UNHCR/300 - ST - Survey Team - Main/Survey Programme Team/Projects/FDS/Countries/Pakistan/Data Management/4 Analysis/FDS_PAK_2024_Roster_complete.dta")
-#HoH <- read_dta("C:/Users/KAPS/OneDrive - UNHCR/300 - ST - Survey Team - Main/Survey Programme Team/Projects/FDS/Countries/Pakistan/Data Management/4 Analysis/FDS_PAK_2024_HoH_complete.dta")
+#HHroster <- read_dta("C:/Users/KAPS/OneDrive - UNHCR/300 - ST - Survey Team - Main/Survey Programme Team/Projects/FDS/Countries/Pakistan/Data Management/4 Analysis/FDS_PAK_2024_Roster_complete.dta")
+#main <- read_dta("C:/Users/KAPS/OneDrive - UNHCR/300 - ST - Survey Team - Main/Survey Programme Team/Projects/FDS/Countries/Pakistan/Data Management/4 Analysis/FDS_PAK_2024_HoH_complete.dta")
 #RA_adult <- read_dta("C:/Users/KAPS/OneDrive - UNHCR/300 - ST - Survey Team - Main/Survey Programme Team/Projects/FDS/Countries/Pakistan/Data Management/4 Analysis/FDS_PAK_2024_Random_Member_complete.dta")
 #RA_woman <- read_dta("C:/Users/KAPS/OneDrive - UNHCR/300 - ST - Survey Team - Main/Survey Programme Team/Projects/FDS/Countries/Pakistan/Data Management/4 Analysis/FDS_PAK_2024_Random_Woman_complete.dta")
 #RA_caregiver <- read_dta ("C:/Users/KAPS/OneDrive - UNHCR/300 - ST - Survey Team - Main/Survey Programme Team/Projects/FDS/Countries/Pakistan/Data Management/4 Analysis/FDS_PAK_2024_Random_Child_complete.dta")
 
 # Rename _uuid to uuid in all datasets
-HoH <- HoH %>%
+main <- main %>%
   rename(uuid = `_uuid`)
 
-roster <- roster %>%
+HHroster <- HHroster %>%
   rename(uuid = `_uuid`)
 
 RA_adult <- RA_adult %>%
@@ -56,9 +56,9 @@ RA_caregiver <- RA_caregiver %>%
 
 # Pull the age of the child about whom he child labour questions are asked 
 # Perform a left join and extract the child's age
-HoH <- HoH %>%
+main <- main %>%
   left_join(
-    roster %>% select(uuid, rosterposition, HH_04), # Select relevant columns from hhroster
+    HHroster %>% select(uuid, rosterposition, HH_04), # Select relevant columns from hhroster
     by = c("uuid" = "uuid", "selected_childla" = "rosterposition") # Match on uuid and positions
   ) %>%
   rename(child_labor_age = HH_04) # Rename HH_04 to child_labor_age
@@ -67,40 +67,40 @@ HoH <- HoH %>%
 ### Household members size
 # Create a new variable to count the number of household members in each household 
 ##Here we are using the variable "member" which assigned a 1 for each person that passes the check for actually being a household member. This check done automatically in the data collection form. 
-household_counts <- roster %>%
+household_counts <- HHroster %>%
   group_by(uuid) %>%
   summarise(HHmembersize = sum(member == 1, na.rm = TRUE))
 ##Join with the main data set
-HoH <- HoH %>%
+main <- main %>%
   left_join(household_counts, by = "uuid")
 
 
 #Disaggregation variables 
 ## Roster ----
 ## 1. Population Groups ----
-##Population group variable is available in the HoH dataset. Here we pull it to the roster dataset. 
-roster <- roster %>%
+##Population group variable is available in the main dataset. Here we pull it to the HHroster dataset. 
+HHroster <- HHroster %>%
   left_join(
-    HoH %>% select(uuid, Intro_07), # Select relevant columns from HoH
+    main %>% select(uuid, Intro_07), # Select relevant columns from main
     by = c("uuid" = "uuid") # Match on uuid 
   ) 
-roster <- roster %>%
+HHroster <- HHroster %>%
   rename(Intro_07_roster = Intro_07) #Rename to Intro_07_roster 
 
 ## 2. Age ----
 ### Create two new variables for different age categories
 ### 4 categories (0-4, 5-17, 18-59, 60+)
 
-roster$HH_04_cat4 <- cut(roster$HH_04, breaks = c(-1, 4, 17, 59, Inf), 
+HHroster$HH_04_cat4 <- cut(HHroster$HH_04, breaks = c(-1, 4, 17, 59, Inf), 
                          labels = c("0-4", "5-17", "18-59", "60+"))
 
 ### 2 categories (<18, >18)
 
-roster$HH_04_cat2 <- cut(roster$HH_04, breaks = c(-1, 17, Inf), 
+HHroster$HH_04_cat2 <- cut(HHroster$HH_04, breaks = c(-1, 17, Inf), 
                          labels = c("0-17", "18-60+"))
 
-table(roster$HH_04_cat4)
-table(roster$HH_04_cat2)
+table(HHroster$HH_04_cat4)
+table(HHroster$HH_04_cat2)
 
 ## 3. Disability ----
 
@@ -111,22 +111,22 @@ table(roster$HH_04_cat2)
 
 ###Step 1: Add the level 0 - no difficulty, for those members above 5 years of age who were not identified as having disabilities. 
 #Vision
-roster <- roster %>% 
+HHroster <- HHroster %>% 
   mutate(Dis_03 = if_else(is.na(Dis_03) & HH_04 > 5, 0, Dis_03))
 #Hearing
-roster <- roster %>% 
+HHroster <- HHroster %>% 
   mutate(Dis_06 = if_else(is.na(Dis_06) & HH_04 > 5, 0, Dis_06))
 #Mobility
-roster <- roster %>% 
+HHroster <- HHroster %>% 
   mutate(Dis_09 = if_else(is.na(Dis_09) & HH_04 > 5, 0, Dis_09))
 #Cognition
-roster <- roster %>% 
+HHroster <- HHroster %>% 
   mutate(Dis_12 = if_else(is.na(Dis_12) & HH_04 > 5, 0, Dis_12))
 #Self-care
-roster <- roster %>% 
+HHroster <- HHroster %>% 
   mutate(Dis_15 = if_else(is.na(Dis_15) & HH_04 > 5, 0, Dis_15))
 #Communication
-roster <- roster %>% 
+HHroster <- HHroster %>% 
   mutate(Dis_18 = if_else(is.na(Dis_18) & HH_04 > 5, 0, Dis_18))
 
 ###Step 2: Generate frequency distributions on each of the WG-SS domain variables
@@ -139,22 +139,22 @@ roster <- roster %>%
 ### 99	Refused to Answer
 
 #Vision 
-barplot(table(roster$Dis_03), main = "Vision")
+barplot(table(HHroster$Dis_03), main = "Vision")
 #Hearing
-barplot(table(roster$Dis_06), main = "Hearing")
+barplot(table(HHroster$Dis_06), main = "Hearing")
 #Mobility
-barplot(table(roster$Dis_09), main = "Mobility")
+barplot(table(HHroster$Dis_09), main = "Mobility")
 #Cognition
-barplot(table(roster$Dis_12), main = "Cognition")
+barplot(table(HHroster$Dis_12), main = "Cognition")
 #Self-care
-barplot(table(roster$Dis_15), main = "Self-care")
+barplot(table(HHroster$Dis_15), main = "Self-care")
 #Communication
-barplot(table(roster$Dis_18), main = "Communicating")
+barplot(table(HHroster$Dis_18), main = "Communicating")
 
 
 ##Step 3: Codes (99) Refuse to answer and (98) Don’t know, are recoded to Missing.
 
-roster <- roster %>%
+HHroster <- HHroster %>%
   mutate(
     Dis_03 = ifelse(Dis_03 == 98 | Dis_03 == 99, NA, Dis_03),
     Dis_06 = ifelse(Dis_06  == 98 | Dis_06  == 99, NA, Dis_06),
@@ -166,7 +166,7 @@ roster <- roster %>%
 
 ## Step 4: Create disability status indicator for the Washington Group short set on disability
 
-roster <- roster %>%
+HHroster <- HHroster %>%
   mutate(disability = case_when(
     Dis_03 %in% c(2, 3) |
       Dis_06 %in% c(2, 3) |
@@ -185,86 +185,86 @@ roster <- roster %>%
 
 
 ## 4. Country of Origin ----
-#The individual information on the country of origin comes from the roster. To have one single variable for country of origin information, the country code for the country of enumeration (i.e. PAK for Pakistan) will be entered as below. This question is asked only to individuals older than 15. For individuals younger than 15, the value is equaled to the country of origin of the household (as responded by the Head of the Household)
+#The individual information on the country of origin comes from the HHroster. To have one single variable for country of origin information, the country code for the country of enumeration (i.e. PAK for Pakistan) will be entered as below. This question is asked only to individuals older than 15. For individuals younger than 15, the value is equaled to the country of origin of the household (as responded by the Head of the Household)
 
-roster <- roster %>%
+HHroster <- HHroster %>%
   left_join(
-    HoH %>% select(uuid, origincntry), # Select relevant columns from HoH
+    main %>% select(uuid, origincntry), # Select relevant columns from main
     by = c("uuid" = "uuid") # Match on uuid 
   ) 
-roster <- roster %>%
+HHroster <- HHroster %>%
   rename(origincountry_roster = origincntry) #Rename to Intro_07_roster
 
-roster <- roster %>%
+HHroster <- HHroster %>%
   mutate( # country of origin from ID_00 and ID_00_specify
     COO = case_when(
       ID_00 == 1 ~ "PAK", ##ensure to adjust here the country code (where FDS took place)
-      ID_00 == 2 ~ as.character(roster$ID_00_specify),
+      ID_00 == 2 ~ as.character(HHroster$ID_00_specify),
       ID_00 == 3 ~ "Stateless",
       ID_00 == 99 ~ "99",
       ID_00 == 98 ~ "98", 
-      is.na(ID_00) ~ as.character(roster$origincountry_roster), #For individuals under 15 years, ID_00 is not asked and therefore NA. For these individuals, we take "origincntry" which is a the country of origin of the household (answered by the HoH)
+      is.na(ID_00) ~ as.character(HHroster$origincountry_roster), #For individuals under 15 years, ID_00 is not asked and therefore NA. For these individuals, we take "origincntry" which is a the country of origin of the household (answered by the main)
     )
   ) 
 
 
-## Head of the Household (HoH dataset) ----
+## Head of the Household (main dataset) ----
 #1. Age ----
 # Age with no categories 
-HoH <- HoH %>%
+main <- main %>%
   left_join(
-    roster %>% select(uuid, rosterposition, HH_04), # Select relevant columns from hhroster
+    HHroster %>% select(uuid, rosterposition, HH_04), # Select relevant columns from hhroster
     by = c("uuid" = "uuid", "HHposinfo" = "rosterposition") # Match on uuid and position
   ) %>%
   rename(HH_04_HoH = HH_04) # Rename HH_04 to HH_04_hOh
 
 
 # 2 categories 
-HoH <- HoH %>%
+main <- main %>%
   left_join(
-    roster %>% select(uuid, rosterposition, HH_04_cat2), # Select relevant columns from roster
+    HHroster %>% select(uuid, rosterposition, HH_04_cat2), # Select relevant columns from HHroster
     by = c("uuid" = "uuid", "HHposinfo" = "rosterposition") # Match on uuid and position 
   ) 
-HoH <- HoH %>%
+main <- main %>%
   rename(HH_04_HoH_cat2 = HH_04_cat2) #HH_04_HoH_cat2
 
 # 4 categories 
-HoH <- HoH %>%
+main <- main %>%
   left_join(
-    roster %>% select(uuid,rosterposition, HH_04_cat4), # Select relevant columns from roster
+    HHroster %>% select(uuid,rosterposition, HH_04_cat4), # Select relevant columns from HHroster
     by = c("uuid" = "uuid", "HHposinfo" = "rosterposition") # Match on uuid  and position 
   ) 
-HoH <- HoH %>%
+main <- main %>%
   rename(HH_04_HoH_cat4 = HH_04_cat4) #HH_04_HoH_cat4
 
 #2. Gender ----
 
-HoH <- HoH %>%
+main <- main %>%
   left_join(
-    roster %>% select(uuid, rosterposition, HH_02), # Select relevant columns from roster
+    HHroster %>% select(uuid, rosterposition, HH_02), # Select relevant columns from HHroster
     by = c("uuid" = "uuid", "HHposinfo" = "rosterposition") # Match on uuid and position 
   ) 
-HoH <- HoH %>%
+main <- main %>%
   rename(HH_02_HoH = HH_02) #Rename to HH_02_HoH
 
 #3. Disability ----
 
-HoH <- HoH %>%
+main <- main %>%
   left_join(
-    roster %>% select(uuid, rosterposition, disability), # Select relevant columns from roster
+    HHroster %>% select(uuid, rosterposition, disability), # Select relevant columns from HHroster
     by = c("uuid" = "uuid", "HHposinfo" = "rosterposition") # Match on uuid and position 
   ) 
-HoH <- HoH %>%
+main <- main %>%
   rename(disability_HoH = disability) #Rename to disability_HoH
 
 #4. Country of Origin ----
 
-HoH <- HoH %>%
+main <- main %>%
   left_join(
-    roster %>% select(uuid,rosterposition, COO), # Select relevant columns from roster
+    HHroster %>% select(uuid,rosterposition, COO), # Select relevant columns from HHroster
     by = c("uuid" = "uuid", "HHposinfo" = "rosterposition") # Match on uuid and position 
   ) 
-HoH <- HoH %>%
+main <- main %>%
   rename(COO_HoH = COO) #Rename to COO_HoH
 
 
@@ -281,13 +281,13 @@ RA_adult$RA_HH_04_cat2 <- cut(RA_adult$age_selected, breaks = c(-1, 17, Inf),
 RA_adult$age_selected <- as.numeric(as.character(RA_adult$age_selected))
 
 RA_adult$RA_HH_04_cat4 <- cut(RA_adult$age_selected, breaks = c(-1, 4, 17, 59, Inf), 
-                         labels = c("0-4", "5-17", "18-59", "60+"))
+                              labels = c("0-4", "5-17", "18-59", "60+"))
 
 #2. Population Group ----
 
 RA_adult <- RA_adult %>%
   left_join(
-    HoH %>% select(uuid, Intro_07), # Select relevant columns from HoH dataset
+    main %>% select(uuid, Intro_07), # Select relevant columns from main dataset
     by = c("uuid" = "uuid") # Match on uuid 
   ) 
 RA_adult <- RA_adult %>%
@@ -297,8 +297,8 @@ RA_adult <- RA_adult %>%
 
 RA_adult <- RA_adult %>%
   left_join(
-    roster %>% select(uuid, COO, rosterposition), # Select relevant columns from roster
-    by = c("uuid" = "uuid", "rosterposition" = "rosterposition") # Match on uuid and roster position
+    HHroster %>% select(uuid, COO, rosterposition), # Select relevant columns from HHroster
+    by = c("uuid" = "uuid", "rosterposition" = "rosterposition") # Match on uuid and HHroster position
   ) 
 RA_adult <- RA_adult %>%
   rename(COO_RA = COO) #Rename to COO_RA
@@ -306,8 +306,8 @@ RA_adult <- RA_adult %>%
 #4. Disability ----
 RA_adult <- RA_adult %>%
   left_join(
-    roster %>% select(uuid, disability, rosterposition), # Select relevant columns from roster
-    by = c("uuid" = "uuid", "rosterposition") # Match on uuid and roster position
+    HHroster %>% select(uuid, disability, rosterposition), # Select relevant columns from HHroster
+    by = c("uuid" = "uuid", "rosterposition") # Match on uuid and HHroster position
   ) 
 RA_adult <- RA_adult %>%
   rename(disability_RA = disability) #Rename to disability_RA
@@ -334,7 +334,7 @@ RA_woman$RW_HH_04_cat4 <- cut(RA_woman$agerandomwoman, breaks = c(-1, 4, 17, 59,
 
 RA_woman <- RA_woman %>%
   left_join(
-    HoH %>% select(uuid, Intro_07), # Select relevant columns from HoH dataset
+    main %>% select(uuid, Intro_07), # Select relevant columns from main dataset
     by = c("uuid" = "uuid") # Match on uuid 
   ) 
 RA_woman <- RA_woman %>%
@@ -344,8 +344,8 @@ RA_woman <- RA_woman %>%
 
 RA_woman <- RA_woman %>%
   left_join(
-    roster %>% select(uuid, COO, rosterposition), # Select relevant columns from roster
-    by = c("uuid" = "uuid", "rosterposition" = "rosterposition") # Match on uuid and roster position
+    HHroster %>% select(uuid, COO, rosterposition), # Select relevant columns from HHroster
+    by = c("uuid" = "uuid", "rosterposition" = "rosterposition") # Match on uuid and HHroster position
   ) 
 RA_woman <- RA_woman %>%
   rename(COO_RW = COO) #Rename to COO_RW
@@ -353,8 +353,8 @@ RA_woman <- RA_woman %>%
 #4. Disability ----
 RA_woman <- RA_woman %>%
   left_join(
-    roster %>% select(uuid, disability, rosterposition), # Select relevant columns from roster
-    by = c("uuid" = "uuid", "rosterposition" = "rosterposition") # Match on uuid and roster position
+    HHroster %>% select(uuid, disability, rosterposition), # Select relevant columns from HHroster
+    by = c("uuid" = "uuid", "rosterposition" = "rosterposition") # Match on uuid and HHroster position
   ) 
 RA_woman <- RA_woman %>%
   rename(disability_RW = disability) #Rename to disability_RW
@@ -365,7 +365,7 @@ RA_woman <- RA_woman %>%
 
 RA_caregiver <- RA_caregiver %>%
   left_join(
-    HoH %>% select(uuid, Intro_07), # Select relevant columns from HoH dataset
+    main %>% select(uuid, Intro_07), # Select relevant columns from main dataset
     by = c("uuid" = "uuid") # Match on uuid 
   ) 
 RA_caregiver <- RA_caregiver %>%
@@ -374,8 +374,8 @@ RA_caregiver <- RA_caregiver %>%
 #2. Disability ----
 RA_caregiver <- RA_caregiver %>%
   left_join(
-    roster %>% select(uuid, disability, rosterposition), # Select relevant columns from roster
-    by = c("uuid" = "uuid", "rosterposition_caregiver" = "rosterposition") # Match on uuid and roster position
+    HHroster %>% select(uuid, disability, rosterposition), # Select relevant columns from HHroster
+    by = c("uuid" = "uuid", "rosterposition_caregiver" = "rosterposition") # Match on uuid and HHroster position
   ) 
 RA_caregiver <- RA_caregiver %>%
   rename(disability_RC = disability) #Rename to disability_RC
@@ -384,8 +384,8 @@ RA_caregiver <- RA_caregiver %>%
 
 RA_caregiver <- RA_caregiver %>%
   left_join(
-    roster %>% select(uuid, COO, rosterposition), # Select relevant columns from roster
-    by = c("uuid" = "uuid", "rosterposition_caregiver" = "rosterposition") # Match on uuid and roster position
+    HHroster %>% select(uuid, COO, rosterposition), # Select relevant columns from HHroster
+    by = c("uuid" = "uuid", "rosterposition_caregiver" = "rosterposition") # Match on uuid and HHroster position
   ) 
 RA_caregiver <- RA_caregiver %>%
   rename(COO_RC = COO) #Rename to COO_RC
@@ -403,17 +403,17 @@ RA_caregiver <- RA_caregiver %>%
 
 ####Calculate crowding index - overcrowded when more than 3 persons share one room to sleep
 
-table(HoH$HH14) ##How many separate structures or buildings do the members of your household occupy? 
-table(HoH$HHmembersize)
+table(main$HH14) ##How many separate structures or buildings do the members of your household occupy? 
+table(main$HHmembersize)
 
-HoH <- HoH %>%
+main <- main %>%
   mutate(crowding=HHmembersize/HH14
   ) %>%
   mutate(crowding_cat=case_when( ##if crowding <= 3, not overcrowded 
     crowding <= 3 ~ 1, TRUE ~ 2)
   )
 
-table(HoH$crowding_cat)
+table(main$crowding_cat)
 
 
 
@@ -425,10 +425,10 @@ popgroup_labels <- c(
   "3" = "Host Community"
 )
 
-roster <- roster %>%
+HHroster <- HHroster %>%
   mutate(Intro_07_roster = recode_factor(Intro_07_roster, !!!popgroup_labels))
 
-HoH <- HoH %>%
+main <- main %>%
   mutate(Intro_07 = recode_factor(Intro_07, !!!popgroup_labels))
 
 RA_adult <- RA_adult %>%
@@ -447,10 +447,10 @@ gender_labels <- c(
 )
 
 # Apply labels to all gender variables in one block
-roster <- roster %>%
+HHroster <- HHroster %>%
   mutate(HH_02 = recode_factor(HH_02, !!!gender_labels))
 
-HoH <- HoH %>%
+main <- main %>%
   mutate(HH_02_HoH = recode_factor(HH_02_HoH, !!!gender_labels))
 
 RA_adult <- RA_adult %>%
@@ -465,10 +465,10 @@ disability_labels <- c(
   "2" = "Non-Disabled"
 )
 
-roster <- roster %>%
+HHroster <- HHroster %>%
   mutate(disability = recode_factor(disability, !!!disability_labels))
 
-HoH <- HoH %>%
+main <- main %>%
   mutate(disability_HoH = recode_factor(disability_HoH, !!!disability_labels))
 
 RA_adult <- RA_adult %>%
