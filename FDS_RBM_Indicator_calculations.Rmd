@@ -653,6 +653,41 @@ ggplot(RBM10203, aes(x = Intro_07_RA, y = mean_value, fill = Intro_07_RA)) +
 ```
 
 
+### Figure for RBM Core Impact 2.3 by Population Groups, Gender and Disability
+
+```{r, eval=FALSE}
+#### Table and chart that shows results by age/sex/diversity
+
+RBM10203_AGD <- FDS_PAK_2024_RA_adult %>%
+  filter(!is.na(HH_02_RA) & !is.na(disability_RA) & !is.na(Intro_07_RA) ) %>%  # Exclude HH07_cat categories 1, 2, and 5
+  group_by(Intro_07_RA, HH_02_RA,disability_RA) %>%
+  summarise(
+    var_name = "impact2_3",                                      # Name of the variable
+    num_obs_uw = survey_total(!is.na(RBM10203), vartype = NULL),  # Unweighted total count
+    denominator = survey_total(),                                # Weighted total count
+    mean_value = survey_mean(RBM10203, vartype = c("ci", "se"), na.rm = TRUE)  # Compute mean with CI and SE
+  )
+
+
+
+ggplot(RBM10203_AGD, aes(x = HH_02_RA, y = mean_value, fill = disability_RA)) +
+  geom_bar(stat = "identity", position = position_dodge(width = 0.7), width = 0.7) +
+  geom_text(aes(label = sprintf("%.2f", mean_value)), 
+            position = position_dodge(width = 0.7), vjust = -0.4, size = 3) +  # Add values on bars
+  facet_wrap(~ Intro_07_RA) +  # Create separate plots for each pop_group
+  labs(
+    title = "Proportion of individuals with access to health services",
+    x = "Gender ",
+    y = "Proportion of individuals with access",
+    fill = "Disability Status"
+  ) +
+  scale_fill_unhcr_d() +  # Use UNHCR color palette
+  scale_y_continuous(limits = c(0, 1.1), expand = c(0, 0)) +
+  theme_unhcr() +  # Apply UNHCR theme
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1)  # Rotate x-axis labels for readability
+  )
+```
 ## 3.2a Core Impact Indicator
 
 **3.2a Proportion of children and young people enrolled in primary education**
