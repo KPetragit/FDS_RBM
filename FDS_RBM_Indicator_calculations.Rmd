@@ -102,7 +102,7 @@ Menstrual Hygiene
 
 **- Caregiver questionnaire**, responded to by the caregiver of the randomly selected child (<5 years of age) from the household.
 
-Anthroppometrics  
+Anthropometrics
 Immunization 
 
 Data is organized in 5 datasets, which are connected through an unique identifier "uuid". The 5 datasets are the following: 
@@ -571,7 +571,7 @@ HHroster <- HHroster %>%
 HHroster <- HHroster %>%
   mutate(
     age_primary = case_when(
-      HH_04 >= 6 & HH_04 <= 14 ~ 1,  #Remember to adjust age levels based on the primary education age per country
+      agetouse >= 6 & agetouse <= 14 ~ 1,  #Remember to adjust age levels based on the primary education age per country
       TRUE ~ 0
     )
   )
@@ -625,7 +625,7 @@ HHroster <- HHroster %>%
 HHroster <- HHroster %>%
   mutate(
     age_secondary = case_when(
-      HH_04 >= 13 & HH_04 <= 16 ~ 1,  #Remember to adjust age levels based on the secondary education age per country
+      agetouse >= 13 & agetouse <= 16 ~ 1,  #Remember to adjust age levels based on the secondary education age per country
       TRUE ~ 0
     )
   )
