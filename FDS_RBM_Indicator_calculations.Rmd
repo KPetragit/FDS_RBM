@@ -102,7 +102,11 @@ Menstrual Hygiene
 
 **- Caregiver questionnaire**, responded to by the caregiver of the randomly selected child (<5 years of age) from the household.
 
+<<<<<<< HEAD
 Anthropometrics
+=======
+Anthropometrics  
+>>>>>>> 3c5edc78d16ac6aec03304d0cdc0df28e541190f
 Immunization 
 
 Data is organized in 5 datasets, which are connected through an unique identifier "uuid". The 5 datasets are the following: 
@@ -136,11 +140,11 @@ pacman::p_load(
 **Population Group**
 ```{r, eval=FALSE}
 
-table(HHroster$Intro_07_roster)   #in dataset "HHroster". 
+table(HHroster$Intro_07)   #in dataset "HHroster". 
 table(main$Intro_07)             #in dataset "main". 
-table(RA_adult$Intro_07_RA)     #in dataset "RA_adult". 
-table(RA_woman$Intro_07_RW)     #in dataset "RA_woman". 
-table(RA_caregiver$Intro_07_RC) #in dataset "RA_caregiver". 
+table(RA_adult$Intro_07)     #in dataset "RA_adult". 
+table(RA_woman$Intro_07)     #in dataset "RA_woman". 
+table(RA_caregiver$Intro_07) #in dataset "RA_caregiver". 
 ```
 
 **Age**
@@ -268,7 +272,7 @@ table(main$BD20_3) ##Specifying minutes on how long it takes to collect water
 table(main$BD22)   ##Does it take more or less than 30 minutes?
 
 
-## Step 2: Add a coloumn specifying is the household uses improved or unimproved source of drinking water 
+## Step 2: Add a column specifying is the household uses improved or unimproved source of drinking water 
 main <- main %>%
 mutate(Improved_dw = ifelse(BD01 %in% c(11, 12, 13, 14, 21, 31, 41, 51, 61, 71, 72, 91, 92), 1, 0)) %>%
   mutate(Improved_dw = labelled(Improved_dw,
@@ -425,26 +429,109 @@ table(main$RBM10202)
 ```
 
 ```{r, eval=FALSE}
-FDS_PAK_2024_HoH <- main %>%
+
+##This indicator is located in the 'main' dataset
+
+##Add weights when/if available
+FDS_PAK_2024_main <- main %>%
   as_survey_design(
     ids = NULL,           # Specify the column with cluster IDs
-    weights = NULL, # Specify the column with survey weights
+    weights = , # Specify the column with survey weights
     nest = TRUE              # Use TRUE if PSUs are nested within clusters (optional, based on your survey design)
   )
 ```
 
+
+###Figure for RBM Core Impact 2.2 : Composite Variables 
+
 ```{r, eval=FALSE}
 #Table by population groups 
-#This table is done as an example on the FDS PAK dataset. Ensure to re-name your table if you are working on a different datatset. 
-RBM10202 <- FDS_PAK_2024_HoH %>%    
-  filter(!is.na(Intro_07)) %>%      # Exclude if pop groups is NA
-  group_by(Intro_07) %>%            # how results disaggregated by pop groups
-  summarise(                        # put all variables here
-    var_name = "RBM10202",          # name of the variable
-    num_obs_uw = unweighted(n()),   # unweighted total count
-    denominator = survey_total(),   # weighted total count
-    mean_value = survey_mean(RBM10202, vartype = c("ci", "se"), na.rm = TRUE)  ## indicator value ( weighted) with CI and SE
+#This table is done as an example on the FDS PAK dataset. Ensure to re-name your table if you are working on a different dataset.
+
+####Standard tables 
+
+
+composite_impact2_2 <- main %>%
+  select(Intro_07, shelter, electricity, Improved_dw_access, Landslides_flooding, RBM10202) %>%
+  pivot_longer(cols = shelter:Landslides_flooding, names_to = "facility", values_to = "access") %>%
+  group_by(Intro_07, facility) %>%
+  summarise(percentage = mean(access, na.rm = TRUE) * 100) %>%
+  ungroup()
+
+##add labels
+composite_impact2_2 <- composite_impact2_2 %>%
+  mutate(
+    facility_label = dplyr::recode(
+      facility,
+      "shelter" = "Habitable Shelter",
+      "electricity" = "Electricity",
+      "Improved_dw_access" = "Improved Drinking Water",
+      "Landslides_flooding" = "No risk(Landslides & Flooding)"
+    )
   )
+
+
+composite_impact2_2 %>%
+  ggplot(aes(x = facility_label, y = percentage, fill = Intro_07)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  geom_text(
+    aes(label = round(percentage, 1)),
+    position = position_dodge(width = 0.9),
+    vjust = -0.5,
+    size = 3
+  ) +
+  scale_fill_unhcr_d() +
+  scale_y_continuous(limits = c(0, 110), expand = c(0, 0)) +
+  labs(
+    title = "Access to Facilities by Population Group",
+    x = "Facility",
+    y = "Percentage Access (%)",
+    fill = "Population Groups"
+  ) +
+  theme_unhcr() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+```
+
+
+
+### Figure for RBM Core Impact 2.2 by Population Groups
+
+```{r, eval=FALSE}
+
+##Indicator Results 
+
+# Table by population groups
+RBM10202 <- FDS_PAK_2024_main %>%    
+  filter(!is.na(Intro_07)) %>%    # Exclude if population groups is NA
+  group_by(Intro_07) %>%          # Group by population groups
+  summarise(                      # Summarise the variables
+    var_name = "impact2_2",        # Name of the variable
+    num_obs_uw = unweighted(n()), # Unweighted total count
+    denominator = survey_total(), # Weighted total count
+    mean_value = survey_mean(RBM10202, vartype = c("ci", "se"), na.rm = TRUE) # Weighted mean with CI and SE
+  ) 
+
+# Chart for RBM10202 by population groups
+ggplot(RBM10202, aes(x = Intro_07, y = mean_value, fill = Intro_07)) +
+  geom_bar(stat = "identity", position = "dodge", width = 0.7) +
+  geom_errorbar(aes(ymin = mean_value - mean_value_se, ymax = mean_value + mean_value_se),
+                width = 0.2, position = position_dodge(0.7)) +
+  geom_text(aes(label = round(mean_value, 2)), 
+            vjust = -0.5, position = position_dodge(0.7)) +  # Add labels for mean_value
+  scale_y_continuous(limits = c(0, 1), expand = c(0, 0)) +
+  labs(
+    title = "Results of RBM Core Impact 2.2",
+    x = "Population Groups",
+    y = "Mean Value with Standard Errors"
+  ) +
+  scale_fill_unhcr_d() + 
+  theme_unhcr() +         # Apply UNHCR theme 
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1)  # Rotate x-axis labels for better readability
+  )
+
 ```
 
 ## 2.3 Core Impact Indicator
@@ -503,6 +590,8 @@ RA_adult <- RA_adult %>%
 ```
 
 
+
+
 ```{r, eval=FALSE}
 RA_adult <- RA_adult %>%
  mutate(RBM10203=labelled(RBM10203,
@@ -515,6 +604,88 @@ RA_adult <- RA_adult %>%
 table(RA_adult$RBM10203)
 ```
 
+### Figure for RBM Core Impact 2.3 by Population Groups
+
+```{r, eval=FALSE}
+
+FDS_PAK_2024_RA_adult <- RA_adult %>%
+  as_survey_design(
+    ids = NULL,           # Specify the column with cluster IDs
+    weights = NULL, # Specify the column with survey weights
+    nest = TRUE              # Use TRUE if PSUs are nested within clusters (optional, based on your survey design)
+  )
+###Table by population groups
+
+RBM10203 <- FDS_PAK_2024_RA_adult %>%
+  filter(!is.na(Intro_07)) %>%   # Exclude if pop groups is NA
+  group_by(Intro_07) %>%      # Group by pop_groups
+  summarise(          # Summarise to compute values
+    var_name = "RBM10203",      # Name of the variable
+    num_obs_uw = unweighted(n()),      # Unweighted total count
+    denominator = survey_total(),    # Weighted total count
+    mean_value = survey_mean(RBM10203, vartype = c("ci", "se"), na.rm = TRUE)  # Compute mean with NA removed
+  )
+
+
+##Chart for the indicator above
+
+ggplot(RBM10203, aes(x = Intro_07, y = mean_value, fill = Intro_07)) +
+  geom_bar(stat = "identity", position = "dodge", width = 0.7) +
+  geom_errorbar(aes(ymin = mean_value - mean_value_se, ymax = mean_value + mean_value_se),
+                width = 0.2, position = position_dodge(0.7)) +
+  geom_text(aes(label = round(mean_value, 2)), 
+            vjust = -0.5, position = position_dodge(0.7)) +  
+  scale_y_continuous(limits = c(0, 1.2), expand = c(0, 0)) +
+  labs(
+    title = "Results of RBM Core Impact 2.3",
+    x = "Population Groups",
+    y = "Mean Value with standard errors"
+  ) +
+  scale_fill_unhcr_d() +  # Use UNHCR color palette (requires unhcrthemes package)
+  theme_unhcr() +         # Apply UNHCR theme (requires unhcrthemes package)
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1)  # Rotate x-axis labels for better readability
+  )
+
+
+```
+
+
+### Figure for RBM Core Impact 2.3 by Population Groups, Gender and Disability
+
+```{r, eval=FALSE}
+#### Table and chart that shows results by age/sex/diversity
+
+RBM10203_AGD <- FDS_PAK_2024_RA_adult %>%
+  filter(!is.na(HH_02_RA) & !is.na(disability_RA) & !is.na(Intro_07) ) %>%  # Exclude HH07_cat categories 1, 2, and 5
+  group_by(Intro_07, HH_02_RA,disability_RA) %>%
+  summarise(
+    var_name = "impact2_3",                                      # Name of the variable
+    num_obs_uw = survey_total(!is.na(RBM10203), vartype = NULL),  # Unweighted total count
+    denominator = survey_total(),                                # Weighted total count
+    mean_value = survey_mean(RBM10203, vartype = c("ci", "se"), na.rm = TRUE)  # Compute mean with CI and SE
+  )
+
+
+
+ggplot(RBM10203_AGD, aes(x = HH_02_RA, y = mean_value, fill = disability_RA)) +
+  geom_bar(stat = "identity", position = position_dodge(width = 0.7), width = 0.7) +
+  geom_text(aes(label = sprintf("%.2f", mean_value)), 
+            position = position_dodge(width = 0.7), vjust = -0.4, size = 3) +  # Add values on bars
+  facet_wrap(~ Intro_07) +  # Create separate plots for each pop_group
+  labs(
+    title = "Proportion of individuals with access to health services",
+    x = "Gender ",
+    y = "Proportion of individuals with access",
+    fill = "Disability Status"
+  ) +
+  scale_fill_unhcr_d() +  # Use UNHCR color palette
+  scale_y_continuous(limits = c(0, 1.1), expand = c(0, 0)) +
+  theme_unhcr() +  # Apply UNHCR theme
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1)  # Rotate x-axis labels for readability
+  )
+```
 ## 3.2a Core Impact Indicator
 
 **3.2a Proportion of children and young people enrolled in primary education**
@@ -571,13 +742,125 @@ HHroster <- HHroster %>%
 HHroster <- HHroster %>%
   mutate(
     age_primary = case_when(
+<<<<<<< HEAD
       agetouse >= 6 & agetouse <= 14 ~ 1,  #Remember to adjust age levels based on the primary education age per country
+=======
+      HH_04 >= 5 & HH_04 <= 12 ~ 1,  #Remember to adjust age levels based on the primary education age per country
+>>>>>>> 3c5edc78d16ac6aec03304d0cdc0df28e541190f
       TRUE ~ 0
     )
   )
 ```
 
 
+### Figure for RBM Core Impact 3.2A by Population Groups
+
+```{r, eval=FALSE}
+
+
+###Results of the indicator table
+
+FDS_PAK_2024_HHroster <- HHroster %>%
+  as_survey_design(
+    ids = NULL,           # Specify the column with cluster IDs
+    weights = NULL, # Specify the column with survey weights
+    nest = TRUE              # Use TRUE if PSUs are nested within clusters (optional, based on your survey design)
+  )
+
+
+###You can check official statistics here: https://data.uis.unesco.org/index.aspx?queryid=3847
+###82.68% for both sexed in Pakistan
+
+
+##Table 
+
+RBM10302A <- FDS_PAK_2024_HHroster %>%
+  filter(!is.na(Intro_07)) %>%         # Exclude if pop_groups is NA
+  group_by(Intro_07) %>%                  # Group by pop_groups
+  summarise(
+    var_name = "impact3_2a",                        # Name of the variable
+    num_obs_uw = survey_total(!is.na(age_primary), na.rm = TRUE),  # Unweighted total count
+    denominator = survey_total(edu_primary, na.rm = TRUE),         # Weighted total count
+    edu_primary_total = survey_total(edu_primary, na.rm = TRUE),   # Total for edu_primary
+    age_primary_total = survey_total(age_primary, na.rm = TRUE)    # Total for age_primary
+  ) %>%
+  mutate(
+    mean_value = round(edu_primary_total / age_primary_total, 4)  # Calculate the mean value
+  )
+
+
+##Figure 
+
+
+ggplot(RBM10302A, aes(x = Intro_07, y = mean_value, fill = Intro_07)) +
+  geom_bar(stat = "identity", position = position_dodge(width = 0.7), width = 0.7) +  # Corrected the misplaced `width`
+  geom_text(aes(label = round(mean_value, 2)), 
+            vjust = -0.5, position = position_dodge(width = 0.7)) +  # Correct text positioning
+  scale_y_continuous(limits = c(0, 1.2), expand = c(0, 0)) +
+  labs(
+    title = "Results of RBM Core Impact 3.2a",
+    x = "Population Groups",
+    y = "Mean Value"
+  ) +
+  scale_fill_unhcr_d() +  # Use UNHCR color palette
+  theme_unhcr() +         # Apply UNHCR theme
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1)  # Rotate x-axis labels for readability
+  )
+
+```
+
+
+
+### Figure for RBM Core Impact 3.2A by Gender, Disability and Population Groups
+
+
+```{r, eval=FALSE}
+
+###Table with gender and disability included for the chart
+
+RBM10302A_AGD <- FDS_PAK_2024_HHroster %>%
+  filter(!is.na(Intro_07) & !is.na(disability) & !is.na(HH_02)) %>%                     # Exclude if pop_groups is NA
+  group_by(Intro_07,disability,HH_02) %>%        # Group by pop_groups
+  summarise(
+    var_name = "impact3_2a",                        # Name of the variable
+    num_obs_uw = survey_total(!is.na(age_primary), na.rm = TRUE),  # Unweighted total count
+    denominator = survey_total(edu_primary, na.rm = TRUE),   # Weighted total count
+    edu_primary_total = survey_total(edu_primary, na.rm = TRUE),   # Total for edu_primary
+    age_primary_total = survey_total(age_primary, na.rm = TRUE)   # Total for age_primary
+  ) %>%
+  mutate(
+    mean_value = round(edu_primary_total / age_primary_total, 4)  # Calculate the mean value
+  )
+
+
+
+###Chart for the above table
+
+
+ggplot(RBM10302A_AGD, aes(x = HH_02, y = mean_value, fill = disability)) +
+  geom_bar(stat = "identity", position = position_dodge(width = 0.7), width = 0.7) +
+  geom_text(aes(label = sprintf("%.2f", mean_value)), 
+            position = position_dodge(width = 0.7), vjust = -0.4, size = 3) +  # Add values on bars
+  facet_wrap(~ Intro_07) +  # Create separate plots for each pop_group
+  labs(
+    title = "Enrollment in primary education by Age, Gender, and Population Groups",
+    x = "Gender ",
+    y = "Proportion of Education Level",
+    fill = "Disability Status"
+  ) +
+  scale_fill_unhcr_d() +  # Use UNHCR color palette
+  scale_y_continuous(limits = c(0, 1.1), expand = c(0, 0)) +
+  theme_unhcr() +  # Apply UNHCR theme
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1)  # Rotate x-axis labels for readability
+  )
+
+
+
+
+
+```
 
 ## 3.2b Core Impact Indicator
 
@@ -631,6 +914,113 @@ HHroster <- HHroster %>%
   )
 ```
 
+
+
+### Figure for RBM Core Impact 3.2B by Population Groups
+
+```{r, eval=FALSE}
+
+
+###Results of the indicator table
+
+FDS_PAK_2024_HHroster <- HHroster %>%
+  as_survey_design(
+    ids = NULL,           # Specify the column with cluster IDs
+    weights = NULL, # Specify the column with survey weights
+    nest = TRUE              # Use TRUE if PSUs are nested within clusters (optional, based on your survey design)
+  )
+
+
+###You can check official statistics here: https://data.uis.unesco.org/index.aspx?queryid=3847
+###82.68% for both sexed in Pakistan for Primary
+
+
+##Table 
+
+RBM10302B <- FDS_PAK_2024_HHroster %>%
+  filter(!is.na(Intro_07)) %>%         # Exclude if pop_groups is NA
+  group_by(Intro_07) %>%                  # Group by pop_groups
+  summarise(
+    var_name = "impact3_2b",                        # Name of the variable
+    num_obs_uw = survey_total(!is.na(age_secondary), na.rm = TRUE),  # Unweighted total count
+    denominator = survey_total(edu_secondary, na.rm = TRUE),         # Weighted total count
+    edu_secondary_total = survey_total(edu_secondary, na.rm = TRUE),   # Total for edu_primary
+    age_secondary_total = survey_total(age_secondary, na.rm = TRUE)    # Total for age_primary
+  ) %>%
+  mutate(
+    mean_value = round(edu_secondary_total / age_secondary_total, 4)  # Calculate the mean value
+  )
+
+
+##Figure 
+
+
+ggplot(RBM10302B, aes(x = Intro_07, y = mean_value, fill = Intro_07)) +
+  geom_bar(stat = "identity", position = position_dodge(width = 0.7), width = 0.7) +  # Corrected the misplaced `width`
+  geom_text(aes(label = round(mean_value, 2)), 
+            vjust = -0.5, position = position_dodge(width = 0.7)) +  # Correct text positioning
+  scale_y_continuous(limits = c(0, 1.2), expand = c(0, 0)) +
+  labs(
+    title = "Results of RBM Core Impact 3.2b",
+    x = "Population Groups",
+    y = "Mean Value"
+  ) +
+  scale_fill_unhcr_d() +  # Use UNHCR color palette
+  theme_unhcr() +         # Apply UNHCR theme
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1)  # Rotate x-axis labels for readability
+  )
+
+```
+
+
+### Figure for RBM Core Impact 3.2B by Gender, Disability and Population Groups
+
+
+```{r, eval=FALSE}
+
+###Table with gender and disability included for the chart
+
+RBM10302B_AGD <- FDS_PAK_2024_HHroster %>%
+  filter(!is.na(Intro_07) & !is.na(disability) & !is.na(HH_02)) %>%                     # Exclude if pop_groups is NA
+  group_by(Intro_07,disability,HH_02) %>%        # Group by pop_groups
+  summarise(
+    var_name = "impact3_2b",                        # Name of the variable
+    num_obs_uw = survey_total(!is.na(age_secondary), na.rm = TRUE),  # Unweighted total count
+    denominator = survey_total(edu_secondary, na.rm = TRUE),   # Weighted total count
+    edu_secondary_total = survey_total(edu_secondary, na.rm = TRUE),   # Total for edu_primary
+    age_secondary_total = survey_total(age_secondary, na.rm = TRUE)   # Total for age_primary
+  ) %>%
+  mutate(
+    mean_value = round(edu_secondary_total / age_secondary_total, 4)  # Calculate the mean value
+  )
+
+
+
+###Chart for the above table
+
+
+ggplot(RBM10302B_AGD, aes(x = HH_02, y = mean_value, fill = disability)) +
+  geom_bar(stat = "identity", position = position_dodge(width = 0.7), width = 0.7) +
+  geom_text(aes(label = sprintf("%.2f", mean_value)), 
+            position = position_dodge(width = 0.7), vjust = -0.4, size = 3) +  # Add values on bars
+  facet_wrap(~ Intro_07) +  # Create separate plots for each pop_group
+  labs(
+    title = "Enrollment in secondary education by Age, Gender, and Population Groups",
+    x = "Gender ",
+    y = "Proportion of Education Level",
+    fill = "Disability Status"
+  ) +
+  scale_fill_unhcr_d() +  # Use UNHCR color palette
+  scale_y_continuous(limits = c(0, 1.1), expand = c(0, 0)) +
+  theme_unhcr() +  # Apply UNHCR theme
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1)  # Rotate x-axis labels for readability
+  )
+
+
+
+```
 
 ## 3.3 Core Impact Indicator
 
@@ -686,7 +1076,97 @@ RA_adult <- RA_adult %>%
       label = "Proportion of people that feel safe walking alone in their neighbourhood after dark"  # Assign the variable label
     )
   )
+
+table(RA_adult$RBM10303)
 ```
+
+
+### Figure for RBM Core Impact 3.3 by Population Groups
+
+
+```{r, eval=FALSE}
+###Table standard 
+
+
+FDS_PAK_2024_RA_adult <- RA_adult %>%
+  as_survey_design(
+    ids = NULL,           # Specify the column with cluster IDs
+    weights = NULL, # Specify the column with survey weights
+    nest = TRUE              # Use TRUE if PSUs are nested within clusters (optional, based on your survey design)
+  )
+
+
+RBM10303 <- FDS_PAK_2024_RA_adult %>%
+  filter(!is.na(Intro_07)) %>%                     # Exclude if pop groups is NA
+  group_by(Intro_07) %>%                           # Group by pop_groups
+  summarise(                                         # Summarise to compute values
+    var_name = "impact3_3",                          # Name of the variable
+    num_obs_uw = unweighted(n()),                    # Unweighted total count
+    denominator = survey_total(),                    # Weighted total count
+    mean_value = survey_mean(RBM10303, vartype = c("ci", "se"), na.rm = TRUE)  # Compute mean with NA removed
+  )
+
+
+##Chart for the indicator above
+
+
+
+ggplot(RBM10303, aes(x = Intro_07, y = mean_value, fill = Intro_07)) +
+  geom_bar(stat = "identity", position = "dodge", width = 0.7) +
+  geom_errorbar(aes(ymin = mean_value - mean_value_se, ymax = mean_value + mean_value_se),
+                width = 0.2, position = position_dodge(0.7)) +
+  geom_text(aes(label = round(mean_value, 2)), 
+            vjust = -0.5, position = position_dodge(0.7)) +  
+  scale_y_continuous(limits = c(0, 1), expand = c(0, 0)) +
+  labs(
+    title = "Results of RBM Core Impact 3.3",
+    x = "Population Groups",
+    y = "Mean Value with standard errors"
+  ) +
+  scale_fill_unhcr_d() +  # Use UNHCR color palette (requires unhcrthemes package)
+  theme_unhcr() +         # Apply UNHCR theme (requires unhcrthemes package)
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1)  # Rotate x-axis labels for better readability
+  )
+```
+
+### Figure for RBM Core Impact 3.3 by Population Groups, Gender and Disability
+
+```{r, eval=FALSE}
+#### Table and chart that shows results by age/sex/diversity
+
+RBM10303_AGD <- FDS_PAK_2024_RA_adult %>%
+  filter(!is.na(HH_02_RA) & !is.na(disability_RA) & !is.na(Intro_07) ) %>%  # Exclude HH07_cat categories 1, 2, and 5
+  group_by(Intro_07, HH_02_RA,disability_RA) %>%
+  summarise(
+    var_name = "impact3_3",                                      # Name of the variable
+    num_obs_uw = survey_total(!is.na(RBM10303), vartype = NULL),  # Unweighted total count
+    denominator = survey_total(),                                # Weighted total count
+    mean_value = survey_mean(RBM10303, vartype = c("ci", "se"), na.rm = TRUE)  # Compute mean with CI and SE
+  )
+
+
+
+ggplot(RBM10303_AGD, aes(x = HH_02_RA, y = mean_value, fill = disability_RA)) +
+  geom_bar(stat = "identity", position = position_dodge(width = 0.7), width = 0.7) +
+  geom_text(aes(label = sprintf("%.2f", mean_value)), 
+            position = position_dodge(width = 0.7), vjust = -0.4, size = 3) +  # Add values on bars
+  facet_wrap(~ Intro_07) +  # Create separate plots for each pop_group
+  labs(
+    title = "Proportion of adults who self-report feeling safe walking alone in their neighborhood after dark",
+    x = "Gender ",
+    y = "Those who declare feeling safe",
+    fill = "Disability Status"
+  ) +
+  scale_fill_unhcr_d() +  # Use UNHCR color palette
+  scale_y_continuous(limits = c(0, 1.1), expand = c(0, 0)) +
+  theme_unhcr() +  # Apply UNHCR theme
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1)  # Rotate x-axis labels for readability
+  )
+```
+
+
 
 ## 1.2 Core Outcome Indicator
 
@@ -794,6 +1274,92 @@ HHroster <- HHroster %>%
 table(HHroster$RBM20102)
 ```
 
+### Figure for RBM Core Outcome 1.2 by Population Groups
+
+```{r, eval=FALSE}
+###Results of the indicator table
+
+FDS_PAK_2024_HHroster <- HHroster %>%
+  as_survey_design(
+    ids = NULL,           # Specify the column with cluster IDs
+    weights = NULL, # Specify the column with survey weights
+    nest = TRUE              # Use TRUE if PSUs are nested within clusters (optional, based on your survey design)
+  )
+
+###Table 
+
+RBM20102 <- FDS_PAK_2024_HHroster %>%
+  filter(!is.na(Intro_07)) %>%         # Exclude if pop groups is NA
+  group_by(Intro_07) %>%                           # Group by pop_groups
+  summarise(                                         # Summarise to compute values
+    var_name = "outcome1_2",                          # Name of the variable
+    num_obs_uw = unweighted(n()),                    # Unweighted total count
+    denominator = survey_total(),                    # Weighted total count
+    mean_value = survey_mean(RBM20102, vartype = c("ci", "se"), na.rm = TRUE)  # Compute mean with NA removed
+  )
+
+
+##Chart for the indicator above
+
+ggplot(RBM20102, aes(x = Intro_07, y = mean_value, fill = Intro_07)) +
+  geom_bar(stat = "identity", position = "dodge", width = 0.7) +
+  geom_errorbar(aes(ymin = mean_value - mean_value_se, ymax = mean_value + mean_value_se),
+                width = 0.2, position = position_dodge(0.7)) +
+  geom_text(aes(label = round(mean_value, 2)), 
+            vjust = -0.5, position = position_dodge(0.7)) +  
+  scale_y_continuous(limits = c(0, 1.2), expand = c(0, 0)) +
+  labs(
+    title = "Results of RBM Core Outcome 1.2",
+    x = "Population Groups",
+    y = "Mean Value with standard errors"
+  ) +
+  scale_fill_unhcr_d() +  # Use UNHCR color palette (requires unhcrthemes package)
+  theme_unhcr() +         # Apply UNHCR theme (requires unhcrthemes package)
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1)  # Rotate x-axis labels for better readability
+  )
+
+```
+
+### Figure for RBM Core Outcome 1.2 by Population Groups and Gender
+
+```{r, eval=FALSE}
+
+##Table with gender and population groups - disability is not asked under 5
+
+
+RBM20102_AGD <- FDS_PAK_2024_HHroster %>%
+  filter(!is.na(HH_02) & !is.na(Intro_07) ) %>%  
+  group_by(Intro_07, HH_02) %>%
+  summarise(
+    var_name = "outcome1_2",                                      # Name of the variable
+    num_obs_uw = survey_total(!is.na(RBM20102), vartype = NULL),  # Unweighted total count
+    denominator = survey_total(),                                # Weighted total count
+    mean_value = survey_mean(RBM20102, vartype = c("ci", "se"), na.rm = TRUE)  # Compute mean with CI and SE
+  )
+
+
+##Figure 
+
+
+ggplot(RBM20102_AGD, aes(x = HH_02, y = mean_value, fill = Intro_07)) +
+  geom_bar(stat = "identity", position = position_dodge(width = 0.7), width = 0.7) +
+  geom_text(aes(label = sprintf("%.2f", mean_value)), 
+            position = position_dodge(width = 0.7), vjust = -0.4, size = 3) +
+  facet_wrap(~ Intro_07) +
+  labs(
+    title = "Proportion of children under 5 years of age whose births have been registered with a civil authority by Gender and Population Groups",
+    x = "Gender ",
+    y = "Proportion of registered children"
+  ) +
+  scale_fill_unhcr_d() +  # Use UNHCR discrete color palette
+  scale_y_continuous(limits = c(0, 1), expand = c(0, 0)) + # adjust limits accordingly
+  theme_unhcr() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1)
+  )
+
+```
 
 ## 1.3 Core Outcome Indicator
 
@@ -860,6 +1426,106 @@ HHroster <- HHroster %>%
 ```{r, eval=FALSE}
 table(HHroster$RBM20103)
 ```
+
+
+
+### Figure for RBM Core Outcome 1.3 by Population Groups
+
+```{r, eval=FALSE}
+###Results of the indicator table
+
+FDS_PAK_2024_HHroster <- HHroster %>%
+  as_survey_design(
+    ids = NULL,           # Specify the column with cluster IDs
+    weights = NULL, # Specify the column with survey weights
+    nest = TRUE              # Use TRUE if PSUs are nested within clusters (optional, based on your survey design)
+  )
+
+###Table 
+
+RBM20103 <- FDS_PAK_2024_HHroster %>%
+  filter(!is.na(Intro_07)) %>%         # Exclude if pop groups is NA
+  group_by(Intro_07) %>%                           # Group by pop_groups
+  summarise(                                         # Summarise to compute values
+    var_name = "outcome1_3",                          # Name of the variable
+    num_obs_uw = unweighted(n()),                    # Unweighted total count
+    denominator = survey_total(),                    # Weighted total count
+    mean_value = survey_mean(RBM20103, vartype = c("ci", "se"), na.rm = TRUE)  # Compute mean with NA removed
+  )
+
+
+##Chart for the indicator above
+
+ggplot(RBM20103, aes(x = Intro_07, y = mean_value, fill = Intro_07)) +
+  geom_bar(stat = "identity", position = "dodge", width = 0.7) +
+  geom_errorbar(aes(ymin = mean_value - mean_value_se, ymax = mean_value + mean_value_se),
+                width = 0.2, position = position_dodge(0.7)) +
+  geom_text(aes(label = round(mean_value, 2)), 
+            vjust = -0.5, position = position_dodge(0.7)) +  
+  scale_y_continuous(limits = c(0, 1.2), expand = c(0, 0)) +
+  labs(
+    title = "Results of RBM Core Outcome 1.3",
+    x = "Population Groups",
+    y = "Mean Value with standard errors"
+  ) +
+  scale_fill_unhcr_d() +  # Use UNHCR color palette (requires unhcrthemes package)
+  theme_unhcr() +         # Apply UNHCR theme (requires unhcrthemes package)
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1)  # Rotate x-axis labels for better readability
+  )
+
+```
+
+
+
+
+### Figure for RBM Core Outcome 1.3 by Gender, Disability and Population Groups
+
+
+```{r, eval=FALSE}
+
+
+#### Table and chart that shows results by age/sex/diversity
+
+
+RBM20103_AGD <- FDS_PAK_2024_HHroster %>%
+  group_by(Intro_07,HH_04_cat4, disability,HH_02) %>%# Group by Age, Gender, and Disability
+  summarise(                                       # Summarise to compute values
+    var_name = "outcome1_3",                        # Name of the variable
+    num_obs_uw = unweighted(n()),                  # Unweighted total count
+    denominator = survey_total(),                  # Weighted total count
+    mean_value = survey_mean(RBM20103, vartype = c("ci", "se"), na.rm = TRUE)  # Compute mean with NA removed
+  )
+
+
+####Chart with the AGD variables 
+
+ggplot(RBM20103_AGD, aes(x = HH_02, y = mean_value, fill=HH_04_cat4)) +
+  geom_bar(stat = "identity", position = position_dodge(width = 0.7), width = 0.7) +  # Grouped bar chart
+  geom_text(aes(label = sprintf("%.2f", mean_value)), 
+            position = position_dodge(width = 0.7), vjust = -0.5, size = 3) +  # Add values on top of bars
+  scale_fill_unhcr_d() +  # Apply UNHCR color palette
+  facet_wrap(~ Intro_07) +  # Create facets for each age group
+  labs(
+    title = "Proportion of individuals with legal identity documents",
+    x = "Gender",
+    y = "Mean Value",
+    fill = "Disability",
+    caption = "Note: The disability module does not include children under 5."
+  ) +
+    scale_y_continuous(limits = c(0, 1.3), expand = c(0, 0)) +
+  theme_unhcr() +  # Apply UNHCR theme
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),  # Rotate x-axis labels for readability
+    axis.text.y = element_text(size = 10)  # Adjust y-axis label size for readability
+  )
+
+
+
+
+```
+
+
 
 ## 4.1 Core Outcome Indicator
 
@@ -929,7 +1595,95 @@ table(RA_adult$RBM20401)
 ```
 
 
-## 4.2 Core Outcome Indicator<
+
+### Figure for RBM Core Impact 4.1 by Population Groups
+
+
+```{r, eval=FALSE}
+###Table standard 
+
+
+FDS_PAK_2024_RA_adult <- RA_adult %>%
+  as_survey_design(
+    ids = NULL,           # Specify the column with cluster IDs
+    weights = NULL, # Specify the column with survey weights
+    nest = TRUE              # Use TRUE if PSUs are nested within clusters (optional, based on your survey design)
+  )
+
+
+RBM20401 <- FDS_PAK_2024_RA_adult %>%
+  filter(!is.na(Intro_07)) %>%                     # Exclude if pop groups is NA
+  group_by(Intro_07) %>%                           # Group by pop_groups
+  summarise(                                         # Summarise to compute values
+    var_name = "outcome4_1",                          # Name of the variable
+    num_obs_uw = unweighted(n()),                    # Unweighted total count
+    denominator = survey_total(),                    # Weighted total count
+    mean_value = survey_mean(RBM20401, vartype = c("ci", "se"), na.rm = TRUE)  # Compute mean with NA removed
+  )
+
+
+##Chart for the indicator above
+
+
+
+ggplot(RBM20401, aes(x = Intro_07, y = mean_value, fill = Intro_07)) +
+  geom_bar(stat = "identity", position = "dodge", width = 0.7) +
+  geom_errorbar(aes(ymin = mean_value - mean_value_se, ymax = mean_value + mean_value_se),
+                width = 0.2, position = position_dodge(0.7)) +
+  geom_text(aes(label = round(mean_value, 2)), 
+            vjust = -0.5, position = position_dodge(0.7)) +  
+  scale_y_continuous(limits = c(0, 1), expand = c(0, 0)) +
+  labs(
+    title = "Results of RBM Core Outcome 4.1",
+    x = "Population Groups",
+    y = "Mean Value with standard errors"
+  ) +
+  scale_fill_unhcr_d() +  # Use UNHCR color palette (requires unhcrthemes package)
+  theme_unhcr() +         # Apply UNHCR theme (requires unhcrthemes package)
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1)  # Rotate x-axis labels for better readability
+  )
+```
+
+
+
+### Figure for RBM Core Impact 4.1 by Population Groups, Gender and Disability
+
+```{r, eval=FALSE}
+#### Table and chart that shows results by age/sex/diversity
+
+RBM20401_AGD <- FDS_PAK_2024_RA_adult %>%
+  filter(!is.na(HH_02_RA) & !is.na(disability_RA) & !is.na(Intro_07) ) %>%  # Exclude HH07_cat categories 1, 2, and 5
+  group_by(Intro_07, HH_02_RA,disability_RA) %>%
+  summarise(
+    var_name = "outcome4_1",                # Name of the variable
+    num_obs_uw = survey_total(!is.na(RBM20401), vartype = NULL),  # Unweighted total count
+    denominator = survey_total(),                                # Weighted total count
+    mean_value = survey_mean(RBM20401, vartype = c("ci", "se"), na.rm = TRUE)  # Compute mean with CI and SE
+  )
+
+## figure
+
+ggplot(RBM20401_AGD, aes(x = HH_02_RA, y = mean_value, fill = disability_RA)) +
+  geom_bar(stat = "identity", position = position_dodge(width = 0.7), width = 0.7) +
+  geom_text(aes(label = sprintf("%.2f", mean_value)), 
+            position = position_dodge(width = 0.7), vjust = -0.4, size = 3) +  # Add values on bars
+  facet_wrap(~ Intro_07) +  # Create separate plots for each pop_group
+  labs(
+    title = "Proportion of people who know where to access available GBV services",
+    x = "Gender ",
+    y = "Proportion of those who know where to access",
+    fill = "Disability Status"
+  ) +
+  scale_fill_unhcr_d() +  # Use UNHCR color palette
+  scale_y_continuous(limits = c(0, 1.1), expand = c(0, 0)) +
+  theme_unhcr() +  # Apply UNHCR theme
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1)  # Rotate x-axis labels for readability
+  )
+```
+
+## 4.2 Core Outcome Indicator
 
 **4.2 Proportion of people who do not accept violence against women**
 
@@ -1004,9 +1758,98 @@ RA_adult <- RA_adult %>%
     )
   )
 
-```
-```{r, eval=FALSE}
+
 table(RA_adult$RBM20402)
+```
+
+
+
+
+### Figure for RBM Core Impact 4.2 by Population Groups
+
+```{r, eval=FALSE}
+###Table standard 
+
+
+FDS_PAK_2024_RA_adult <- RA_adult %>%
+  as_survey_design(
+    ids = NULL,           # Specify the column with cluster IDs
+    weights = NULL, # Specify the column with survey weights
+    nest = TRUE              # Use TRUE if PSUs are nested within clusters (optional, based on your survey design)
+  )
+
+
+RBM20402 <- FDS_PAK_2024_RA_adult %>%
+  filter(!is.na(Intro_07)) %>%                     # Exclude if pop groups is NA
+  group_by(Intro_07) %>%                           # Group by pop_groups
+  summarise(                                         # Summarise to compute values
+    var_name = "outcome4_2",                          # Name of the variable
+    num_obs_uw = unweighted(n()),                    # Unweighted total count
+    denominator = survey_total(),                    # Weighted total count
+    mean_value = survey_mean(RBM20402, vartype = c("ci", "se"), na.rm = TRUE)  # Compute mean with NA removed
+  )
+
+
+##Chart for the indicator above
+
+
+
+ggplot(RBM20402, aes(x = Intro_07, y = mean_value, fill = Intro_07)) +
+  geom_bar(stat = "identity", position = "dodge", width = 0.7) +
+  geom_errorbar(aes(ymin = mean_value - mean_value_se, ymax = mean_value + mean_value_se),
+                width = 0.2, position = position_dodge(0.7)) +
+  geom_text(aes(label = round(mean_value, 2)), 
+            vjust = -0.5, position = position_dodge(0.7)) +  
+  scale_y_continuous(limits = c(0, 1), expand = c(0, 0)) +
+  labs(
+    title = "Results of RBM Core Outcome 4.2",
+    x = "Population Groups",
+    y = "Mean Value with standard errors"
+  ) +
+  scale_fill_unhcr_d() +  # Use UNHCR color palette (requires unhcrthemes package)
+  theme_unhcr() +         # Apply UNHCR theme (requires unhcrthemes package)
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1)  # Rotate x-axis labels for better readability
+  )
+```
+
+
+
+
+### Figure for RBM Core Impact 4.2 by Population Groups, Gender and Disability
+
+```{r, eval=FALSE}
+#### Table and chart that shows results by age/sex/diversity
+
+RBM20402_AGD <- FDS_PAK_2024_RA_adult %>%
+  filter(!is.na(HH_02_RA) & !is.na(disability_RA) & !is.na(Intro_07) ) %>%  # Exclude HH07_cat categories 1, 2, and 5
+  group_by(Intro_07, HH_02_RA,disability_RA) %>%
+  summarise(
+    var_name = "outcome4_2",                # Name of the variable
+    num_obs_uw = survey_total(!is.na(RBM20402), vartype = NULL),  # Unweighted total count
+    denominator = survey_total(),                                # Weighted total count
+    mean_value = survey_mean(RBM20402, vartype = c("ci", "se"), na.rm = TRUE)  # Compute mean with CI and SE
+  )
+
+## figure
+
+ggplot(RBM20402_AGD, aes(x = HH_02_RA, y = mean_value, fill = disability_RA)) +
+  geom_bar(stat = "identity", position = position_dodge(width = 0.7), width = 0.7) +
+  geom_text(aes(label = sprintf("%.2f", mean_value)), 
+            position = position_dodge(width = 0.7), vjust = -0.4, size = 3) +  # Add values on bars
+  facet_wrap(~ Intro_07) +  # Create separate plots for each pop_group
+  labs(
+    title = "Proportion of people who do not accept violence against women",
+    x = "Gender ",
+    y = "Proportion of those who do not accept",
+    fill = "Disability Status"
+  ) +
+  scale_fill_unhcr_d() +  # Use UNHCR color palette
+  scale_y_continuous(limits = c(0, 1.1), expand = c(0, 0)) +
+  theme_unhcr() +  # Apply UNHCR theme
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1)  # Rotate x-axis labels for readability
+  )
 ```
 
 ## 8.2 Core Outcome Indicator
@@ -1073,8 +1916,54 @@ main <- main %>%
     )
   )
 ```
+
+### Figure for RBM Core Outcome 8.2 by Population Groups
+
 ```{r, eval=FALSE}
-table(main$RBM20802)
+
+##Table by population groups
+
+FDS_PAK_2024_main <- main %>%
+  as_survey_design(
+    ids = NULL,           # Specify the column with cluster IDs
+    weights = NULL, # Specify the column with survey weights
+    nest = TRUE              # Use TRUE if PSUs are nested within clusters (optional, based on your survey design)
+  )
+
+###Table 
+
+RBM20802 <- FDS_PAK_2024_main %>%
+  filter(!is.na(Intro_07)) %>%     # Exclude if pop groups is NA
+  group_by(Intro_07) %>%      # Show results disaggregated by pop groups
+  summarise(                                         # put all variables here
+    var_name = "outcome8_2",                          # name of the variable
+    num_obs_uw = unweighted(n()),                    # unweighted total count
+    denominator = survey_total(),                      # weighted total count
+    mean_value = survey_mean(RBM20802, vartype = c("ci", "se"), na.rm = TRUE) # indicator value ( weighted) with CI and SE
+  )
+
+
+###Chart of outcome 8_2 by pop groups
+
+ggplot(RBM20802, aes(x = Intro_07, y = mean_value, fill = Intro_07)) +
+  geom_bar(stat = "identity", position = "dodge", width = 0.7) +
+  geom_errorbar(aes(ymin = mean_value - mean_value_se, ymax = mean_value + mean_value_se),
+                width = 0.2, position = position_dodge(0.7)) +
+  geom_text(aes(label = round(mean_value, 2)), 
+            vjust = -0.5, position = position_dodge(0.7)) +  # Add labels for mean_value
+  scale_y_continuous(limits = c(0, 1), expand = c(0, 0)) +
+  labs(
+    title = "Results of RBM Core Outcome 8.2",
+    x = "Population Groups",
+    y = "Mean Value with Standard Errors"
+  ) +
+  scale_fill_unhcr_d() +  # Use UNHCR color palette (requires unhcrthemes package)
+  theme_unhcr() +         # Apply UNHCR theme (requires unhcrthemes package)
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1)  # Rotate x-axis labels for better readability
+  )
+
+
 ```
 
 
@@ -1133,8 +2022,7 @@ table(main$crowding_cat) ## Crowding category - overcrowded when more than 3 per
 main <- main %>%
   mutate_at(vars(HH04, HH05, HH08, HH09, HH10, HH11), ~ ifelse(. == 96, NA, .))
 
-```
-```{r, eval=FALSE}
+
 #Step 3:  Add coloumn to classify the provision of protection from cold, damp, heat, rain, wind, and other threats to health, structural hazards, and disease vectors.
 main <- main %>%
   mutate(habitablehousing = case_when(
@@ -1145,8 +2033,7 @@ main <- main %>%
     TRUE ~ NA_integer_
   ))
 
-```
-```{r, eval=FALSE}
+
 table(main$habitablehousing)
 
 ```
@@ -1171,6 +2058,55 @@ main <- main %>%
 
 
 table(main$RBM20901)
+```
+  
+### Figure for RBM Core Outcome 9.1 by Population Groups
+
+```{r, eval=FALSE}
+
+##Table by population groups
+
+FDS_PAK_2024_main <- main %>%
+  as_survey_design(
+    ids = NULL,           # Specify the column with cluster IDs
+    weights = NULL, # Specify the column with survey weights
+    nest = TRUE              # Use TRUE if PSUs are nested within clusters (optional, based on your survey design)
+  )
+
+###Table 
+
+RBM20901 <- FDS_PAK_2024_main %>%
+  filter(!is.na(Intro_07)) %>%     # Exclude if pop groups is NA
+  group_by(Intro_07) %>%      # Show results disaggregated by pop groups
+  summarise(                                         # put all variables here
+    var_name = "outcome9_1",                          # name of the variable
+    num_obs_uw = unweighted(n()),                    # unweighted total count
+    denominator = survey_total(),                      # weighted total count
+    mean_value = survey_mean(RBM20901, vartype = c("ci", "se"), na.rm = TRUE) # indicator value ( weighted) with CI and SE
+  )
+
+
+###Chart of outcome 9_1 by pop groups
+
+ggplot(RBM20901, aes(x = Intro_07, y = mean_value, fill = Intro_07)) +
+  geom_bar(stat = "identity", position = "dodge", width = 0.7) +
+  geom_errorbar(aes(ymin = mean_value - mean_value_se, ymax = mean_value + mean_value_se),
+                width = 0.2, position = position_dodge(0.7)) +
+  geom_text(aes(label = round(mean_value, 2)), 
+            vjust = -0.5, position = position_dodge(0.7)) +  # Add labels for mean_value
+  scale_y_continuous(limits = c(0, 1), expand = c(0, 0)) +
+  labs(
+    title = "Results of RBM Core Outcome 9.1",
+    x = "Population Groups",
+    y = "Mean Value with Standard Errors"
+  ) +
+  scale_fill_unhcr_d() +  # Use UNHCR color palette (requires unhcrthemes package)
+  theme_unhcr() +         # Apply UNHCR theme (requires unhcrthemes package)
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1)  # Rotate x-axis labels for better readability
+  )
+
+
 ```
   
 ## 9.2 Core Outcome Indicator
@@ -1227,8 +2163,56 @@ main <- main %>%
                                label = "Proportion of people that have energy to ensure lighting"
   ))
 ```
+
+
+
+### Figure for RBM Core Outcome 9.2 by Population Groups
+
 ```{r, eval=FALSE}
-table(main$RBM20902)
+
+##Table by population groups
+
+FDS_PAK_2024_main <- main %>%
+  as_survey_design(
+    ids = NULL,           # Specify the column with cluster IDs
+    weights = NULL, # Specify the column with survey weights
+    nest = TRUE              # Use TRUE if PSUs are nested within clusters (optional, based on your survey design)
+  )
+
+###Table 
+
+RBM20902 <- FDS_PAK_2024_main %>%
+  filter(!is.na(Intro_07)) %>%     # Exclude if pop groups is NA
+  group_by(Intro_07) %>%      # Show results disaggregated by pop groups
+  summarise(                                         # put all variables here
+    var_name = "outcome9_2",                          # name of the variable
+    num_obs_uw = unweighted(n()),                    # unweighted total count
+    denominator = survey_total(),                      # weighted total count
+    mean_value = survey_mean(RBM20902, vartype = c("ci", "se"), na.rm = TRUE) # indicator value ( weighted) with CI and SE
+  )
+
+
+###Chart of outcome 9_1 by pop groups
+
+ggplot(RBM20902, aes(x = Intro_07, y = mean_value, fill = Intro_07)) +
+  geom_bar(stat = "identity", position = "dodge", width = 0.7) +
+  geom_errorbar(aes(ymin = mean_value - mean_value_se, ymax = mean_value + mean_value_se),
+                width = 0.2, position = position_dodge(0.7)) +
+  geom_text(aes(label = round(mean_value, 2)), 
+            vjust = -0.5, position = position_dodge(0.7)) +  # Add labels for mean_value
+  scale_y_continuous(limits = c(0, 1), expand = c(0, 0)) +
+  labs(
+    title = "Results of RBM Core Outcome 9.2",
+    x = "Population Groups",
+    y = "Mean Value with Standard Errors"
+  ) +
+  scale_fill_unhcr_d() +  # Use UNHCR color palette (requires unhcrthemes package)
+  theme_unhcr() +         # Apply UNHCR theme (requires unhcrthemes package)
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1)  # Rotate x-axis labels for better readability
+  )
+
+
 ```
 
 
@@ -1278,8 +2262,7 @@ RA_caregiver <- RA_caregiver %>%
     )
   )
 
-```
-```{r, eval=FALSE}
+
 RA_caregiver <- RA_caregiver %>%
 mutate(RBM21001 = labelled(RBM21001,
                                  labels = c(
@@ -1289,10 +2272,105 @@ mutate(RBM21001 = labelled(RBM21001,
                                  label = "Proportion of children aged 9 months to five years who have received measles vaccination*"))
 
 ```
+
+
+### Figure for RBM Core Outcome 10.1 by Population Groups
+
 ```{r, eval=FALSE}
-table(RA_caregiver$RBM21001)
+
+##Table 
+
+FDS_PAK_2024_RA_caregiver <- RA_caregiver %>%
+  as_survey_design(
+    ids = NULL,           # Specify the column with cluster IDs
+    weights = NULL, # Specify the column with survey weights
+    nest = TRUE              # Use TRUE if PSUs are nested within clusters (optional, based on your survey design)
+  )
+
+
+
+RBM21001 <- FDS_PAK_2024_RA_caregiver %>%
+  filter(!is.na(Intro_07)) %>%                     # Exclude if pop groups is NA
+  group_by(Intro_07) %>%                           # Group by pop_groups
+  summarise(                                         # Summarise to compute values
+    var_name = "outcome10_1",                          # Name of the variable
+    num_obs_uw = unweighted(n()),                    # Unweighted total count
+    denominator = survey_total(),                    # Weighted total count
+    mean_value = survey_mean(RBM21001, vartype = c("ci", "se"), na.rm = TRUE)  # Compute mean with NA removed
+  )
+
+
+
+###Chart of outcome 10.1 by pop groups
+
+ggplot(RBM21001, aes(x = Intro_07, y = mean_value, fill = Intro_07)) +
+  geom_bar(stat = "identity", position = "dodge", width = 0.7) +
+  geom_errorbar(aes(ymin = mean_value - mean_value_se, ymax = mean_value + mean_value_se),
+                width = 0.2, position = position_dodge(0.7)) +
+  geom_text(aes(label = round(mean_value, 2)), 
+            vjust = -0.5, position = position_dodge(0.7)) +  # Add labels for mean_value
+  scale_y_continuous(limits = c(0, 1.1), expand = c(0, 0)) +
+  labs(
+    title = "Results of RBM Core Outcome 10.1",
+    x = "Population Groups",
+    y = "Mean Value with Standard Errors"
+  ) +
+  scale_fill_unhcr_d() +  # Use UNHCR color palette (requires unhcrthemes package)
+  theme_unhcr() +         # Apply UNHCR theme (requires unhcrthemes package)
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1)  # Rotate x-axis labels for better readability
+  )
+
 
 ```
+
+### Figure for RBM Core Outcome 10.1 by Population Groups and Gender
+
+```{r, eval=FALSE}
+
+##Table with disability and gender
+
+
+RBM21001_AGD <- FDS_PAK_2024_RA_caregiver %>%
+  filter(!is.na(HH_02_RC) & !is.na(Intro_07) ) %>%  # Exclude HH07_cat categories 1, 2, and 5
+  group_by(Intro_07, HH_02_RC) %>%
+  summarise(
+    var_name = "outcome10_1",                                      # Name of the variable
+    num_obs_uw = survey_total(!is.na(RBM21001), vartype = NULL),  # Unweighted total count
+    denominator = survey_total(),                                # Weighted total count
+    mean_value = survey_mean(RBM21001, vartype = c("ci", "se"), na.rm = TRUE)  # Compute mean with CI and SE
+  )
+
+
+##Chart with pop groups
+
+gender_colors <- c("Male" = "#8395B9", "Female" = "#E0E9FE")
+
+
+ggplot(RBM21001_AGD, aes(x = HH_02_RC, y = mean_value, fill = HH_02_RC)) +  # Fill mapped to HH04 for gender
+  geom_bar(stat = "identity", position = position_dodge(width = 0.7), width = 0.7) +
+  geom_text(aes(label = sprintf("%.2f", mean_value)), 
+            position = position_dodge(width = 0.7), vjust = -0.5, size = 3) +  # Add values on bars
+  facet_wrap(~ Intro_07) +  # Create separate plots for each population group
+  labs(
+    title = "Proportion of children aged 9 months to five years who have received measles vaccination by Population Groups and Gender",
+    x = "Gender",
+    y = "Proportion of Children",
+    caption = "Note: Only children under 5"
+  ) +
+  scale_fill_manual(values = gender_colors) +  # Apply custom colors for male and female
+  theme_unhcr() +  # Apply UNHCR theme
+    scale_y_continuous(limits = c(0, 1.1), expand = c(0, 0)) +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1)  # Rotate x-axis labels for readability
+  )
+
+
+```
+
+
+
+
 ## 10.2 Core Outcome Indicator
 
 **10.2 Proportion of births attended by skilled health personnel**
@@ -1342,8 +2420,7 @@ RA_woman <- RA_woman %>%
     )
   )
 
-```
-```{r, eval=FALSE}
+
 RA_woman <- RA_woman %>%
 mutate(RBM21002 = labelled(RBM21002,
                                 labels = c(
@@ -1353,8 +2430,55 @@ mutate(RBM21002 = labelled(RBM21002,
                                 label = "Proportion of births attended by skilled health personnel"
   ))
 ```
+
+
+### Figure for RBM Core Outcome 10.2 by Population Groups
+
 ```{r, eval=FALSE}
 table(RA_woman$RBM21002)
+
+
+###Table 
+
+FDS_PAK_2024_RA_woman <- RA_woman %>%
+  as_survey_design(
+    ids = NULL,           # Specify the column with cluster IDs
+    weights = NULL, # Specify the column with survey weights
+    nest = TRUE              # Use TRUE if PSUs are nested within clusters (optional, based on your survey design)
+  )
+
+
+RBM21002  <- FDS_PAK_2024_RA_woman %>%
+  filter(!is.na(Intro_07)) %>%                     # Exclude if pop groups is NA
+  group_by(Intro_07) %>%                           # Group by pop_groups
+  summarise(                                         # Summarise to compute values
+    var_name = "outcome10_2",                          # Name of the variable
+    num_obs_uw = unweighted(n()),                    # Unweighted total count
+    denominator = survey_total(),                    # Weighted total count
+    mean_value = survey_mean(RBM21002, vartype = c("ci", "se"), na.rm = TRUE)  # Compute mean with NA removed
+  )
+
+
+###Chart of outcome 10.2 by pop groups
+
+ggplot(RBM21002, aes(x = Intro_07, y = mean_value, fill = Intro_07)) +
+  geom_bar(stat = "identity", position = "dodge", width = 0.7) +
+  geom_errorbar(aes(ymin = mean_value - mean_value_se, ymax = mean_value + mean_value_se),
+                width = 0.2, position = position_dodge(0.7)) +
+  geom_text(aes(label = round(mean_value, 2)), 
+            vjust = -0.5, position = position_dodge(0.7)) +  # Add labels for mean_value
+  scale_y_continuous(limits = c(0, 1.1), expand = c(0, 0)) +
+  labs(
+    title = "Results of RBM Core Outcome 10.2",
+    x = "Population Groups",
+    y = "Mean Value with Standard Errors"
+  ) +
+  scale_fill_unhcr_d() +  # Use UNHCR color palette (requires unhcrthemes package)
+  theme_unhcr() +         # Apply UNHCR theme (requires unhcrthemes package)
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1)  # Rotate x-axis labels for better readability
+  )
+
 
 ```
 
@@ -1417,35 +2541,78 @@ mutate(Improved_dw_Loc = labelled(Improved_dw_Loc,
                                label = "Improved drinking water source in own dwelling, yard or plot"))
 
 
-```
-```{r, eval=FALSE}
 ##Step 4: Add a column specifying if it takes more or less than 30 min to the improved drinking water source. If the improved drinking water source is located in own dwelling, yard or plot, it is considered that it takes less than 30 minutes to reach. 
 ## BD20-3 - Minutes
-main <- main %>%
+main <- main %>% 
 mutate(
-    Improved_dw_access= ifelse(
+    RBM21201= ifelse(
       (Improved_dw_Loc == 1 )|
       (Improved_dw_Loc == 0 & BD20_2 == 1 & BD20_3 < 30) |
       (Improved_dw_Loc == 0 & BD20_2 == 98 & BD22 == 1),
       1,
-      2
+      0
     )
   )%>%
-mutate(Improved_dw_access = labelled(Improved_dw_access,
+mutate(RBM21201 = labelled(RBM21201,
                                labels = c(
                                  "Yes" = 1,
                                  "No" = 0
                                ),
                                label = "Access to clean drinking water services"))
 
+table(main$RBM21201)
 
-table(main$Improved_dw_access)
 ```
+### Figure for RBM Core Outcome 12.1 by Population Groups
+
 
 ```{r, eval=FALSE}
-table(main$RBM21201)
-```
 
+
+##Table by population groups
+
+FDS_PAK_2024_main <- main %>%
+  as_survey_design(
+    ids = NULL,           # Specify the column with cluster IDs
+    weights = NULL, # Specify the column with survey weights
+    nest = TRUE              # Use TRUE if PSUs are nested within clusters (optional, based on your survey design)
+  )
+
+###Table 
+
+RBM21201 <- FDS_PAK_2024_main %>%
+  filter(!is.na(Intro_07)) %>%     # Exclude if pop groups is NA
+  group_by(Intro_07) %>%      # Show results disaggregated by pop groups
+  summarise(                                         # put all variables here
+    var_name = "outcome12_1",                          # name of the variable
+    num_obs_uw = unweighted(n()),                    # unweighted total count
+    denominator = survey_total(),                      # weighted total count
+    mean_value = survey_mean(RBM21201, vartype = c("ci", "se"), na.rm = TRUE) # indicator value ( weighted) with CI and SE
+  )
+
+
+###Chart of outcome 12_1 by pop groups
+
+ggplot(RBM21201, aes(x = Intro_07, y = mean_value, fill = Intro_07)) +
+  geom_bar(stat = "identity", position = "dodge", width = 0.7) +
+  geom_errorbar(aes(ymin = mean_value - mean_value_se, ymax = mean_value + mean_value_se),
+                width = 0.2, position = position_dodge(0.7)) +
+  geom_text(aes(label = round(mean_value, 2)), 
+            vjust = -0.5, position = position_dodge(0.7)) +  # Add labels for mean_value
+  scale_y_continuous(limits = c(0, 1.1), expand = c(0, 0)) +
+  labs(
+    title = "Results of RBM Core Outcome 12.1",
+    x = "Population Groups",
+    y = "Mean Value with Standard Errors"
+  ) +
+  scale_fill_unhcr_d() +  # Use UNHCR color palette (requires unhcrthemes package)
+  theme_unhcr() +         # Apply UNHCR theme (requires unhcrthemes package)
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1)  # Rotate x-axis labels for better readability
+  )
+
+
+```
 
 ## 12.2 Core Outcome Indicator
 
@@ -1521,9 +2688,58 @@ mutate(RBM21202 = case_when(
                                 ),
                                 label = "Proportion of people with access to at least basic sanitation services."
   ))
-```
-```{r, eval=FALSE}
+
 table(main$RBM21202)
+```
+
+### Figure for RBM Core Outcome 12.2 by Population Groups
+
+
+```{r, eval=FALSE}
+
+##Table by population groups
+
+FDS_PAK_2024_main <- main %>%
+  as_survey_design(
+    ids = NULL,           # Specify the column with cluster IDs
+    weights = NULL, # Specify the column with survey weights
+    nest = TRUE              # Use TRUE if PSUs are nested within clusters (optional, based on your survey design)
+  )
+
+###Table 
+
+RBM21202 <- FDS_PAK_2024_main %>%
+  filter(!is.na(Intro_07)) %>%     # Exclude if pop groups is NA
+  group_by(Intro_07) %>%      # Show results disaggregated by pop groups
+  summarise(                                         # put all variables here
+    var_name = "outcome12_2",                          # name of the variable
+    num_obs_uw = unweighted(n()),                    # unweighted total count
+    denominator = survey_total(),                      # weighted total count
+    mean_value = survey_mean(RBM21202, vartype = c("ci", "se"), na.rm = TRUE) # indicator value ( weighted) with CI and SE
+  )
+
+
+###Chart of outcome 12.1 by population groups
+
+ggplot(RBM21202, aes(x = Intro_07, y = mean_value, fill = Intro_07)) +
+  geom_bar(stat = "identity", position = "dodge", width = 0.7) +
+  geom_errorbar(aes(ymin = mean_value - mean_value_se, ymax = mean_value + mean_value_se),
+                width = 0.2, position = position_dodge(0.7)) +
+  geom_text(aes(label = round(mean_value, 2)), 
+            vjust = -0.5, position = position_dodge(0.7)) +  # Add labels for mean_value
+  scale_y_continuous(limits = c(0, 1.1), expand = c(0, 0)) +
+  labs(
+    title = "Results of RBM Core Outcome 12.2",
+    x = "Population Groups",
+    y = "Mean Value with Standard Errors"
+  ) +
+  scale_fill_unhcr_d() +  # Use UNHCR color palette (requires unhcrthemes package)
+  theme_unhcr() +         # Apply UNHCR theme (requires unhcrthemes package)
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1)  # Rotate x-axis labels for better readability
+  )
+
+
 ```
 
 
@@ -1578,11 +2794,94 @@ RA_adult <- RA_adult %>%
                                 ),
                                 label = "Proportion of people above with an account at a bank or other financial institution or with a mobile-money-service provider"
   ))
-```
-```{r, eval=FALSE}
+
 table(RA_adult$RBM21301)
 ```
 
+
+### Figure for RBM Core Impact 13.1 by Population Groups
+
+```{r, eval=FALSE}
+###Table standard 
+
+
+FDS_PAK_2024_RA_adult <- RA_adult %>%
+  as_survey_design(
+    ids = NULL,           # Specify the column with cluster IDs
+    weights = NULL, # Specify the column with survey weights
+    nest = TRUE              # Use TRUE if PSUs are nested within clusters (optional, based on your survey design)
+  )
+
+
+RBM21301 <- FDS_PAK_2024_RA_adult %>%
+  filter(!is.na(Intro_07)) %>%                     # Exclude if pop groups is NA
+  group_by(Intro_07) %>%                           # Group by pop_groups
+  summarise(                                         # Summarise to compute values
+    var_name = "outcome13_1",                          # Name of the variable
+    num_obs_uw = unweighted(n()),                    # Unweighted total count
+    denominator = survey_total(),                    # Weighted total count
+    mean_value = survey_mean(RBM21301, vartype = c("ci", "se"), na.rm = TRUE)  # Compute mean with NA removed
+  )
+
+
+##Chart for the indicator above
+
+ggplot(RBM21301, aes(x = Intro_07, y = mean_value, fill = Intro_07)) +
+  geom_bar(stat = "identity", position = "dodge", width = 0.7) +
+  geom_errorbar(aes(ymin = mean_value - mean_value_se, ymax = mean_value + mean_value_se),
+                width = 0.2, position = position_dodge(0.7)) +
+  geom_text(aes(label = round(mean_value, 2)), 
+            vjust = -0.5, position = position_dodge(0.7)) +  
+  scale_y_continuous(limits = c(0, 1), expand = c(0, 0)) +
+  labs(
+    title = "Results of RBM Core Outcome 13.1",
+    x = "Population Groups",
+    y = "Mean Value with standard errors"
+  ) +
+  scale_fill_unhcr_d() +  # Use UNHCR color palette (requires unhcrthemes package)
+  theme_unhcr() +         # Apply UNHCR theme (requires unhcrthemes package)
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1)  # Rotate x-axis labels for better readability
+  )
+```
+
+
+
+### Figure for RBM Core Impact 13.1 by Population Groups, Gender and Disability
+
+```{r, eval=FALSE}
+#### Table and chart that shows results by age/sex/diversity
+
+RBM21301_AGD <- FDS_PAK_2024_RA_adult %>%
+  filter(!is.na(HH_02_RA) & !is.na(disability_RA) & !is.na(Intro_07) ) %>%  # Exclude HH07_cat categories 1, 2, and 5
+  group_by(Intro_07, HH_02_RA,disability_RA) %>%
+  summarise(
+    var_name = "outcome13_1",                # Name of the variable
+    num_obs_uw = survey_total(!is.na(RBM21301), vartype = NULL),  # Unweighted total count
+    denominator = survey_total(),                                # Weighted total count
+    mean_value = survey_mean(RBM21301, vartype = c("ci", "se"), na.rm = TRUE)  # Compute mean with CI and SE
+  )
+
+## figure
+
+ggplot(RBM21301_AGD, aes(x = HH_02_RA, y = mean_value, fill = disability_RA)) +
+  geom_bar(stat = "identity", position = position_dodge(width = 0.7), width = 0.7) +
+  geom_text(aes(label = sprintf("%.2f", mean_value)), 
+            position = position_dodge(width = 0.7), vjust = -0.4, size = 3) +  # Add values on bars
+  facet_wrap(~ Intro_07) +  # Create separate plots for each pop_group
+  labs(
+    title = "Proportion of people above with an account at a bank or other financial institution or with a mobile-money-service provider",
+    x = "Gender ",
+    y = "Proportion of people with an account",
+    fill = "Disability Status"
+  ) +
+  scale_fill_unhcr_d() +  # Use UNHCR color palette
+  scale_y_continuous(limits = c(0, 1), expand = c(0, 0)) +
+  theme_unhcr() +  # Apply UNHCR theme
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1)  # Rotate x-axis labels for readability
+  )
+```
 
 ## 13.2 Core Outcome Indicator 
 
@@ -1630,11 +2929,58 @@ main <- main %>%
                                 ),
                                 label = "Proportion of people who self-report positive changes in their income compared to previous year"
   ))
-```
-```{r, eval=FALSE}
 table(main$RBM21302)
 ```
 
+
+### Figure for RBM Core Impact 13.2 by Population Groups
+
+```{r, eval=FALSE}
+
+##Table by population groups
+
+FDS_PAK_2024_main <- main %>%
+  as_survey_design(
+    ids = NULL,           # Specify the column with cluster IDs
+    weights = NULL, # Specify the column with survey weights
+    nest = TRUE              # Use TRUE if PSUs are nested within clusters (optional, based on your survey design)
+  )
+
+###Table 
+
+RBM21302 <- FDS_PAK_2024_main %>%
+  filter(!is.na(Intro_07)) %>%     # Exclude if pop groups is NA
+  group_by(Intro_07) %>%      # Show results disaggregated by pop groups
+  summarise(                                         # put all variables here
+    var_name = "outcome13_2",                          # name of the variable
+    num_obs_uw = unweighted(n()),                    # unweighted total count
+    denominator = survey_total(),                      # weighted total count
+    mean_value = survey_mean(RBM21302, vartype = c("ci", "se"), na.rm = TRUE) # indicator value ( weighted) with CI and SE
+  )
+
+
+###Chart of outcome 9_1 by pop groups
+
+ggplot(RBM21302, aes(x = Intro_07, y = mean_value, fill = Intro_07)) +
+  geom_bar(stat = "identity", position = "dodge", width = 0.7) +
+  geom_errorbar(aes(ymin = mean_value - mean_value_se, ymax = mean_value + mean_value_se),
+                width = 0.2, position = position_dodge(0.7)) +
+  geom_text(aes(label = round(mean_value, 2)), 
+            vjust = -0.5, position = position_dodge(0.7)) +  # Add labels for mean_value
+  scale_y_continuous(limits = c(0, 1), expand = c(0, 0)) +
+  labs(
+    title = "Results of RBM Core Outcome 13.2",
+    x = "Population Groups",
+    y = "Mean Value with Standard Errors"
+  ) +
+  scale_fill_unhcr_d() +  # Use UNHCR color palette (requires unhcrthemes package)
+  theme_unhcr() +         # Apply UNHCR theme (requires unhcrthemes package)
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1)  # Rotate x-axis labels for better readability
+  )
+
+
+```
 ## 13.3 Core Outcome Indicator 
 
 **13.3 Proportion of people (working age) who are unemployed**
@@ -1740,9 +3086,91 @@ RA_adult <- RA_adult %>%
                                 ),
                                 label = "Proportion of people (working age) who are unemployed"))
 
-```
-```{r}
 table(RA_adult$RBM21303)
+```
+
+
+### Figure for RBM Core Impact 13.3 by Population Groups
+
+```{r, eval=FALSE}
+###Table standard 
+
+
+FDS_PAK_2024_RA_adult <- RA_adult %>%
+  as_survey_design(
+    ids = NULL,           # Specify the column with cluster IDs
+    weights = NULL, # Specify the column with survey weights
+    nest = TRUE              # Use TRUE if PSUs are nested within clusters (optional, based on your survey design)
+  )
+
+
+RBM21303 <- FDS_PAK_2024_RA_adult %>%
+  filter(!is.na(Intro_07)) %>%                     # Exclude if pop groups is NA
+  group_by(Intro_07) %>%                           # Group by pop_groups
+  summarise(                                         # Summarise to compute values
+    var_name = "outcome13_3",                          # Name of the variable
+    num_obs_uw = unweighted(n()),                    # Unweighted total count
+    denominator = survey_total(),                    # Weighted total count
+    mean_value = survey_mean(RBM21303, vartype = c("ci", "se"), na.rm = TRUE)  # Compute mean with NA removed
+  )
+
+
+##Chart for the indicator above
+
+ggplot(RBM21303, aes(x = Intro_07, y = mean_value, fill = Intro_07)) +
+  geom_bar(stat = "identity", position = "dodge", width = 0.7) +
+  geom_errorbar(aes(ymin = mean_value - mean_value_se, ymax = mean_value + mean_value_se),
+                width = 0.2, position = position_dodge(0.7)) +
+  geom_text(aes(label = round(mean_value, 2)), 
+            vjust = -0.5, position = position_dodge(0.7)) +  
+  scale_y_continuous(limits = c(0, 1), expand = c(0, 0)) +
+  labs(
+    title = "Results of RBM Core Outcome 13.3",
+    x = "Population Groups",
+    y = "Mean Value with standard errors"
+  ) +
+  scale_fill_unhcr_d() +  # Use UNHCR color palette (requires unhcrthemes package)
+  theme_unhcr() +         # Apply UNHCR theme (requires unhcrthemes package)
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1)  # Rotate x-axis labels for better readability
+  )
+```
+
+
+### Figure for RBM Core Impact 13.3 by Population Groups, Gender and Disability
+
+```{r, eval=FALSE}
+#### Table and chart that shows results by age/sex/diversity
+
+RBM21303_AGD <- FDS_PAK_2024_RA_adult %>%
+  filter(!is.na(HH_02_RA) & !is.na(disability_RA) & !is.na(Intro_07) ) %>%  # Exclude HH07_cat categories 1, 2, and 5
+  group_by(Intro_07, HH_02_RA,disability_RA) %>%
+  summarise(
+    var_name = "outcome13_3",                # Name of the variable
+    num_obs_uw = survey_total(!is.na(RBM21303), vartype = NULL),  # Unweighted total count
+    denominator = survey_total(),                                # Weighted total count
+    mean_value = survey_mean(RBM21303, vartype = c("ci", "se"), na.rm = TRUE)  # Compute mean with CI and SE
+  )
+
+## figure
+
+ggplot(RBM21303_AGD, aes(x = HH_02_RA, y = mean_value, fill = disability_RA)) +
+  geom_bar(stat = "identity", position = position_dodge(width = 0.7), width = 0.7) +
+  geom_text(aes(label = sprintf("%.2f", mean_value)), 
+            position = position_dodge(width = 0.7), vjust = -0.4, size = 3) +  # Add values on bars
+  facet_wrap(~ Intro_07) +  # Create separate plots for each pop_group
+  labs(
+    title = "Proportion of people (working age) who are unemployed",
+    x = "Gender ",
+    y = "Proportion of people who are unemployed",
+    fill = "Disability Status"
+  ) +
+  scale_fill_unhcr_d() +  # Use UNHCR color palette
+  scale_y_continuous(limits = c(0, 1), expand = c(0, 0)) +
+  theme_unhcr() +  # Apply UNHCR theme
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1)  # Rotate x-axis labels for readability
+  )
 ```
 
 
@@ -1810,9 +3238,56 @@ HHroster <- HHroster %>%
                                  'No' = 0
                                ),
                                label = "Proportion of returnees with legally recognized identity documents or credential"))
-```
-```{r, eval=FALSE}
 table(HHroster$RBM21401)
+```
+
+
+
+### Figure for RBM Core Outcome 14.1 (For Refugee Returnees Only)
+
+```{r, eval=FALSE}
+###Results of the indicator table
+
+FDS_PAK_2024_HHroster <- HHroster %>%
+  as_survey_design(
+    ids = NULL,           # Specify the column with cluster IDs
+    weights = NULL, # Specify the column with survey weights
+    nest = TRUE              # Use TRUE if PSUs are nested within clusters (optional, based on your survey design)
+  )
+
+###Table 
+
+RBM21401 <- FDS_PAK_2024_HHroster %>%
+  filter(!is.na(Intro_07_roster)) %>%         # Exclude if pop groups is NA
+  group_by(Intro_07_roster) %>%                           # Group by pop_groups
+  summarise(                                         # Summarise to compute values
+    var_name = "outcome14_1",                          # Name of the variable
+    num_obs_uw = unweighted(n()),                    # Unweighted total count
+    denominator = survey_total(),                    # Weighted total count
+    mean_value = survey_mean(RBM21401, vartype = c("ci", "se"), na.rm = TRUE)  # Compute mean with NA removed
+  )
+
+
+##Chart for the indicator above
+
+ggplot(RBM21401, aes(x = Intro_07_roster, y = mean_value, fill = Intro_07_roster)) +
+  geom_bar(stat = "identity", position = "dodge", width = 0.7) +
+  geom_errorbar(aes(ymin = mean_value - mean_value_se, ymax = mean_value + mean_value_se),
+                width = 0.2, position = position_dodge(0.7)) +
+  geom_text(aes(label = round(mean_value, 2)), 
+            vjust = -0.5, position = position_dodge(0.7)) +  
+  scale_y_continuous(limits = c(0, 1.2), expand = c(0, 0)) +
+  labs(
+    title = "Results of RBM Core Outcome 14.1",
+    x = "Population Groups",
+    y = "Mean Value with standard errors"
+  ) +
+  scale_fill_unhcr_d() +  # Use UNHCR color palette (requires unhcrthemes package)
+  theme_unhcr() +         # Apply UNHCR theme (requires unhcrthemes package)
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1)  # Rotate x-axis labels for better readability
+  )
+
 ```
 
 ## 16.1 Core Outcome Indicator
@@ -1994,9 +3469,59 @@ main <- main %>%
                                 ),
                                 label = "Proportion of people with secure tenure rights and/or property rights to housing and/or land"))
 
-```
-```{r}
 table(main$RBM21601)
+```
+
+
+
+
+### Figure for RBM Core Impact 16.1 by Population Groups
+
+```{r, eval=FALSE}
+
+##Table by population groups
+
+FDS_PAK_2024_main <- main %>%
+  as_survey_design(
+    ids = NULL,           # Specify the column with cluster IDs
+    weights = NULL, # Specify the column with survey weights
+    nest = TRUE              # Use TRUE if PSUs are nested within clusters (optional, based on your survey design)
+  )
+
+###Table 
+
+RBM21601 <- FDS_PAK_2024_main %>%
+  filter(!is.na(Intro_07)) %>%     # Exclude if pop groups is NA
+  group_by(Intro_07) %>%      # Show results disaggregated by pop groups
+  summarise(                                         # put all variables here
+    var_name = "outcome16_1",                          # name of the variable
+    num_obs_uw = unweighted(n()),                    # unweighted total count
+    denominator = survey_total(),                      # weighted total count
+    mean_value = survey_mean(RBM21601, vartype = c("ci", "se"), na.rm = TRUE) # indicator value ( weighted) with CI and SE
+  )
+
+
+###Chart of outcome 16_1 by pop groups
+
+ggplot(RBM21601, aes(x = Intro_07, y = mean_value, fill = Intro_07)) +
+  geom_bar(stat = "identity", position = "dodge", width = 0.7) +
+  geom_errorbar(aes(ymin = mean_value - mean_value_se, ymax = mean_value + mean_value_se),
+                width = 0.2, position = position_dodge(0.7)) +
+  geom_text(aes(label = round(mean_value, 2)), 
+            vjust = -0.5, position = position_dodge(0.7)) +  # Add labels for mean_value
+  scale_y_continuous(limits = c(0, 1), expand = c(0, 0)) +
+  labs(
+    title = "Results of RBM Core Outcome 16.1",
+    x = "Population Groups",
+    y = "Mean Value with Standard Errors"
+  ) +
+  scale_fill_unhcr_d() +  # Use UNHCR color palette (requires unhcrthemes package)
+  theme_unhcr() +         # Apply UNHCR theme (requires unhcrthemes package)
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1)  # Rotate x-axis labels for better readability
+  )
+
+
 ```
 
 ## 16.2 Core Outcome Indicator
@@ -2086,7 +3611,134 @@ main <- main %>%
                                 ),
                                 label = "Proportion of people covered by national social protection systems"))
 
-```
-```{r, eval=FALSE}
 table(main$RBM21602)
 ```
+
+
+
+
+### Figure for RBM Core Impact 16.2 by Population Groups
+
+```{r, eval=FALSE}
+
+##Table by population groups
+
+FDS_PAK_2024_main <- main %>%
+  as_survey_design(
+    ids = NULL,           # Specify the column with cluster IDs
+    weights = NULL, # Specify the column with survey weights
+    nest = TRUE              # Use TRUE if PSUs are nested within clusters (optional, based on your survey design)
+  )
+
+###Table 
+
+RBM21602 <- FDS_PAK_2024_main %>%
+  filter(!is.na(Intro_07)) %>%     # Exclude if pop groups is NA
+  group_by(Intro_07) %>%      # Show results disaggregated by pop groups
+  summarise(                                         # put all variables here
+    var_name = "outcome16_2",                          # name of the variable
+    num_obs_uw = unweighted(n()),                    # unweighted total count
+    denominator = survey_total(),                      # weighted total count
+    mean_value = survey_mean(RBM21602, vartype = c("ci", "se"), na.rm = TRUE) # indicator value ( weighted) with CI and SE
+  )
+
+
+###Chart of outcome 16_1 by pop groups
+
+ggplot(RBM21602, aes(x = Intro_07, y = mean_value, fill = Intro_07)) +
+  geom_bar(stat = "identity", position = "dodge", width = 0.7) +
+  geom_errorbar(aes(ymin = mean_value - mean_value_se, ymax = mean_value + mean_value_se),
+                width = 0.2, position = position_dodge(0.7)) +
+  geom_text(aes(label = round(mean_value, 2)), 
+            vjust = -0.5, position = position_dodge(0.7)) +  # Add labels for mean_value
+  scale_y_continuous(limits = c(0, 1), expand = c(0, 0)) +
+  labs(
+    title = "Results of RBM Core Outcome 16.2",
+    x = "Population Groups",
+    y = "Mean Value with Standard Errors"
+  ) +
+  scale_fill_unhcr_d() +  # Use UNHCR color palette (requires unhcrthemes package)
+  theme_unhcr() +         # Apply UNHCR theme (requires unhcrthemes package)
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1)  # Rotate x-axis labels for better readability
+  )
+
+
+```
+
+
+
+## How to download the final RBM results?
+
+```{r, eval=FALSE}
+
+####FINAL TABLE -----
+
+##Delete if you don't have some of the indicators
+# Combine all indicators into one data frame
+combined_RBM_indicators <- bind_rows(
+  RBM10202,
+  RBM10203,
+  RBM10302A,
+  RBM10302B,
+  RBM10303,
+  RBM20102,
+  RBM20103,
+  RBM20401,
+  RBM20402,
+  RBM20802,
+  RBM20901,
+  RBM20902,
+  RBM21001,
+  RBM21002,
+  RBM21201,
+  RBM21202,
+  RBM21301,
+  RBM21302,
+  RBM21303,
+  RBM21601,
+  RBM21602
+)
+
+# Export the combined data frame to an Excel file
+
+write_xlsx(combined_RBM_indicators, "Combined_Indicators.xlsx")
+
+# This will export the combined data frame to a single Excel file
+
+
+```
+
+
+## How to download the final RBM results with AGD where applicable?
+
+```{r, eval=FALSE}
+
+####FINAL TABLE with AGD-----
+
+##Delete if you don't have some of the indicators
+# Combine all indicators into one data frame
+combined_RBM_indicators_AGD <- bind_rows(
+  RBM10203_AGD,
+  RBM10302A_AGD,
+  RBM10302B_AGD,
+  RBM10303_AGD,
+  RBM20102_AGD,
+  RBM20103_AGD,
+  RBM20401_AGD,
+  RBM20402_AGD,
+  RBM21001_AGD,
+  RBM21301_AGD,
+  RBM21303_AGD,
+)
+
+# Export the combined data frame to an Excel file
+
+write_xlsx(combined_RBM_indicators_AGD, "Combined_Indicators_AGD.xlsx")
+
+# This will export the combined data frame to a single Excel file
+
+
+```
+
+
