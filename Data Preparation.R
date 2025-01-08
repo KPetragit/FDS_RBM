@@ -36,7 +36,6 @@ RA_woman <- RA_woman %>%
 RA_caregiver <- RA_caregiver %>%
   rename(uuid = `_uuid`)
 
-
 ###Age of the child - Immunization 
 # Calculate the age of the child which was asked the questions on immunization
 RA_caregiver <- RA_caregiver %>%
@@ -84,8 +83,7 @@ HHroster <- HHroster %>%
     main %>% select(uuid, Intro_07), # Select relevant columns from main
     by = c("uuid" = "uuid") # Match on uuid 
   ) 
-HHroster <- HHroster %>%
-  rename(Intro_07_roster = Intro_07) #Rename to Intro_07_roster 
+
 
 ## 2. Age ----
 ### Create two new variables for different age categories
@@ -290,8 +288,6 @@ RA_adult <- RA_adult %>%
     main %>% select(uuid, Intro_07), # Select relevant columns from main dataset
     by = c("uuid" = "uuid") # Match on uuid 
   ) 
-RA_adult <- RA_adult %>%
-  rename(Intro_07_RA = Intro_07) #Rename to Intro_07_RA
 
 #3. Country of origin ----
 
@@ -337,8 +333,7 @@ RA_woman <- RA_woman %>%
     main %>% select(uuid, Intro_07), # Select relevant columns from main dataset
     by = c("uuid" = "uuid") # Match on uuid 
   ) 
-RA_woman <- RA_woman %>%
-  rename(Intro_07_RW = Intro_07) #Rename to Intro_07_RW
+
 
 #3. Country of origin ----
 
@@ -368,8 +363,6 @@ RA_caregiver <- RA_caregiver %>%
     main %>% select(uuid, Intro_07), # Select relevant columns from main dataset
     by = c("uuid" = "uuid") # Match on uuid 
   ) 
-RA_caregiver <- RA_caregiver %>%
-  rename(Intro_07_RC = Intro_07) #Rename to Intro_07_RC
 
 #2. Disability ----
 RA_caregiver <- RA_caregiver %>%
@@ -426,19 +419,19 @@ popgroup_labels <- c(
 )
 
 HHroster <- HHroster %>%
-  mutate(Intro_07_roster = recode_factor(Intro_07_roster, !!!popgroup_labels))
+  mutate(Intro_07 = recode_factor(Intro_07, !!!popgroup_labels))
 
 main <- main %>%
   mutate(Intro_07 = recode_factor(Intro_07, !!!popgroup_labels))
 
 RA_adult <- RA_adult %>%
-  mutate(Intro_07_RA = recode_factor(Intro_07_RA, !!!popgroup_labels))
+  mutate(Intro_07 = recode_factor(Intro_07, !!!popgroup_labels))
 
 RA_woman <- RA_woman %>%
-  mutate(Intro_07_RW = recode_factor(Intro_07_RW, !!!popgroup_labels))
+  mutate(Intro_07 = recode_factor(Intro_07, !!!popgroup_labels))
 
 RA_caregiver <- RA_caregiver %>%
-  mutate(Intro_07_RC = recode_factor(Intro_07_RC, !!!popgroup_labels))
+  mutate(Intro_07 = recode_factor(Intro_07, !!!popgroup_labels))
 
 #### Define labels for gender
 gender_labels <- c(
