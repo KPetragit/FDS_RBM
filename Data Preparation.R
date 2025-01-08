@@ -8,17 +8,17 @@ pacman::p_load(
 
 #Import 5 datasets. Here we are using FDS Pakistan dataset. 
 
-HHroster <- read_dta("FDS_PAK_2024_Roster_complete.dta")
-main <- read_dta("FDS_PAK_2024_HoH_complete.dta")
-RA_adult <- read_dta("FDS_PAK_2024_Random_Member_complete.dta")
-RA_woman <- read_dta("FDS_PAK_2024_Random_Woman_complete.dta")
-RA_caregiver <- read_dta ("FDS_PAK_2024_Random_Child_complete.dta")
+#HHroster <- read_dta("FDS_PAK_2024_Roster_complete.dta")
+#main <- read_dta("FDS_PAK_2024_HoH_complete.dta")
+#RA_adult <- read_dta("FDS_PAK_2024_Random_Member_complete.dta")
+#RA_woman <- read_dta("FDS_PAK_2024_Random_Woman_complete.dta")
+#RA_caregiver <- read_dta ("FDS_PAK_2024_Random_Child_complete.dta")
 
-#HHroster <- read_dta("C:/Users/KAPS/OneDrive - UNHCR/300 - ST - Survey Team - Main/Survey Programme Team/Projects/FDS/Countries/Pakistan/Data Management/4 Analysis/FDS_PAK_2024_Roster_complete.dta")
-#main <- read_dta("C:/Users/KAPS/OneDrive - UNHCR/300 - ST - Survey Team - Main/Survey Programme Team/Projects/FDS/Countries/Pakistan/Data Management/4 Analysis/FDS_PAK_2024_HoH_complete.dta")
-#RA_adult <- read_dta("C:/Users/KAPS/OneDrive - UNHCR/300 - ST - Survey Team - Main/Survey Programme Team/Projects/FDS/Countries/Pakistan/Data Management/4 Analysis/FDS_PAK_2024_Random_Member_complete.dta")
-#RA_woman <- read_dta("C:/Users/KAPS/OneDrive - UNHCR/300 - ST - Survey Team - Main/Survey Programme Team/Projects/FDS/Countries/Pakistan/Data Management/4 Analysis/FDS_PAK_2024_Random_Woman_complete.dta")
-#RA_caregiver <- read_dta ("C:/Users/KAPS/OneDrive - UNHCR/300 - ST - Survey Team - Main/Survey Programme Team/Projects/FDS/Countries/Pakistan/Data Management/4 Analysis/FDS_PAK_2024_Random_Child_complete.dta")
+HHroster <- read_dta("C:/Users/KAPS/OneDrive - UNHCR/300 - ST - Survey Team - Main/Survey Programme Team/Projects/FDS/Countries/Pakistan/Data Management/4 Analysis/FDS_PAK_2024_Roster_complete.dta")
+main <- read_dta("C:/Users/KAPS/OneDrive - UNHCR/300 - ST - Survey Team - Main/Survey Programme Team/Projects/FDS/Countries/Pakistan/Data Management/4 Analysis/FDS_PAK_2024_HoH_complete.dta")
+RA_adult <- read_dta("C:/Users/KAPS/OneDrive - UNHCR/300 - ST - Survey Team - Main/Survey Programme Team/Projects/FDS/Countries/Pakistan/Data Management/4 Analysis/FDS_PAK_2024_Random_Member_complete.dta")
+RA_woman <- read_dta("C:/Users/KAPS/OneDrive - UNHCR/300 - ST - Survey Team - Main/Survey Programme Team/Projects/FDS/Countries/Pakistan/Data Management/4 Analysis/FDS_PAK_2024_Random_Woman_complete.dta")
+RA_caregiver <- read_dta ("C:/Users/KAPS/OneDrive - UNHCR/300 - ST - Survey Team - Main/Survey Programme Team/Projects/FDS/Countries/Pakistan/Data Management/4 Analysis/FDS_PAK_2024_Random_Child_complete.dta")
 
 # Rename _uuid to uuid in all datasets
 main <- main %>%
@@ -58,10 +58,10 @@ RA_caregiver <- RA_caregiver %>%
 # Perform a left join and extract the child's age
 main <- main %>%
   left_join(
-    HHroster %>% select(uuid, rosterposition, HH_04), # Select relevant columns from hhroster
+    HHroster %>% select(uuid, rosterposition, agetouse), # Select relevant columns from hhroster
     by = c("uuid" = "uuid", "selected_childla" = "rosterposition") # Match on uuid and positions
   ) %>%
-  rename(child_labor_age = HH_04) # Rename HH_04 to child_labor_age
+  rename(child_labor_age = agetouse) # Rename agetouse to child_labor_age
 
 
 ### Household members size
@@ -88,15 +88,19 @@ HHroster <- HHroster %>%
   rename(Intro_07_roster = Intro_07) #Rename to Intro_07_roster 
 
 ## 2. Age ----
+
+# Convert agetouse from character to numeric
+HHroster$agetouse <- as.numeric(HHroster$agetouse)
+
 ### Create two new variables for different age categories
 ### 4 categories (0-4, 5-17, 18-59, 60+)
 
-HHroster$HH_04_cat4 <- cut(HHroster$HH_04, breaks = c(-1, 4, 17, 59, Inf), 
+HHroster$HH_04_cat4 <- cut(HHroster$agetouse, breaks = c(-1, 4, 17, 59, Inf), 
                          labels = c("0-4", "5-17", "18-59", "60+"))
 
 ### 2 categories (<18, >18)
 
-HHroster$HH_04_cat2 <- cut(HHroster$HH_04, breaks = c(-1, 17, Inf), 
+HHroster$HH_04_cat2 <- cut(HHroster$agetouse, breaks = c(-1, 17, Inf), 
                          labels = c("0-17", "18-60+"))
 
 table(HHroster$HH_04_cat4)
@@ -112,22 +116,22 @@ table(HHroster$HH_04_cat2)
 ###Step 1: Add the level 0 - no difficulty, for those members above 5 years of age who were not identified as having disabilities. 
 #Vision
 HHroster <- HHroster %>% 
-  mutate(Dis_03 = if_else(is.na(Dis_03) & HH_04 > 5, 0, Dis_03))
+  mutate(Dis_03 = if_else(is.na(Dis_03) & agetouse > 5, 0, Dis_03))
 #Hearing
 HHroster <- HHroster %>% 
-  mutate(Dis_06 = if_else(is.na(Dis_06) & HH_04 > 5, 0, Dis_06))
+  mutate(Dis_06 = if_else(is.na(Dis_06) & agetouse > 5, 0, Dis_06))
 #Mobility
 HHroster <- HHroster %>% 
-  mutate(Dis_09 = if_else(is.na(Dis_09) & HH_04 > 5, 0, Dis_09))
+  mutate(Dis_09 = if_else(is.na(Dis_09) & agetouse > 5, 0, Dis_09))
 #Cognition
 HHroster <- HHroster %>% 
-  mutate(Dis_12 = if_else(is.na(Dis_12) & HH_04 > 5, 0, Dis_12))
+  mutate(Dis_12 = if_else(is.na(Dis_12) & agetouse > 5, 0, Dis_12))
 #Self-care
 HHroster <- HHroster %>% 
-  mutate(Dis_15 = if_else(is.na(Dis_15) & HH_04 > 5, 0, Dis_15))
+  mutate(Dis_15 = if_else(is.na(Dis_15) & agetouse > 5, 0, Dis_15))
 #Communication
 HHroster <- HHroster %>% 
-  mutate(Dis_18 = if_else(is.na(Dis_18) & HH_04 > 5, 0, Dis_18))
+  mutate(Dis_18 = if_else(is.na(Dis_18) & agetouse > 5, 0, Dis_18))
 
 ###Step 2: Generate frequency distributions on each of the WG-SS domain variables
 
@@ -152,37 +156,32 @@ barplot(table(HHroster$Dis_15), main = "Self-care")
 barplot(table(HHroster$Dis_18), main = "Communicating")
 
 
-##Step 3: Codes (99) Refuse to answer and (98) Don’t know, are recoded to Missing.
+#Step 3: Construct disability variable 
+#Initialize disability variable with 2
+HHroster$disability <- 2
 
-HHroster <- HHroster %>%
-  mutate(
-    Dis_03 = ifelse(Dis_03 == 98 | Dis_03 == 99, NA, Dis_03),
-    Dis_06 = ifelse(Dis_06  == 98 | Dis_06  == 99, NA, Dis_06),
-    Dis_09  = ifelse(Dis_09 == 98 | Dis_09 == 99, NA, Dis_09),
-    Dis_12 = ifelse(Dis_12 == 98 | Dis_12 == 99, NA, Dis_12),
-    Dis_15 = ifelse(Dis_15 == 98 | Dis_15 == 99, NA, Dis_15),
-    Dis_18 = ifelse(Dis_18 == 98 | Dis_18 == 99, NA, Dis_18)
-  )
+# Replace disability with NA if all specified columns are missing and age is > 5
+HHroster$disability <- ifelse(
+  HHroster$agetouse > 5 &
+    is.na(HHroster$Dis_03) & is.na(HHroster$Dis_06) & is.na(HHroster$Dis_09) &
+    is.na(HHroster$Dis_12) & is.na(HHroster$Dis_15) & is.na(HHroster$Dis_18),
+  NA, 
+  HHroster$disability
+)
 
-## Step 4: Create disability status indicator for the Washington Group short set on disability
+# Replace disability with 1 if any of the specified conditions are met and age is > 5
+HHroster$disability <- ifelse(
+  HHroster$agetouse > 5 & (
+    HHroster$Dis_03 %in% c(2, 3) | HHroster$Dis_06 %in% c(2, 3) | 
+      HHroster$Dis_09 %in% c(2, 3) | HHroster$Dis_12 %in% c(2, 3) | 
+      HHroster$Dis_15 %in% c(2, 3) | HHroster$Dis_18 %in% c(2, 3)
+  ),
+  1,
+  HHroster$disability
+)
 
-HHroster <- HHroster %>%
-  mutate(disability = case_when(
-    Dis_03 %in% c(2, 3) |
-      Dis_06 %in% c(2, 3) |
-      Dis_09 %in% c(2, 3) |
-      Dis_12 %in% c(2, 3) |
-      Dis_15 %in% c(2, 3) |
-      Dis_18 %in% c(2, 3) ~ 1,
-    Dis_03 %in% c(0, 1) |
-      Dis_06 %in% c(0, 1)|
-      Dis_09 %in% c(0, 1)|
-      Dis_12 %in% c(0, 1)|
-      Dis_15 %in% c(0, 1)|
-      Dis_18 %in% c(0, 1) ~ 2, 
-    TRUE ~ NA_real_
-  ))
-
+# Tabulate the disability variable
+table(HHroster$disability, useNA = "ifany")
 
 ## 4. Country of Origin ----
 #The individual information on the country of origin comes from the HHroster. To have one single variable for country of origin information, the country code for the country of enumeration (i.e. PAK for Pakistan) will be entered as below. This question is asked only to individuals older than 15. For individuals younger than 15, the value is equaled to the country of origin of the household (as responded by the Head of the Household)
@@ -213,10 +212,10 @@ HHroster <- HHroster %>%
 # Age with no categories 
 main <- main %>%
   left_join(
-    HHroster %>% select(uuid, rosterposition, HH_04), # Select relevant columns from hhroster
+    HHroster %>% select(uuid, rosterposition, agetouse), # Select relevant columns from hhroster
     by = c("uuid" = "uuid", "HHposinfo" = "rosterposition") # Match on uuid and position
   ) %>%
-  rename(HH_04_HoH = HH_04) # Rename HH_04 to HH_04_hOh
+  rename(HH_04_HoH = agetouse) # Rename agetouse to HH_04_hOh
 
 
 # 2 categories 
@@ -480,3 +479,7 @@ RA_woman <- RA_woman %>%
 RA_caregiver <- RA_caregiver %>%
   mutate(disability_RC = recode_factor(disability_RC, !!!disability_labels))
 
+#Create a new variable for strata, intro_06, submission_date
+#Adjust the order of the variables, Pop groups, age, gender, disability, country or origin, strata, submission_date, uuid, 
+#change the path to save the datatsets to analysis folder 
+#agetouse
