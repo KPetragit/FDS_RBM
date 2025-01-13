@@ -136,6 +136,8 @@ pacman::p_load(
 **Population Group**
 ```{r, eval=FALSE}
 
+#Import 5 datasets. Here we are using FDS Pakistan datase.  
+
 table(HHroster$Intro_07)     #in dataset "HHroster". 
 table(main$Intro_07)         #in dataset "main". 
 table(RA_adult$Intro_07)     #in dataset "RA_adult". 
@@ -481,10 +483,11 @@ composite_impact2_2 <- composite_impact2_2 %>%
       facility,
       "shelter" = "Habitable Shelter",
       "electricity" = "Electricity",
-      "Improved_dw_access" = "Improved Drinking Water",
+      "Improved_dw_final" = "Improved Drinking Water",
       "Landslides_flooding" = "No risk(Landslides & Flooding)"
     )
   )
+
 
 
 composite_impact2_2 %>%
@@ -506,6 +509,7 @@ composite_impact2_2 %>%
   ) +
   theme_unhcr() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
 
 
 ```
@@ -660,7 +664,7 @@ RBM10203 <- FDS_PAK_2024_RA_adult %>%
    # num_obs_uw = unweighted(n()),  # Unweighted total count
     #denominator = survey_total(),  # Weighted total count
     #mean_value = survey_mean(RBM10203, vartype = c("ci", "se"), na.rm = TRUE)  # Compute mean with NA removed
-  )
+  
 
 
 ##Chart for the indicator above
@@ -781,7 +785,7 @@ HHroster <- HHroster %>%
   mutate(
     age_primary = case_when(
 
-      agetouse >= 6 & agetouse <= 14 ~ 1,  #Remember to adjust age levels based on the primary education age per country
+      agetouse >= 5 & agetouse <= 12 ~ 1,  #Remember to adjust age levels based on the primary education age per country
 
       HH_04 >= 5 & HH_04 <= 12 ~ 1,  #Remember to adjust age levels based on the primary education age per country
       TRUE ~ 0
