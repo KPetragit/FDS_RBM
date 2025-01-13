@@ -6,19 +6,14 @@ pacman::p_load(
   readr,labelled,pastecs,psych,tableone, outbreaks, ggplot2, unhcrthemes,
   scales, gt,webshot2, sjlabelled, waffle, writexl,remotes, haven )
 
-#Import 5 datasets. Here we are using FDS Pakistan dataset. 
+#Import 5 datasets. Here we are using FDS Pakistan datase.  
 
-#HHroster <- read_dta("FDS_PAK_2024_Roster_complete.dta")
-#main <- read_dta("FDS_PAK_2024_HoH_complete.dta")
-#RA_adult <- read_dta("FDS_PAK_2024_Random_Member_complete.dta")
-#RA_woman <- read_dta("FDS_PAK_2024_Random_Woman_complete.dta")
-#RA_caregiver <- read_dta ("FDS_PAK_2024_Random_Child_complete.dta")
+HHroster <- read_dta("FDS_PAK_2024_Roster_complete.dta")
+main <- read_dta("FDS_PAK_2024_HoH_complete.dta")
+RA_adult <- read_dta("FDS_PAK_2024_Random_Member_complete.dta")
+RA_woman <- read_dta("FDS_PAK_2024_Random_Woman_complete.dta")
+RA_caregiver <- read_dta ("FDS_PAK_2024_Random_Child_complete.dta")
 
-HHroster <- read_dta("C:/Users/KAPS/OneDrive - UNHCR/300 - ST - Survey Team - Main/Survey Programme Team/Projects/FDS/Countries/Pakistan/Data Management/4 Analysis/FDS_PAK_2024_Roster_complete.dta")
-main <- read_dta("C:/Users/KAPS/OneDrive - UNHCR/300 - ST - Survey Team - Main/Survey Programme Team/Projects/FDS/Countries/Pakistan/Data Management/4 Analysis/FDS_PAK_2024_HoH_complete.dta")
-RA_adult <- read_dta("C:/Users/KAPS/OneDrive - UNHCR/300 - ST - Survey Team - Main/Survey Programme Team/Projects/FDS/Countries/Pakistan/Data Management/4 Analysis/FDS_PAK_2024_Random_Member_complete.dta")
-RA_woman <- read_dta("C:/Users/KAPS/OneDrive - UNHCR/300 - ST - Survey Team - Main/Survey Programme Team/Projects/FDS/Countries/Pakistan/Data Management/4 Analysis/FDS_PAK_2024_Random_Woman_complete.dta")
-RA_caregiver <- read_dta ("C:/Users/KAPS/OneDrive - UNHCR/300 - ST - Survey Team - Main/Survey Programme Team/Projects/FDS/Countries/Pakistan/Data Management/4 Analysis/FDS_PAK_2024_Random_Child_complete.dta")
 
 # Rename _uuid to uuid in all datasets
 main <- main %>%
@@ -190,7 +185,7 @@ HHroster <- HHroster %>%
     by = c("uuid" = "uuid") # Match on uuid 
   ) 
 HHroster <- HHroster %>%
-  rename(origincountry_roster = origincntry) #Rename to Intro_07_roster
+  rename(origincountry_roster = origincntry) #Rename to origincountry_roster
 
 HHroster <- HHroster %>%
   mutate( # country of origin from ID_00 and ID_00_specify
@@ -471,6 +466,18 @@ RA_woman <- RA_woman %>%
 
 RA_caregiver <- RA_caregiver %>%
   mutate(disability_RC = recode_factor(disability_RC, !!!disability_labels))
+
+
+#Safe the datasets in a STATA dta. 
+
+output_path <- "C:/Users/KAPS/OneDrive - UNHCR/300 - ST - Survey Team - Main/Survey Programme Team/Projects/FDS/Countries/Pakistan/Data Management/4 Analysis/"
+
+write_dta(HHroster, paste0(output_path, "HHroster_modified.dta"))
+write_dta(main, paste0(output_path, "main_modified.dta"))
+write_dta(RA_adult, paste0(output_path, "RA_adult_modified.dta"))
+write_dta(RA_woman, paste0(output_path, "RA_woman_modified.dta"))
+write_dta(RA_caregiver, paste0(output_path, "RA_caregiver_modified.dta"))
+
 
 #Create a new variable for strata, intro_06, submission_date
 #Adjust the order of the variables, Pop groups, age, gender, disability, country or origin, strata, submission_date, uuid, 
