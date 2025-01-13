@@ -13,7 +13,7 @@ output:
 knitr::opts_chunk$set(eval=FALSE)
 ```
 
-Date: Last revision was in December 2024
+Date: Last revision was in January 2025
 
 *For any issues please contact Ilgi Bozdag at bozdag@unhcr.org or Petra Kaps at kaps@unhcr.org*
 
@@ -28,7 +28,7 @@ There is broad consensus around the key indicators used to measure, inform and m
 UNHCR's objectives are largely aligned with these frameworks.
 
 [The Forced Displacement Survey (FDS)](https://www.unhcr.org/what-we-do/reports-and-publications/data-and-statistics/forced-displacement-survey) is a household-level survey with standard questionnaires following context-appropriate methodological approaches.
-They can be implemented across UNHCR operations to monitor changes in the lives of all relevant groups of persons of concern (impacts) and in UNHCR's key areas of engagement (outcomes). 
+They can be implemented across UNHCR operations to monitor changes in the lives of all relevant groups of forcibly displaced and stateless persons (impacts) and in UNHCR's key areas of engagement (outcomes). 
 
 FDS help us to calculate impact and outcome indicators in a standardized way to have a global understanding of the results. Both indicators and questionnaire is also largely aligned with MICS, DHS, IHSN, national household surveys and other UNHCR standardized surveys.
 
@@ -53,10 +53,10 @@ Identification module
 HH Roster (including education & language)  
 Banking for HH Roster  
 Disability   
-Legal Status 2  
-
+ 
 ***Head of the Household***
 
+Legal Status 2 
 Displacement History  
 Shelter  
 WASH  
@@ -102,11 +102,7 @@ Menstrual Hygiene
 
 **- Caregiver questionnaire**, responded to by the caregiver of the randomly selected child (<5 years of age) from the household.
 
-<<<<<<< HEAD
 Anthropometrics
-=======
-Anthropometrics  
->>>>>>> 3c5edc78d16ac6aec03304d0cdc0df28e541190f
 Immunization 
 
 Data is organized in 5 datasets, which are connected through an unique identifier "uuid". The 5 datasets are the following: 
@@ -140,8 +136,8 @@ pacman::p_load(
 **Population Group**
 ```{r, eval=FALSE}
 
-table(HHroster$Intro_07)   #in dataset "HHroster". 
-table(main$Intro_07)             #in dataset "main". 
+table(HHroster$Intro_07)     #in dataset "HHroster". 
+table(main$Intro_07)         #in dataset "main". 
 table(RA_adult$Intro_07)     #in dataset "RA_adult". 
 table(RA_woman$Intro_07)     #in dataset "RA_woman". 
 table(RA_caregiver$Intro_07) #in dataset "RA_caregiver". 
@@ -149,18 +145,21 @@ table(RA_caregiver$Intro_07) #in dataset "RA_caregiver".
 
 **Age**
 ```{r, eval=FALSE}
+# Main age variable
+summary(HHroster$agetouse) #Main age variable at individual level can be found in the dataset "HHroster". 
+
 #2 categories (<18, >18)
 table(HHroster$HH_04_cat2) #in dataset "HHroster".
 
 #4 categories (0-4, 5-17, 18-59, 60+)
 table(HHroster$HH_04_cat4) #in dataset "HHroster".
 
-#We look at age categories only indicators for which data is pulled from the "HHroster" dataset, which holds the individual data for all members of the household. For other four datasets (Headh of the household, randomly selected adult, randomly selected woman, and randomly selected caregiver) the respondent is always => 15 years of age. 
+#We look at age categories only for indicators for which data is pulled from the "HHroster" dataset, which holds the individual data for all members of the household. For other four datasets (Head of the household, randomly selected adult, randomly selected woman, and randomly selected caregiver) the respondent is always => 15 years of age. 
 
-table(main$HH_04_HoH)           #in dataset "main".
-table(RA_adult$age_selected)   #in dataset "RA_adult".
-table(RA_woman$agerandomwoman) #in dataset "RA_woman".
-table(RA_caregiver$HH_04_RC)   #in dataset "RA_caregiver".
+summary(main$HH_04_HoH)           #in dataset "main".
+summary(RA_adult$age_selected)   #in dataset "RA_adult".
+summary(RA_woman$agerandomwoman) #in dataset "RA_woman".
+summary(RA_caregiver$HH_04_RC)   #in dataset "RA_caregiver".
 ```
 
 **Gender**
@@ -203,16 +202,17 @@ table(RA_caregiver$COO_RC) #in dataset "RA_caregiver".
 
 This indicator aims to measure the proportion of forcibly displaced and stateless people that reside in safe and secure settlements with access to basic facilities such as shelter, WASH, energy and security from natural hazards.
 
-To facilitate measurement for UNHCR, three basic services are considered for this indicator: shelter, drinking water, energy (access to electricity) and health. All of these basic services must be available to people for it to be considered that they have access to basic services.
+To facilitate measurement for UNHCR, four basic services are considered for this indicator: shelter, drinking water, energy (access to electricity), health. All of these basic services must be available to people for it to be considered that they have access to basic services.
 
+In FDS, we are only able to calculate a proxy as we limited in assessing the health aspect of this indicator. Therefore, only three basic services are included in the calculation. 
 
 | Services       | Variables                                                            |
 |----------------|:--------------------------------------------------------:            |
-| Electricity    |HL01, HL03                                                            |                                                     
+| Electricity    |HL01, HL03                                                            |                                                    
 | Drinking water |BD01, BD01a, BD20_2, BD22                                             |
 | Shelter        |HH04, HH05,HH08,HH09, HH10, HH11,HH14, ExpShock02                     |
 
-### Calculate binary variables for access to four basic services {.tabset}
+### Calculate binary variables for access to three basic services {.tabset}
 
 **Click on services below to see how they are calculated**
 
@@ -272,7 +272,7 @@ table(main$BD20_3) ##Specifying minutes on how long it takes to collect water
 table(main$BD22)   ##Does it take more or less than 30 minutes?
 
 
-## Step 2: Add a column specifying is the household uses improved or unimproved source of drinking water 
+## Step 2: Add a column specifying if the household uses improved or unimproved source of drinking water 
 main <- main %>%
 mutate(Improved_dw = ifelse(BD01 %in% c(11, 12, 13, 14, 21, 31, 41, 51, 61, 71, 72, 91, 92), 1, 0)) %>%
   mutate(Improved_dw = labelled(Improved_dw,
@@ -284,35 +284,51 @@ mutate(Improved_dw = ifelse(BD01 %in% c(11, 12, 13, 14, 21, 31, 41, 51, 61, 71, 
 
 ##Step 3: Add a coloumn specifying if the improved water source is located in own dwelling/yard/plot or elsewhere. 
 main <- main %>%
-mutate(Improved_dw_Loc = ifelse(BD01 %in% c(11, 12) | (((BD01 %in% c(13, 14, 21, 31, 41, 51, 61, 71, 72, 91, 92))) & BD01a %in% c(1, 2)),1,0))%>%
+mutate(Improved_dw_Loc = case_when(
+BD01 %in% c(11, 12) ~ 1,
+BD01 %in% c(13, 14, 21, 31, 41, 51) & BD01a %in% c(1, 2) ~ 1,
+BD01 %in% c(13, 14, 21, 31, 41, 51) & BD01a == 3 ~ 0))%>%
 mutate(Improved_dw_Loc = labelled(Improved_dw_Loc,
                                labels = c(
-                                 "Yes" = 1,
-                                 "No" = 0
+                                 "Own dwelling/yard/plot" = 1,
+                                 "Elsewhere" = 0
                                ),
                                label = "Improved drinking water source in own dwelling, yard or plot"))
 
 ##Step 4: Add a coloumn specifying if it takes more or less than 30 min to the improved drinking water source. If the improved drinking water source is located in own dwelling, yard or plot, it is considered that it takes less than 30 minutes to reach. 
 ## BD20_3 - Minutes
+
 main <- main %>%
   mutate(
-    Improved_dw_access= ifelse(
-      (Improved_dw_Loc == 1 )|
-      (Improved_dw_Loc == 0 & BD20_2 == 1 & BD20_3 < 30) |
-      (Improved_dw_Loc == 0 & BD20_2 == 98 & BD22 == 1),
-      1,
-      0
-    )
-  )%>%
+    Improved_dw_access = case_when(
+      BD01 %in% c(11, 12,91,92) ~ 1, #Assigns 1 if improved water source is "Piped to plot/yard/dwelling", "Bottled water" or "Sachets". 
+      BD01 %in% c(13, 14, 21, 31, 41, 51, 61, 71, 72) & ((BD20_2 == 1 & BD20_3 < 30) | (BD20_2 == 98 & BD22 == 1)) ~ 1, #Assigns 1 if other improved water source which are reachable in less than 30 minutes. 
+      TRUE ~ 0))%>% #Assigns 0 in all other cases. 
 mutate(Improved_dw_access = labelled(Improved_dw_access,
                                labels = c(
-                                 "Yes" = 1,
+                                 "Yes" = 1, 
+                                 "No" = 0
+                               ),
+                               label = "Improved water source located reachable in less than 30min"))
+      
+      
+main <- main %>%
+  mutate(
+    Improved_dw_final = case_when(
+      Improved_dw == 1 & (Improved_dw_Loc == 1 | Improved_dw_access == 1)~ 1, #Assigns 1 when an improved water source is located on premises or reachable in less than 30 min. 
+      TRUE ~ 0
+    )
+  ) %>%
+  mutate(Improved_dw_final = labelled(Improved_dw_final,
+                               labels = c(
+                                 "Yes" = 1, 
                                  "No" = 0
                                ),
                                label = "Access to clean drinking water services"))
 
 
-table(main$Improved_dw_access)
+
+table(main$Improved_dw_final)
 
 
 ```
@@ -378,7 +394,7 @@ main <- main %>%
 table(main$shelter)
 ```
 
-After computing the four basic services, we will include an assessment of whether individuals reside in physically safe and secure environments. Safe and secure settlements are those with no risks and hazards like flooding, landslides, landmines, and close proximity to military installations and hazardous zones. In FDS, we only look at the risk of flooding and landslides. 
+After computing the three basic services, we will include an assessment of whether individuals reside in physically safe and secure environments. Safe and secure settlements are those with no risks and hazards like flooding, landslides, landmines, and close proximity to military installations and hazardous zones. In FDS, we only look at the risk of flooding and landslides. 
 
 ```{r, eval=FALSE}
 
@@ -415,8 +431,8 @@ Combine all binary variables as below to calculate the final impact2_2.
 
 main <-main %>%
   mutate(RBM10202=case_when(
-    shelter==0 | electricity==0 | Improved_dw_access==0 | Landslides_flooding==0 ~ 0,
-    shelter==1 & electricity==1 & Improved_dw_access==1 & Landslides_flooding==1 ~ 1)
+    shelter==0 | electricity==0 | Improved_dw_final==0 | Landslides_flooding==0 ~ 0,
+    shelter==1 & electricity==1 & Improved_dw_final==1 & Landslides_flooding==1 ~ 1)
   ) %>% 
   mutate(RBM10202=labelled(RBM10202,
                             labels =c(
@@ -452,7 +468,7 @@ FDS_PAK_2024_main <- main %>%
 
 
 composite_impact2_2 <- main %>%
-  select(Intro_07, shelter, electricity, Improved_dw_access, Landslides_flooding, RBM10202) %>%
+  select(Intro_07, shelter, electricity, Improved_dw_final, Landslides_flooding, RBM10202) %>%
   pivot_longer(cols = shelter:Landslides_flooding, names_to = "facility", values_to = "access") %>%
   group_by(Intro_07, facility) %>%
   summarise(percentage = mean(access, na.rm = TRUE) * 100) %>%
@@ -540,7 +556,7 @@ ggplot(RBM10202, aes(x = Intro_07, y = mean_value, fill = Intro_07)) +
 
 *Indicator Code*: RBM10203
 
-This indicator measures access to essential primary health care services for forcibly displaced and stateless people in need of health services. Health services refers to preventive, promotive, curative, rehabilitative and palliative health services.
+This indicator measures access to essential primary health care services for forcibly displaced and stateless people in need of health services. Health services refer to preventive, promotive, curative, rehabilitative and palliative health services.
 
 Please note that the FDS does not measure access to mental health, psycho social support, rehabilitative services, or palliative care. Additionally, the standard recall period is typically 3 months; however, in the FDS, a 30-day recall period is used. Therefore, the results below should be considered as a proxy for the 2.3 Core Impact Indicator. 
 
@@ -571,43 +587,49 @@ table(RA_adult$H06)   # did receive the needed health care
 #table(RA_adult$H08)   # What are the reasons why you did not try to see a health professional in the past 30 days? - check if this variable is present in your data set
 
 
-#Option 1: Use this option in cases when H08 is not present in the data set. In this option, cases where an individual needed to see a health professional but did not try to see it are classified as 1 - Has access to health services. 
+#Option 1: Use this option in cases when H08 is not present in the data set. Note that with 
+#Step 1: Create a variable indicating if an individual has access to health services
 RA_adult <- RA_adult %>%
-  mutate(RBM10203=case_when(
-    H01_1==1 & H04== 1 & H06==1 ~ 1,
-    H01_1==1 & H04== 2 ~ 1,
-    H01_1==2 ~ NA,
-    H01_1==1 & H04== 1 & H06==2 ~ 0 ))
+  mutate(health_access=case_when(
+    H01_1==1 & H04 == 1 & (H06==1 | H06==3) ~ 1, #Assigns 1 when an individual needed a health professional, tried to see a health professional and received all or some health care services they needed
+    TRUE ~ 0))%>%
+  mutate(health_access=labelled(health_access,
+                                labels =c(
+                                  "Yes"=1,
+                                  "No"=0
+                                ),
+                                label="Has access to health services"))
+
+#Step 2: Create a variable specifying the denominator
+
+RA_adult <- RA_adult %>%
+  mutate(health_all=case_when(
+    H01_1==1 ~ 1, #Assigns 1 when an individual needed to see a health professional. 
+    TRUE ~ 0))
+
 
 #Option 2: Use this option in cases when H08 is present in the data set.
 #RA_adult<- RA_adult %>%
  # mutate(RBM10203=case_when(
-   # H01_1==1 & H04== 1 & H06==1 ~ 1,
-   # H01_1==1 & H04== 2 & (H08 == "E" |H08 == "H" |H08 == "X" | |H08 == "Y") ~ 1, #Individuals who needed to see a health professional, and didn't try due to lack of time, fear of coronavirus, other reasons, or don't know why they didn't try are deemed as having access to health services. 
+   #H01_1==1 & H04== 1 & (H06==1 | H06==3) ~ 1,
+   #H01_1==2 ~ NA,
+   #H01_1==1 & H04== 2 & (H08 == "E" |H08 == "H" |H08 == "X" | |H08 == "Y") ~ 1, #Individuals who needed to see a health professional, and didn't try due to lack of time, fear of coronavirus, other reasons, or don't know why they didn't try are deemed as having access to health services. 
    # H01_1==1 & H04== 2 & H08 %in% c("A", "B","C", "D", "F", "G") ~ 0, #Individuals who needed to see a health professional, and didn't try due to non personal reasons/choices are deemed as not having access to health services. 
-   # H01_1==2 ~ NA,
    # H01_1==1 & H04== 1 & H06==2 ~ 0 ))
+
+#RA_adult <- RA_adult %>%
+#mutate(RBM10203=labelled(RBM10203,
+                                #labels =c(
+                                #  "Yes"=1,
+                                #  "No"=0
+                                #),
+                                #label="Has access to health services"))
 ```
 
-
-
-
-```{r, eval=FALSE}
-RA_adult <- RA_adult %>%
- mutate(RBM10203=labelled(RBM10203,
-                            labels =c(
-                              "Yes"=1,
-                              "No"=0
-                            ),
-                            label="Proportion of people with access to health services"))
-
-table(RA_adult$RBM10203)
-```
 
 ### Figure for RBM Core Impact 2.3 by Population Groups
 
 ```{r, eval=FALSE}
-
 FDS_PAK_2024_RA_adult <- RA_adult %>%
   as_survey_design(
     ids = NULL,           # Specify the column with cluster IDs
@@ -618,12 +640,26 @@ FDS_PAK_2024_RA_adult <- RA_adult %>%
 
 RBM10203 <- FDS_PAK_2024_RA_adult %>%
   filter(!is.na(Intro_07)) %>%   # Exclude if pop groups is NA
-  group_by(Intro_07) %>%      # Group by pop_groups
-  summarise(          # Summarise to compute values
+  group_by(Intro_07) %>%        # Group by population groups
+  summarise(                    # Summarise to compute values
     var_name = "RBM10203",      # Name of the variable
-    num_obs_uw = unweighted(n()),      # Unweighted total count
-    denominator = survey_total(),    # Weighted total count
-    mean_value = survey_mean(RBM10203, vartype = c("ci", "se"), na.rm = TRUE)  # Compute mean with NA removed
+    num_obs_uw = survey_total(!is.na(health_all),na.rm = TRUE),  # Unweighted total count
+    denominator = survey_total(!is.na(health_all),na.rm = TRUE),  # Weighted total count
+    health_all_total = survey_total(health_all, na.rm = TRUE),    # Total for health_all (denominator)
+    health_access_total = survey_total(health_access, na.rm = TRUE), # Total for health_access (numerator)
+    mean_value = survey_mean(health_access / health_all, vartype = c("ci", "se"), na.rm = TRUE)  # Compute mean with NA removed
+  )
+
+#If you are using option 2 to calculate the indicator, use the below code to generate table by population groups: 
+
+#RBM10203 <- FDS_PAK_2024_RA_adult %>%
+  #filter(!is.na(Intro_07)) %>%   # Exclude if pop groups is NA
+  #group_by(Intro_07) %>%        # Group by population groups
+  #summarise(                    # Summarise to compute values
+   # var_name = "RBM10203",      # Name of the variable
+   # num_obs_uw = unweighted(n()),  # Unweighted total count
+    #denominator = survey_total(),  # Weighted total count
+    #mean_value = survey_mean(RBM10203, vartype = c("ci", "se"), na.rm = TRUE)  # Compute mean with NA removed
   )
 
 
@@ -661,9 +697,11 @@ RBM10203_AGD <- FDS_PAK_2024_RA_adult %>%
   group_by(Intro_07, HH_02_RA,disability_RA) %>%
   summarise(
     var_name = "impact2_3",                                      # Name of the variable
-    num_obs_uw = survey_total(!is.na(RBM10203), vartype = NULL),  # Unweighted total count
-    denominator = survey_total(),                                # Weighted total count
-    mean_value = survey_mean(RBM10203, vartype = c("ci", "se"), na.rm = TRUE)  # Compute mean with CI and SE
+    num_obs_uw = survey_total(!is.na(health_all),na.rm = TRUE),  # Unweighted total count
+    denominator = survey_total(!is.na(health_all),na.rm = TRUE),  # Weighted total count
+    health_all_total = survey_total(health_all, na.rm = TRUE),    # Total for health_all (denominator)
+    health_access_total = survey_total(health_access, na.rm = TRUE), # Total for health_access (numerator)
+    mean_value = survey_mean(health_access / health_all, vartype = c("ci", "se"), na.rm = TRUE)  # Compute mean with NA removed
   )
 
 
@@ -742,11 +780,10 @@ HHroster <- HHroster %>%
 HHroster <- HHroster %>%
   mutate(
     age_primary = case_when(
-<<<<<<< HEAD
+
       agetouse >= 6 & agetouse <= 14 ~ 1,  #Remember to adjust age levels based on the primary education age per country
-=======
+
       HH_04 >= 5 & HH_04 <= 12 ~ 1,  #Remember to adjust age levels based on the primary education age per country
->>>>>>> 3c5edc78d16ac6aec03304d0cdc0df28e541190f
       TRUE ~ 0
     )
   )
@@ -769,7 +806,7 @@ FDS_PAK_2024_HHroster <- HHroster %>%
 
 
 ###You can check official statistics here: https://data.uis.unesco.org/index.aspx?queryid=3847
-###82.68% for both sexed in Pakistan
+###82.68% for both sexes in Pakistan
 
 
 ##Table 
@@ -780,7 +817,7 @@ RBM10302A <- FDS_PAK_2024_HHroster %>%
   summarise(
     var_name = "impact3_2a",                        # Name of the variable
     num_obs_uw = survey_total(!is.na(age_primary), na.rm = TRUE),  # Unweighted total count
-    denominator = survey_total(edu_primary, na.rm = TRUE),         # Weighted total count
+    denominator = survey_total(age_primary, na.rm = TRUE),         # Weighted total count
     edu_primary_total = survey_total(edu_primary, na.rm = TRUE),   # Total for edu_primary
     age_primary_total = survey_total(age_primary, na.rm = TRUE)    # Total for age_primary
   ) %>%
@@ -825,7 +862,7 @@ RBM10302A_AGD <- FDS_PAK_2024_HHroster %>%
   summarise(
     var_name = "impact3_2a",                        # Name of the variable
     num_obs_uw = survey_total(!is.na(age_primary), na.rm = TRUE),  # Unweighted total count
-    denominator = survey_total(edu_primary, na.rm = TRUE),   # Weighted total count
+    denominator = survey_total(age_primary, na.rm = TRUE),   # Weighted total count
     edu_primary_total = survey_total(edu_primary, na.rm = TRUE),   # Total for edu_primary
     age_primary_total = survey_total(age_primary, na.rm = TRUE)   # Total for age_primary
   ) %>%
@@ -943,7 +980,7 @@ RBM10302B <- FDS_PAK_2024_HHroster %>%
   summarise(
     var_name = "impact3_2b",                        # Name of the variable
     num_obs_uw = survey_total(!is.na(age_secondary), na.rm = TRUE),  # Unweighted total count
-    denominator = survey_total(edu_secondary, na.rm = TRUE),         # Weighted total count
+    denominator = survey_total(age_secondary, na.rm = TRUE),         # Weighted total count
     edu_secondary_total = survey_total(edu_secondary, na.rm = TRUE),   # Total for edu_primary
     age_secondary_total = survey_total(age_secondary, na.rm = TRUE)    # Total for age_primary
   ) %>%
@@ -987,7 +1024,7 @@ RBM10302B_AGD <- FDS_PAK_2024_HHroster %>%
   summarise(
     var_name = "impact3_2b",                        # Name of the variable
     num_obs_uw = survey_total(!is.na(age_secondary), na.rm = TRUE),  # Unweighted total count
-    denominator = survey_total(edu_secondary, na.rm = TRUE),   # Weighted total count
+    denominator = survey_total(age_secondary, na.rm = TRUE),   # Weighted total count
     edu_secondary_total = survey_total(edu_secondary, na.rm = TRUE),   # Total for edu_primary
     age_secondary_total = survey_total(age_secondary, na.rm = TRUE)   # Total for age_primary
   ) %>%
@@ -1185,7 +1222,7 @@ The standard module for this indicator is taken from MICS and adjusted to UNHCR 
 
 ***Definitions***
 
-•**Birth registration** refers to the registration of new births by civil authorities and completion of the process through the issuance of a birth certificate.
+•Birth registration refers to the registration of new births by civil authorities and completion of the process through the issuance of a birth certificate.
 This also includes documents issued by UNHCR or other relevant organizations when **given the authority by the State and these documents are recognized by national authorities**.
 
 ***Clarifications***
@@ -1409,8 +1446,8 @@ table(HHroster$Legal_passport) #If the person has a passport?
 
 HHroster <- HHroster %>% 
   mutate(RBM20103 = case_when(
-    ID_09 %in% c(2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 15) | ID_13 %in% c("B", "C", "D", "E", "F","G","H","I","J","K","L","P") | Legal_birth_certificate == 1 | Legal_ID_card == 1 | Legal_passport == 1 ~ 1, #Assigns 1 if the person has valid legal documents or credentials as recognized by the host state and/or UNHCR. 
-    ID_09 %in% c(1, 13, 14, 98) & ID_13 %in% c("A","M","N","DK")  & Legal_birth_certificate == 2 & Legal_ID_card == 2 & Legal_passport == 2 ~ 0, #Assigns 0 if the person has no primary, secondary and no other legal documents, as recognized by the host state and/or UNHCR.  
+    ID_09 %in% c(7,8,9,10,11,12) | ID_13 %in% c("G","H","I","J","K","L") | Legal_birth_certificate == 1 | Legal_ID_card == 1 | Legal_passport == 1 ~ 1, #Assigns 1 if the person has valid legal documents or credentials as recognized by the host state and/or UNHCR. 
+    ID_09 %in% c(1,2,3,4,5,6, 13, 14, 15,96, 98) & ID_13 %in% c("A","B","C","D","E","F","M","N","P","OT","DK")  & Legal_birth_certificate == 2 & Legal_ID_card == 2 & Legal_passport == 2 ~ 0, #Assigns 0 if the person has no primary, secondary and no other legal documents, as recognized by the host state and/or UNHCR.  
     TRUE ~ NA))
   
 ```
@@ -2520,7 +2557,7 @@ table(main$BD22)   ##Does it take more or less than 30 minutes?
 
 ## Step 2: Add a coloumn specifying is the household uses improved or unimproved source of drinking water 
 main <- main %>%
-    mutate(Improved_dw = ifelse(BD01 %in% c(11, 12, 13, 14, 21, 31, 41, 51, 61, 71, 72, 91, 92), 1, 0)) %>%
+mutate(Improved_dw = ifelse(BD01 %in% c(11, 12, 13, 14, 21, 31, 41, 51, 61, 71, 72, 91, 92), 1, 0)) %>%
   mutate(Improved_dw = labelled(Improved_dw,
                                labels = c(
                                  "Yes" = 1,
@@ -2532,33 +2569,50 @@ main <- main %>%
 ```{r, eval=FALSE}
 ##Step 3: Add a coloumn specifying if the improved water source is located in own dwelling/yard/plot or elsewhere. 
 main <- main %>%
-mutate(Improved_dw_Loc = ifelse(BD01 %in% c(11, 12) | (((BD01 %in% c(13, 14, 21, 31, 41, 51, 61, 71, 72, 91, 92))) & BD01a %in% c(1, 2)),1,0))%>%
+mutate(Improved_dw_Loc = case_when(
+BD01 %in% c(11, 12) ~ 1,
+BD01 %in% c(13, 14, 21, 31, 41, 51) & BD01a %in% c(1, 2) ~ 1,
+BD01 %in% c(13, 14, 21, 31, 41, 51) & BD01a == 3 ~ 0))%>%
 mutate(Improved_dw_Loc = labelled(Improved_dw_Loc,
                                labels = c(
-                                 "Yes" = 1,
-                                 "No" = 0
+                                 "Own dwelling/yard/plot" = 1,
+                                 "Elsewhere" = 0
                                ),
                                label = "Improved drinking water source in own dwelling, yard or plot"))
 
 
-##Step 4: Add a column specifying if it takes more or less than 30 min to the improved drinking water source. If the improved drinking water source is located in own dwelling, yard or plot, it is considered that it takes less than 30 minutes to reach. 
-## BD20-3 - Minutes
-main <- main %>% 
-mutate(
-    RBM21201= ifelse(
-      (Improved_dw_Loc == 1 )|
-      (Improved_dw_Loc == 0 & BD20_2 == 1 & BD20_3 < 30) |
-      (Improved_dw_Loc == 0 & BD20_2 == 98 & BD22 == 1),
-      1,
-      0
-    )
-  )%>%
-mutate(RBM21201 = labelled(RBM21201,
+##Step 4: Add a coloumn specifying if it takes more or less than 30 min to the improved drinking water source. If the improved drinking water source is located in own dwelling, yard or plot, it is considered that it takes less than 30 minutes to reach. 
+## BD20_3 - Minutes
+
+main <- main %>%
+  mutate(
+    Improved_dw_access = case_when(
+      BD01 %in% c(11, 12,91,92) ~ 1, #Assigns 1 if improved water source is "Piped to plot/yard/dwelling", "Bottled water" or "Sachets". 
+      BD01 %in% c(13, 14, 21, 31, 41, 51, 61, 71, 72) & ((BD20_2 == 1 & BD20_3 < 30) | (BD20_2 == 98 & BD22 == 1)) ~ 1, #Assigns 1 if other improved water source which are reachable in less than 30 minutes. 
+      TRUE ~ 0))%>% #Assigns 0 in all other cases. 
+mutate(Improved_dw_access = labelled(Improved_dw_access,
                                labels = c(
-                                 "Yes" = 1,
+                                 "Yes" = 1, 
+                                 "No" = 0
+                               ),
+                               label = "Improved water source located reachable in less than 30min"))
+      
+      
+main <- main %>%
+  mutate(
+    RBM21201 = case_when(
+      Improved_dw == 1 & (Improved_dw_Loc == 1 | Improved_dw_access == 1)~ 1, #Assigns 1 when an improved water source is located on premises or reachable in less than 30 min. 
+      TRUE ~ 0
+    )
+  ) %>%
+  mutate(RBM21201 = labelled(RBM21201,
+                               labels = c(
+                                 "Yes" = 1, 
                                  "No" = 0
                                ),
                                label = "Access to clean drinking water services"))
+
+
 
 table(main$RBM21201)
 
@@ -3192,7 +3246,9 @@ This indicator measures the proportion of returned refugees who possess legally 
 |:-------------------------------------------------------------------------------------------------------------------------------------------------------:|
 | ID_VAR, ID_09, ID_13, Legal_birth_certificate, Legal_ID_card, Legal_passport, Legal_residency, Legal_work_permit, Legal_socsec_card, Legal_marriage_cert|
 
-*Note that the availability of the above standard questions will differ from FDS country to country. Ensure to check your data set and identify which variables are present. Moreover, ensure to check the response options of variables ID_09 and ID_13 to determine which response options are considerd as valid identity documents or credentials are recognized by the host state and/or UNHCR. 
+*Note that the availability of the above standard questions will differ from FDS country to country. Ensure to check your data set and identify which variables are present. Moreover, ensure to check the response options of variables ID_09 and ID_13 to determine which response options are considered as valid identity documents or credentials and recognized by the host state and/or UNHCR. 
+
+*This indicator should be calculated only for surveys where the sample includes refugee returnees! 
 
 **Unit of observation**: Individual
 
@@ -3225,22 +3281,23 @@ table(HHroster$Legal_passport) #If the person has a passport?
 
 HHroster <- HHroster %>% 
   mutate(RBM21401 = case_when(
-    ID_VAR == 4 & (ID_09 %in% c(2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 15) | ID_13 %in% c("B", "C", "D", "E", "F","G","H","I","J","K","L","P") | Legal_birth_certificate == 1 | Legal_ID_card == 1 | Legal_passport == 1 ~ 1, #Assigns 1 if the person has valid legal documents or credentials as recognized by the host state and/or UNHCR. 
-    ID_09 %in% c(1, 13, 14, 98) & ID_13 %in% c("A","M","N","DK")  & Legal_birth_certificate == 2 & Legal_ID_card == 2 & Legal_passport == 2 ~ 0, #Assigns 0 if the person has no primary, secondary and no other legal documents, as recognized by the host state and/or UNHCR.  
+    ID_VAR == 4 & (ID_09 %in% c(7,8,9,10,11,12) | ID_13 %in% c("G","H","I","J","K","L") | Legal_birth_certificate == 1 | Legal_ID_card == 1 | Legal_passport == 1 ~ 1, #Assigns 1 if the person has valid legal documents or credentials as recognized by the host state and/or UNHCR. 
+    ID_09 %in% c(1,2,3,4,5,6, 13, 14, 15,96, 98) & ID_13 %in% c("A","B","C","D","E","F","M","N","P","OT","DK")  & Legal_birth_certificate == 2 & Legal_ID_card == 2 & Legal_passport == 2 ~ 0, #Assigns 0 if the person has no primary, secondary and no other legal documents, as recognized by the host state and/or UNHCR.  
     TRUE ~ NA))
   
 ```
 ```{r, eval=FALSE}
 HHroster <- HHroster %>% 
-  mutate(RBM21401 = labelled(RBM21401,
+  mutate(RBM20103 = labelled(RBM20103,
                                labels = c(
                                  'Yes' = 1,
                                  'No' = 0
                                ),
-                               label = "Proportion of returnees with legally recognized identity documents or credential"))
-table(HHroster$RBM21401)
+                               label = "Proportion of people with legally recognized identity documents or credentials"))
 ```
-
+```{r, eval=FALSE}
+table(HHroster$RBM20103)
+```
 
 
 ### Figure for RBM Core Outcome 14.1 (For Refugee Returnees Only)
@@ -3532,9 +3589,9 @@ ggplot(RBM21601, aes(x = Intro_07, y = mean_value, fill = Intro_07)) +
 
 This indicator measures the proportion of people who receive government social protection benefits and services as a result of inclusion in national social protection systems. This counts those who actually receive social protection benefits or are actively contributing to a social insurance scheme. This means it does not consider whether they have legal rights to social protection (for which there are other rights-based monitoring mechanisms), and it does not count just those who are registered for benefits (which can be reported using the Good Practice Indicator: “Number of people enrolled in social registries”).
 
-|    Standard Questions                                  |
-|:------------------------------------------------------:|
-| ScProtec01, ScProtec04, ScProtec16                     |
+|    Standard Questions               |
+|:-----------------------------------:|
+| ScProtec01, ScProtec04, ScProtec16  |
 
 **Unit of observation**: Household
 
