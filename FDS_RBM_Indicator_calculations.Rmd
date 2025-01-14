@@ -287,7 +287,7 @@ main <- main %>%
 mutate(Improved_dw_Loc = case_when(
 BD01 %in% c(11, 12) ~ 1, #Assigns 1 if piped into dwelling/yard/plot
 BD01 %in% c(13, 14, 21, 31, 41, 51) & BD01a %in% c(1, 2) ~ 1, #Assigns 1 if other source located in HH dwelling or plot
-BD01 %in% c(13, 14, 21, 31, 41, 51) & BD01a == 3 ~ 0))%>% #Assigns 2 if other source located elsewere
+BD01 %in% c(13, 14, 21, 31, 41, 51) & BD01a == 3 ~ 0))%>% #Assigns 2 if other source located elsewhere
 mutate(Improved_dw_Loc = labelled(Improved_dw_Loc,
                                labels = c(
                                  "Own dwelling/yard/plot" = 1,
@@ -2570,9 +2570,9 @@ mutate(Improved_dw = ifelse(BD01 %in% c(11, 12, 13, 14, 21, 31, 41, 51, 61, 71, 
 ##Step 3: Add a coloumn specifying if the improved water source is located in own dwelling/yard/plot or elsewhere. 
 main <- main %>%
 mutate(Improved_dw_Loc = case_when(
-BD01 %in% c(11, 12) ~ 1,
-BD01 %in% c(13, 14, 21, 31, 41, 51) & BD01a %in% c(1, 2) ~ 1,
-BD01 %in% c(13, 14, 21, 31, 41, 51) & BD01a == 3 ~ 0))%>%
+BD01 %in% c(11, 12) ~ 1, #Assigns 1 if piped into dwelling/yard/plot
+BD01 %in% c(13, 14, 21, 31, 41, 51) & BD01a %in% c(1, 2) ~ 1, #Assigns 1 if other source located in HH dwelling or plot
+BD01 %in% c(13, 14, 21, 31, 41, 51) & BD01a == 3 ~ 0))%>% #Assigns 2 if other source located elsewhere
 mutate(Improved_dw_Loc = labelled(Improved_dw_Loc,
                                labels = c(
                                  "Own dwelling/yard/plot" = 1,
@@ -2740,7 +2740,7 @@ mutate(RBM21202 = case_when(
                                   "Yes" = 1,
                                   "No" = 0
                                 ),
-                                label = "Proportion of people with access to at least basic sanitation services."
+                                label = "Proportion of people with access at least basic sanitation services."
   ))
 
 table(main$RBM21202)
