@@ -468,15 +468,25 @@ RA_caregiver <- RA_caregiver %>%
   mutate(disability_RC = recode_factor(disability_RC, !!!disability_labels))
 
 
-#Safe the datasets in a STATA dta. 
+#Save the datasets in a STATA dta. 
 
 output_path <- "C:/Users/KAPS/OneDrive - UNHCR/300 - ST - Survey Team - Main/Survey Programme Team/Projects/FDS/Countries/Pakistan/Data Management/4 Analysis/"
 
-write_dta(HHroster, paste0(output_path, "HHroster_modified.dta"))
-write_dta(main, paste0(output_path, "main_modified.dta"))
-write_dta(RA_adult, paste0(output_path, "RA_adult_modified.dta"))
-write_dta(RA_woman, paste0(output_path, "RA_woman_modified.dta"))
-write_dta(RA_caregiver, paste0(output_path, "RA_caregiver_modified.dta"))
+write_dta(HHroster, paste0(output_path, "HHroster.dta"))
+write_dta(main, paste0(output_path, "main.dta"))
+write_dta(RA_adult, paste0(output_path, "RA_adult.dta"))
+write_dta(RA_woman, paste0(output_path, "RA_woman.dta"))
+write_dta(RA_caregiver, paste0(output_path, "RA_caregiver.dta"))
+
+#Save the datasets in a R dataset.
+
+saveRDS(HHroster, file = paste0(output_path, "HHroster.rds"))
+saveRDS(main, file = paste0(output_path, "main.rds"))
+saveRDS(RA_adult, file = paste0(output_path, "RA_adult.rds"))
+saveRDS(RA_woman, file = paste0(output_path, "RA_woman.rds"))
+saveRDS(RA_caregiver, file = paste0(output_path, "RA_caregiver.rds"))
+
+
 
 
 #Create a new variable for strata, intro_06, submission_date
