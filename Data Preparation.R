@@ -407,6 +407,9 @@ table(main$crowding_cat)
 #### ADD LABELS ----
 
 # Define labels for population groups
+# Remember to adjust this for other countries 
+# FOR ILGI: Why do we have 1 & 3? I believe ref & asy have been merged to 1, and 2 is hosts, to check
+
 popgroup_labels <- c(
   "1" = "Refugees and Asylum Seekers",
   "3" = "Host Community"
