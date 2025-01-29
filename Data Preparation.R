@@ -491,5 +491,3 @@ saveRDS(RA_caregiver, file = paste0(output_path, "RA_caregiver.rds"))
 
 #Create a new variable for strata, intro_06, submission_date
 #Adjust the order of the variables, Pop groups, age, gender, disability, country or origin, strata, submission_date, uuid, 
-#change the path to save the datatsets to analysis folder 
-#agetouse
