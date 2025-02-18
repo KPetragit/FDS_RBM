@@ -412,7 +412,7 @@ table(main$crowding_cat)
 
 popgroup_labels <- c(
   "1" = "Refugees and Asylum Seekers",
-  "3" = "Host Community"
+  "2" = "Host Community"
 )
 
 HHroster <- HHroster %>%

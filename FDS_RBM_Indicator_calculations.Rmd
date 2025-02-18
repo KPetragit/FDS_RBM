@@ -454,7 +454,7 @@ table(main$RBM10202)
 FDS_PAK_2024_main <- main %>%
   as_survey_design(
     ids = NULL,           # Specify the column with cluster IDs
-    weights = , # Specify the column with survey weights
+    weights = NULL, # Specify the column with survey weights
     nest = TRUE              # Use TRUE if PSUs are nested within clusters (optional, based on your survey design)
   )
 ```
@@ -469,12 +469,19 @@ FDS_PAK_2024_main <- main %>%
 ####Standard tables 
 
 
-composite_impact2_2 <- main %>%
-  select(Intro_07, shelter, electricity, Improved_dw_final, Landslides_flooding, RBM10202) %>%
-  pivot_longer(cols = shelter:Landslides_flooding, names_to = "facility", values_to = "access") %>%
-  group_by(Intro_07, facility) %>%
-  summarise(percentage = mean(access, na.rm = TRUE) * 100) %>%
+composite_impact2_2 <- FDS_CMR_2024_main %>%
+  filter(!is.na(Intro_07)) %>%
+  group_by(Intro_07) %>%
+  summarise(
+    shelter = survey_mean(shelter, na.rm = TRUE),
+    electricity = survey_mean(electricity, na.rm = TRUE),
+    Improved_dw_final = survey_mean(Improved_dw_final, na.rm = TRUE),
+    Landslides_flooding = survey_mean(Landslides_flooding, na.rm = TRUE)
+  ) %>%
   ungroup()
+ 
+composite_impact2_2 <- composite_impact2_2 %>%
+  pivot_longer(cols = shelter:Landslides_flooding, names_to = "facility", values_to = "percentage")
 
 ##add labels
 composite_impact2_2 <- composite_impact2_2 %>%
@@ -2680,7 +2687,7 @@ ggplot(RBM21201, aes(x = Intro_07, y = mean_value, fill = Intro_07)) +
 
 This indicator measures the proportion of people with access to at least basic sanitation services. Basic sanitation services are defined as improved facilities (toilets) that are not shared with other households. 
 
-As this indicator measures 'at least basic sanitation services ' as defined by the JMP sanitation ladder it includes also safely managed sanitation services which are defined as the use of hygienic toilet facilities that are not shared with other households and where excreta are either separated from human contact and safely disposed of in situ or transported and treated off-site, thereby protecting people and the environment from disease agents. Safely disposed in situ when pit latrines and septic tanks are not emptied, the excreta may still remain isolated from human contact and can reconsidered safely managed.
+As this indicator measures 'at least basic sanitation services' as defined by the JMP sanitation ladder it includes also safely managed sanitation services which are defined as the use of hygienic toilet facilities that are not shared with other households and where excreta are either separated from human contact and safely disposed of in situ or transported and treated off-site, thereby protecting people and the environment from disease agents. Safely disposed in situ when pit latrines and septic tanks are not emptied, the excreta may still remain isolated from human contact and can reconsidered safely managed.
 
 | Standard Questions           |
 |:----------------------------:|
@@ -3319,8 +3326,8 @@ FDS_PAK_2024_HHroster <- HHroster %>%
 ###Table 
 
 RBM21401 <- FDS_PAK_2024_HHroster %>%
-  filter(!is.na(Intro_07_roster)) %>%         # Exclude if pop groups is NA
-  group_by(Intro_07_roster) %>%                           # Group by pop_groups
+  filter(!is.na(Intro_07)) %>%         # Exclude if pop groups is NA
+  group_by(Intro_07) %>%                           # Group by pop_groups
   summarise(                                         # Summarise to compute values
     var_name = "outcome14_1",                          # Name of the variable
     num_obs_uw = unweighted(n()),                    # Unweighted total count
