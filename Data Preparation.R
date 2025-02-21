@@ -1,3 +1,9 @@
+########################################################################
+#################ADD DISAGGREGATION VARIABLES###########################
+########################################################################
+
+
+
 #Load Packages 
 if(!require(pacman)) install.packages('pacman')
 
@@ -412,7 +418,7 @@ table(main$crowding_cat)
 
 popgroup_labels <- c(
   "1" = "Refugees and Asylum Seekers",
-  "2" = "Host Community"
+  "3" = "Host Community"
 )
 
 HHroster <- HHroster %>%

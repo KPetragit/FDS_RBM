@@ -1,26 +1,28 @@
 ---
-title: "FDS Questionnaire v1 RBM Indicator Calculations"
+title: "FDS Questionnaire - Standard UNHCR RBM Indicator Calculations"
 author: "Global Survey Team"
 output:
   unhcrdown::html_page:
     toc: true
     toc_depth: 2
     toc_float: true
+editor_options: 
+  markdown: 
+    wrap: sentence
 ---
-
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(eval=FALSE)
 ```
 
-Date: Last revision was in January 2025
+Date: Last revision was in February 2025
 
-*For any issues please contact Ilgi Bozdag at bozdag@unhcr.org or Petra Kaps at kaps@unhcr.org*
+*For any issues please contact Ilgi Bozdag at [bozdag\@unhcr.org](mailto:bozdag@unhcr.org){.email} or Petra Kaps at [kaps\@unhcr.org](mailto:kaps@unhcr.org){.email}*
 
 **Important Instructions**
 
-1. For correct calculations, ensure you have five datasets named: 'HHroster', 'main', 'RA_adult', 'RA_caregiver', 'RA_woman'. 
-2. Confirm that your datasets are cleaned and weighted as required for accurate results!
+1.  For correct calculations, ensure you have five datasets named: 'HHroster', 'main', 'RA_adult', 'RA_caregiver', 'RA_woman'.
+2.  Confirm that your datasets are cleaned and weighted as required for accurate results!
 
 # RBM Core Impact and Outcome Indicators
 
@@ -28,97 +30,99 @@ There is broad consensus around the key indicators used to measure, inform and m
 UNHCR's objectives are largely aligned with these frameworks.
 
 [The Forced Displacement Survey (FDS)](https://www.unhcr.org/what-we-do/reports-and-publications/data-and-statistics/forced-displacement-survey) is a household-level survey with standard questionnaires following context-appropriate methodological approaches.
-They can be implemented across UNHCR operations to monitor changes in the lives of all relevant groups of forcibly displaced and stateless persons (impacts) and in UNHCR's key areas of engagement (outcomes). 
+They can be implemented across UNHCR operations to monitor changes in the lives of all relevant groups of forcibly displaced and stateless persons (impacts) and in UNHCR's key areas of engagement (outcomes).
 
-FDS help us to calculate impact and outcome indicators in a standardized way to have a global understanding of the results. Both indicators and questionnaire is also largely aligned with MICS, DHS, IHSN, national household surveys and other UNHCR standardized surveys.
+FDS help us to calculate impact and outcome indicators in a standardized way to have a global understanding of the results.
+Both indicators and questionnaire is also largely aligned with MICS, DHS, IHSN, national household surveys and other UNHCR standardized surveys.
 
 This document will guide you on how each and every indicator will be calculated with the FDS standard questionnaire module corresponding to each indicator.
 
 **Population** refers to survey population in this guidance for the calculation of indicators as shown by numerator and denominator.
 
-**How to calculate an indicator?** In the calculation of a percentage or rate, the denominator is often the total number of observations, events, or units in the population or sample being studied. The numerator, on the other hand, represents the specific part or subset of interest.
+**How to calculate an indicator?** In the calculation of a percentage or rate, the denominator is often the total number of observations, events, or units in the population or sample being studied.
+The numerator, on the other hand, represents the specific part or subset of interest.
 
-Percentage = \(\left(\frac{\text{Numerator}}{\text{Denominator}}\right) \times 100\)
+Percentage = $\left(\frac{\text{Numerator}}{\text{Denominator}}\right) \times 100$
 
 **Description of the datasets**
 
-The FDS consists of 4 questionnaires and an introduction section which together form the FDS interview. The 4 questionnaires and the respective modules in each are the following: 
+The FDS consists of 4 questionnaires and an introduction section which together form the FDS interview.
+The 4 questionnaires and the respective modules in each are the following:
 
-**- Head of the Household questionnaire**, responded to by the head of the household (>= 15 years of age), it includes all household level questions such as access to services. This questionnaire also includes the household roster, where the head of the household responds to individual level questions about all household members.  
+**- Head of the Household questionnaire**, responded to by the head of the household (\>= 15 years of age), it includes all household level questions such as access to services.
+This questionnaire also includes the household roster, where the head of the household responds to individual level questions about all household members.
 
 ***Head of the Household - Household Roster***
 
-HH definition  
-Identification module  
-HH Roster (including education & language)  
-Banking for HH Roster  
-Disability   
- 
+HH definition\
+Identification module\
+HH Roster (including education & language)\
+Banking for HH Roster\
+Disability
+
 ***Head of the Household***
 
-Legal Status 2 
-Displacement History  
-Shelter  
-WASH  
-Clean Energy  
-Assets  
-Mosquito Nets  
-Land and Property  
-Food and Nutrition  
-Objective Wellbeing   
-Experience of Shocks  
-Social Protection  
-Child Labor  
+Legal Status 2 Displacement History\
+Shelter\
+WASH\
+Clean Energy\
+Assets\
+Mosquito Nets\
+Land and Property\
+Food and Nutrition\
+Objective Wellbeing\
+Experience of Shocks\
+Social Protection\
+Child Labor
 
+**- Random Adult questionnaire**, responded to by the randomly selected adult (\>= 15 years of age) from the household.
 
-**- Random Adult questionnaire**, responded to by the randomly selected adult (>= 15 years of age) from the household.
+Subjective and Mental Wellbeing\
+Aspiration\
+Healthcare\
+Mental Health\
+Mobility\
+Education 2\
+Skills\
+Employment\
+Job Search\
+Time Spent on Domestic Work\
+Trust - Political Participation\
+Financial Solutions\
+Remittances\
+Access to Information\
+Freedom of thought\
+Feel Safe Walking Alone\
+Access to Justice\
+Acceptance between communities\
+Discrimination\
+Victimization
 
-Subjective and Mental Wellbeing  
-Aspiration   
-Healthcare   
-Mental Health  
-Mobility  
-Education 2  
-Skills   
-Employment  
-Job Search   
-Time Spent on Domestic Work   
-Trust - Political Participation  
-Financial Solutions  
-Remittances  
-Access to Information  
-Freedom of thought  
-Feel Safe Walking Alone  
-Access to Justice  
-Acceptance between communities  
-Discrimination  
-Victimization  
+**- Random Woman questionnaire**, responded to by the randomly selected woman (\>= 15 years of age) who gave birth in the last 2 years.
 
-**- Random Woman questionnaire**, responded to by the randomly selected woman (>= 15 years of age) who gave birth in the last 2 years.
+Women’s health - Birth attendance\
+Family Planning\
+Menstrual Hygiene
 
-Women’s health - Birth attendance  
-Family Planning  
-Menstrual Hygiene  
+**- Caregiver questionnaire**, responded to by the caregiver of the randomly selected child (\<5 years of age) from the household.
 
-**- Caregiver questionnaire**, responded to by the caregiver of the randomly selected child (<5 years of age) from the household.
+Anthropometrics Immunization
 
-Anthropometrics
-Immunization 
+Data is organized in 5 datasets, which are connected through an unique identifier "uuid".
+The 5 datasets are the following:
 
-Data is organized in 5 datasets, which are connected through an unique identifier "uuid". The 5 datasets are the following: 
+-   *HHroster* = Roster section from questionnaire responded to by the head of the household
 
-- *HHroster* = Roster section from questionnaire responded to by the head of the household 
+-   *main* = Questionnaire responded to by head of the Household
 
-- *main* = Questionnaire responded to by head of the Household 
+-   *RA_adult* = Questionnaire responded to by the randomly selected adult
 
-- *RA_adult* = Questionnaire responded to by the randomly selected adult 
+-   *RA_woman* = Questionnaire responded to by the randomly selected woman
 
-- *RA_woman* = Questionnaire responded to by the randomly selected woman
+-   *RA_caregiver* = Questionnaire responded to by the caregiver of the randomly selected child
 
-- *RA_caregiver* = Questionnaire responded to by the caregiver of the randomly selected child
-
-
-At this step, you should already have all five datasets structured in a way that will allow you to calculate your indicators as you will be guided in this document. It's not recommended to clear your work space if your datasets are already loaded. 
+At this step, you should already have all five datasets structured in a way that will allow you to calculate your indicators as you will be guided in this document.
+It's not recommended to clear your work space if your datasets are already loaded.
 
 ```{r, eval=FALSE}
 ## Install pacman if not already installed
@@ -134,6 +138,7 @@ pacman::p_load(
 ## Standardized Disaggregation Variables
 
 **Population Group**
+
 ```{r, eval=FALSE}
 
 #Import 5 datasets. Here we are using FDS Pakistan datase.  
@@ -146,6 +151,7 @@ table(RA_caregiver$Intro_07) #in dataset "RA_caregiver".
 ```
 
 **Age**
+
 ```{r, eval=FALSE}
 # Main age variable
 summary(HHroster$agetouse) #Main age variable at individual level can be found in the dataset "HHroster". 
@@ -165,6 +171,7 @@ summary(RA_caregiver$HH_04_RC)   #in dataset "RA_caregiver".
 ```
 
 **Gender**
+
 ```{r, eval=FALSE}
 table(HHroster$HH_02)          #in dataset "HHroster".
 table(main$HH_02_HoH)         #in dataset "main". 
@@ -172,8 +179,8 @@ table(RA_adult$HH_02_RA)     #in dataset "RA_adult".
 table(RA_caregiver$HH_02_RC) #in dataset "RA_caregiver".
 ```
 
-
 **Disability**
+
 ```{r, eval=FALSE}
 table(HHroster$disability)          #in dataset "HHroster".
 table(main$disability_HoH)         #in dataset "main". 
@@ -182,8 +189,8 @@ table(RA_woman$disability_RW)     #in dataset "RA_woman".
 table(RA_caregiver$disability_RC) #in dataset "RA_caregiver".
 ```
 
-
 **Country of origin**
+
 ```{r, eval=FALSE}
 table(HHroster$COO)          #in dataset "HHroster".
 table(main$COO_HoH)         #in dataset "main".
@@ -193,32 +200,32 @@ table(RA_caregiver$COO_RC) #in dataset "RA_caregiver".
 
 ```
 
-
-
 ## 2.2 Core Impact Indicator
 
 **Core Impact 2.2 Proportion of people residing in physically safe and secure settlements with access to basic facilities**
 
 *Indicator Code:* RBM10202
 
-
 This indicator aims to measure the proportion of forcibly displaced and stateless people that reside in safe and secure settlements with access to basic facilities such as shelter, WASH, energy and security from natural hazards.
 
-To facilitate measurement for UNHCR, four basic services are considered for this indicator: shelter, drinking water, energy (access to electricity), health. All of these basic services must be available to people for it to be considered that they have access to basic services.
+To facilitate measurement for UNHCR, four basic services are considered for this indicator: shelter, drinking water, energy (access to electricity), health.
+All of these basic services must be available to people for it to be considered that they have access to basic services.
 
-In FDS, we are only able to calculate a proxy as we limited in assessing the health aspect of this indicator. Therefore, only three basic services are included in the calculation. 
+In FDS, we are only able to calculate a proxy as we limited in assessing the health aspect of this indicator.
+Therefore, only three basic services are included in the calculation.
 
-| Services       | Variables                                                            |
-|----------------|:--------------------------------------------------------:            |
-| Electricity    |HL01, HL03                                                            |                                                    
-| Drinking water |BD01, BD01a, BD20_2, BD22                                             |
-| Shelter        |HH04, HH05,HH08,HH09, HH10, HH11,HH14, ExpShock02                     |
+| Services       |                     Variables                     |
+|----------------|:-------------------------------------------------:|
+| Electricity    |                    HL01, HL03                     |
+| Drinking water |             BD01, BD01a, BD20_2, BD22             |
+| Shelter        | HH04, HH05,HH08,HH09, HH10, HH11,HH14, ExpShock02 |
 
 ### Calculate binary variables for access to three basic services {.tabset}
 
 **Click on services below to see how they are calculated**
 
 #### Electricity
+
 Households lighting provides a sense of safety and security within and outside the households after sunset.
 If households lack access to electricity, especially for lighting and connectivity, this affects the occupants' security and limits their opportunities for socialization, learning and self-reliance.
 
@@ -228,7 +235,7 @@ If households lack access to electricity, especially for lighting and connectivi
 
 **Dataset**: main, RA_adult
 
-**Sources**  
+**Sources**\
 1.[RBM 2.2 Outcome Indicator Guidance](https://intranet.unhcr.org/content/dam/unhcr/intranet/protection-operations/prog-hub/program-cycle/indictors/core/impact/Core%20impact%202.2%20Proportion%20of%20people%20residing%20in%20physically%20safe%20and%20secure%20settlements%20with%20access%20to%20basic%20facilities.pdf)
 
 ```{r, eval=FALSE}
@@ -253,17 +260,16 @@ table(main$electricity)
 #### Drinking water
 
 Access to clean drinking water is essential for a person's survival and well being and a precursor for achieving protection outcomes related to health, education and economic developed.
-The FDS only measure access to at least basic drinking water services which needs to fulfill the following conditions, in accordance with  [JMP WASH guidance](https://washdata.org/sites/default/files/documents/reports/2019-03/JMP-2018-core-questions-for-household-surveys.pdf).
+The FDS only measure access to at least basic drinking water services which needs to fulfill the following conditions, in accordance with [JMP WASH guidance](https://washdata.org/sites/default/files/documents/reports/2019-03/JMP-2018-core-questions-for-household-surveys.pdf).
 
-1. Improved water source.
-2. The main water source is located within the household's dwelling or yard, or it is reachable within a 30-minute round trip, including any time spent queuing.
+1.  Improved water source.
+2.  The main water source is located within the household's dwelling or yard, or it is reachable within a 30-minute round trip, including any time spent queuing.
 
-**Numerator**: Individuals using drinking water from an improved source, provided collection time is not more than 30 minutes for a round trip, including queuing. 
+**Numerator**: Individuals using drinking water from an improved source, provided collection time is not more than 30 minutes for a round trip, including queuing.
 
 **Denominator**: Total number of individuals
 
 **Dataset**: main
-
 
 ```{r, eval=FALSE}
 ##Step 1: Check all variables
@@ -337,10 +343,14 @@ table(main$Improved_dw_final)
 
 #### Habitable housing
 
-Habitable housing refers to the presence of adequate space which is defined by the minimum emergency standards. Habitable housing also refers to the fact that the housing should provide protection from cold, damp, heat, rain, wind, and other threats to health, structural hazards, and disease vectors. It should provide physical safety to its occupants. This indicator does not measure ‘adequate’ housing but focuses on whether housing is livable.
+Habitable housing refers to the presence of adequate space which is defined by the minimum emergency standards.
+Habitable housing also refers to the fact that the housing should provide protection from cold, damp, heat, rain, wind, and other threats to health, structural hazards, and disease vectors.
+It should provide physical safety to its occupants.
+This indicator does not measure ‘adequate’ housing but focuses on whether housing is livable.
 
-Overcrowded living conditions can facilitate the rapid transmission of infectious diseases due to close contact among individuals. (Smith, 2020). As a result, overcrowding may cause health issues, thus the shelter is not considered as livable.
-
+Overcrowded living conditions can facilitate the rapid transmission of infectious diseases due to close contact among individuals.
+(Smith, 2020).
+As a result, overcrowding may cause health issues, thus the shelter is not considered as livable.
 
 **Numerator**: Individuals that are living in habitable housing
 
@@ -396,7 +406,9 @@ main <- main %>%
 table(main$shelter)
 ```
 
-After computing the three basic services, we will include an assessment of whether individuals reside in physically safe and secure environments. Safe and secure settlements are those with no risks and hazards like flooding, landslides, landmines, and close proximity to military installations and hazardous zones. In FDS, we only look at the risk of flooding and landslides. 
+After computing the three basic services, we will include an assessment of whether individuals reside in physically safe and secure environments.
+Safe and secure settlements are those with no risks and hazards like flooding, landslides, landmines, and close proximity to military installations and hazardous zones.
+In FDS, we only look at the risk of flooding and landslides.
 
 ```{r, eval=FALSE}
 
@@ -424,7 +436,7 @@ main$Landslides_flooding <- apply(main[shock_columns], 1, function(row) {
 table(main$Landslides_flooding)
 ```
 
-### Final calculation of the core impact 2.2 
+### Final calculation of the core impact 2.2
 
 Combine all binary variables as below to calculate the final impact2_2.
 
@@ -459,8 +471,7 @@ FDS_PAK_2024_main <- main %>%
   )
 ```
 
-
-###Figure for RBM Core Impact 2.2 : Composite Variables 
+###Figure for RBM Core Impact 2.2 : Composite Variables
 
 ```{r, eval=FALSE}
 #Table by population groups 
@@ -469,7 +480,7 @@ FDS_PAK_2024_main <- main %>%
 ####Standard tables 
 
 
-composite_impact2_2 <- FDS_CMR_2024_main %>%
+composite_impact2_2 <- FDS_PAK_2024_main %>%
   filter(!is.na(Intro_07)) %>%
   group_by(Intro_07) %>%
   summarise(
@@ -521,8 +532,6 @@ composite_impact2_2 %>%
 
 ```
 
-
-
 ### Figure for RBM Core Impact 2.2 by Population Groups
 
 ```{r, eval=FALSE}
@@ -567,13 +576,16 @@ ggplot(RBM10202, aes(x = Intro_07, y = mean_value, fill = Intro_07)) +
 
 *Indicator Code*: RBM10203
 
-This indicator measures access to essential primary health care services for forcibly displaced and stateless people in need of health services. Health services refer to preventive, promotive, curative, rehabilitative and palliative health services.
+This indicator measures access to essential primary health care services for forcibly displaced and stateless people in need of health services.
+Health services refer to preventive, promotive, curative, rehabilitative and palliative health services.
 
-Please note that the FDS does not measure access to mental health, psycho social support, rehabilitative services, or palliative care. Additionally, the standard recall period is typically 3 months; however, in the FDS, a 30-day recall period is used. Therefore, the results below should be considered as a proxy for the 2.3 Core Impact Indicator. 
+Please note that the FDS does not measure access to mental health, psycho social support, rehabilitative services, or palliative care.
+Additionally, the standard recall period is typically 3 months; however, in the FDS, a 30-day recall period is used.
+Therefore, the results below should be considered as a proxy for the 2.3 Core Impact Indicator.
 
-| Standard Questions         |
-|:--------------------------:|
-|  H01_1, H02, H04, H06, H08 |
+|    Standard Questions     |
+|:-------------------------:|
+| H01_1, H02, H04, H06, H08 |
 
 **Unit of observation**: Individual
 
@@ -583,11 +595,11 @@ Please note that the FDS does not measure access to mental health, psycho social
 
 **Dataset**: RA_adult
 
-
-The standard survey/FDS methodology for this indicator entails asking households whether any household member needed to see health professionals in the past 30 days, their reasons for seeking consultation and whether they received the needed medical attention, and if not, reasons for not receiving this. Individuals who chose not to seek services are excluded from the calculation.
+The standard survey/FDS methodology for this indicator entails asking households whether any household member needed to see health professionals in the past 30 days, their reasons for seeking consultation and whether they received the needed medical attention, and if not, reasons for not receiving this.
+Individuals who chose not to seek services are excluded from the calculation.
 Healthcare can be delivered through a combination of community level, mobile and fixed healthcare facilities.
 
-**Sources**  
+**Sources**\
 1.[RBM 2.3 Outcome Indicator Guidance](https://intranet.unhcr.org/content/dam/unhcr/intranet/protection-operations/prog-hub/program-cycle/indictors/core/impact/Core%20impact%202.3%20Proportion%20of%20people%20with%20access%20to%20health%20services.pdf)
 
 ```{r, eval=FALSE}
@@ -636,7 +648,6 @@ RA_adult <- RA_adult %>%
                                 #),
                                 #label="Has access to health services"))
 ```
-
 
 ### Figure for RBM Core Impact 2.3 by Population Groups
 
@@ -697,7 +708,6 @@ ggplot(RBM10203, aes(x = Intro_07, y = mean_value, fill = Intro_07)) +
 
 ```
 
-
 ### Figure for RBM Core Impact 2.3 by Population Groups, Gender and Disability
 
 ```{r, eval=FALSE}
@@ -735,6 +745,7 @@ ggplot(RBM10203_AGD, aes(x = HH_02_RA, y = mean_value, fill = disability_RA)) +
     axis.text.x = element_text(angle = 45, hjust = 1)  # Rotate x-axis labels for readability
   )
 ```
+
 ## 3.2a Core Impact Indicator
 
 **3.2a Proportion of children and young people enrolled in primary education**
@@ -743,7 +754,6 @@ ggplot(RBM10203_AGD, aes(x = HH_02_RA, y = mean_value, fill = disability_RA)) +
 
 This indicator measures the number of students enrolled in primary education, regardless of age, expressed as a percentage of the official school-age population corresponding to the respective same level of education.
 This is also referred to as Gross enrollment rate (GER).
-
 
 *Definitions*:
 
@@ -757,12 +767,11 @@ This is also referred to as Gross enrollment rate (GER).
 3.  "Primary school age" depends on the education system and it varies from country to country.
     Children typically enter in primary education between age 5 and 7 and leave at the age of 10 and 12.
 
-| Standard Questions    |
+|  Standard Questions   |
 |:---------------------:|
 | HH_Educ03, HH_Educ02a |
 
-
-**Unit of observation**: Individual 
+**Unit of observation**: Individual
 
 **Numerator**: Number of students enrolled in primary education (regardless of age)
 
@@ -770,7 +779,7 @@ This is also referred to as Gross enrollment rate (GER).
 
 **Dataset**: HHroster
 
-**Sources**  
+**Sources**\
 1.[RBM 3.2.a Outcome Indicator Guidance](https://intranet.unhcr.org/content/dam/unhcr/intranet/protection-operations/prog-hub/program-cycle/indictors/core/impact/Core%20impact%203.2a%20Proportion%20of%20children%20and%20young%20people%20enrolled%20in%20primary%20education.pdf)
 
 ```{r, eval=FALSE}
@@ -786,6 +795,7 @@ HHroster <- HHroster %>%
     HH_Educ02a == 2 ~ 0
   ))
 ```
+
 ```{r, eval=FALSE}
 #Create a variable to adjust age groups for primary level 
 HHroster <- HHroster %>%
@@ -799,7 +809,6 @@ HHroster <- HHroster %>%
     )
   )
 ```
-
 
 ### Figure for RBM Core Impact 3.2A by Population Groups
 
@@ -858,10 +867,7 @@ ggplot(RBM10302A, aes(x = Intro_07, y = mean_value, fill = Intro_07)) +
 
 ```
 
-
-
 ### Figure for RBM Core Impact 3.2A by Gender, Disability and Population Groups
-
 
 ```{r, eval=FALSE}
 
@@ -912,22 +918,21 @@ ggplot(RBM10302A_AGD, aes(x = HH_02, y = mean_value, fill = disability)) +
 
 ## 3.2b Core Impact Indicator
 
-
-**3.2b Proportion of children and young people enrolled in secondary education**
-*Indicator Code*: RBM10302B
+**3.2b Proportion of children and young people enrolled in secondary education** *Indicator Code*: RBM10302B
 
 "Enrollment" refers to individuals officially registered in a secondary school education programme.
 
-"Secondary education" provides learning and educational activities building on primary education and preparing for both first labour market entry as well as further study. The common duration is 6 years and is often divided between lower and upper secondary education (corresponding respectively to ISCED 2 and 3).
+"Secondary education" provides learning and educational activities building on primary education and preparing for both first labour market entry as well as further study.
+The common duration is 6 years and is often divided between lower and upper secondary education (corresponding respectively to ISCED 2 and 3).
 
-"Secondary school age" depends on the education system and differs from country to country. Adolescents typically enter secondary education between ages 11 and 13 and leave between the ages of 17 and 19.
+"Secondary school age" depends on the education system and differs from country to country.
+Adolescents typically enter secondary education between ages 11 and 13 and leave between the ages of 17 and 19.
 
-| Standard Questions    |
+|  Standard Questions   |
 |:---------------------:|
 | HH_Educ03, HH_Educ02a |
 
-
-**Unit of observation**: Individual 
+**Unit of observation**: Individual
 
 **Numerator**: Number of students enrolled in secondary education (regardless of age)
 
@@ -935,7 +940,7 @@ ggplot(RBM10302A_AGD, aes(x = HH_02, y = mean_value, fill = disability)) +
 
 **Dataset**: HHroster
 
-**Sources**  
+**Sources**\
 1.[RBM 3.2.b Outcome Indicator Guidance](https://intranet.unhcr.org/content/dam/unhcr/intranet/protection-operations/prog-hub/program-cycle/indictors/core/impact/Core%20impact%203.2b%20Proportion%20of%20children%20and%20young%20people%20enrolled%20in%20secondary%20education.pdf)
 
 ```{r, eval=FALSE}
@@ -961,8 +966,6 @@ HHroster <- HHroster %>%
     )
   )
 ```
-
-
 
 ### Figure for RBM Core Impact 3.2B by Population Groups
 
@@ -1021,9 +1024,7 @@ ggplot(RBM10302B, aes(x = Intro_07, y = mean_value, fill = Intro_07)) +
 
 ```
 
-
 ### Figure for RBM Core Impact 3.2B by Gender, Disability and Population Groups
-
 
 ```{r, eval=FALSE}
 
@@ -1072,7 +1073,7 @@ ggplot(RBM10302B_AGD, aes(x = HH_02, y = mean_value, fill = disability)) +
 
 ## 3.3 Core Impact Indicator
 
-**3.3 Proportion of people feeling safe walking alone in their neighborhood after dark **
+**3.3 Proportion of people feeling safe walking alone in their neighborhood after dark**
 
 *Indicator Code*: RBM10303
 
@@ -1082,7 +1083,7 @@ It is linked to SDG indicator [16.1.4](https://unstats.un.org/sdgs/metadata/file
 
 | Standard Questions |
 |:------------------:|
-|       FS01         |
+|        FS01        |
 
 **Unit of observation**: Individual
 
@@ -1090,11 +1091,12 @@ It is linked to SDG indicator [16.1.4](https://unstats.un.org/sdgs/metadata/file
 
 **Denominator**: Total number of individuals
 
-The standard survey question module for this indicator is taken from SDG indicator owner UNODC. To calculate the indicator value, the standard survey methodology considers in the numerator only individuals who respond they feel “very safe” and “fairly safe”.
+The standard survey question module for this indicator is taken from SDG indicator owner UNODC.
+To calculate the indicator value, the standard survey methodology considers in the numerator only individuals who respond they feel “very safe” and “fairly safe”.
 
 **Dataset**: RA_adult
 
-**Sources**  
+**Sources**\
 1.[RBM 3.3 Outcome Indicator Guidance](https://intranet.unhcr.org/content/dam/unhcr/intranet/protection-operations/prog-hub/program-cycle/indictors/core/impact/Core%20impact%203.3%20Proportion%20of%20people%20that%20feel%20safe%20walking%20alone%20in%20their%20neighbourhood.pdf)
 
 ```{r, eval=FALSE}
@@ -1128,9 +1130,7 @@ RA_adult <- RA_adult %>%
 table(RA_adult$RBM10303)
 ```
 
-
 ### Figure for RBM Core Impact 3.3 by Population Groups
-
 
 ```{r, eval=FALSE}
 ###Table standard 
@@ -1214,8 +1214,6 @@ ggplot(RBM10303_AGD, aes(x = HH_02_RA, y = mean_value, fill = disability_RA)) +
   )
 ```
 
-
-
 ## 1.2 Core Outcome Indicator
 
 **1.2 Proportion of children under 5 years of age whose births have been registered with a civil authority**
@@ -1229,7 +1227,7 @@ The standard module for this indicator is taken from MICS and adjusted to UNHCR 
 
 | Standard Questions |
 |:------------------:|
-| HH_07a, HH_07b     |
+|   HH_07a, HH_07b   |
 
 ***Definitions***
 
@@ -1251,16 +1249,16 @@ Operations are encouraged to track both the number of birth notifications and bi
 
 **Dataset**: HHroster
 
-***Sources***  
+***Sources***\
 1.[UNICEF SDG 16.9.1 Guidance](https://data.unicef.org/wp-content/uploads/2018/04/SDG-briefing-note-15_birth-registration.pdf).
 
 2.[Core Outcome 1.2 Guidance](https://intranet.unhcr.org/content/dam/unhcr/intranet/protection-operations/prog-hub/program-cycle/indictors/core/outcome/Core%20outcome%201.2%20Proportion%20of%20children%20under%205%20years%20of%20age%20whose%20births%20have%20been%20registered%20with%20a%20civil%20authority.pdf).
-
 
 ```{r, eval=FALSE}
 table(HHroster$HH_07a) # Does [name] have a birth certificate?
 table(HHroster$HH_07b) # Has [name]’s birth been registered with the [civil authorities]?
 ```
+
 ```{r, eval=FALSE}
 # Step 1:Identify children who have a birth certificate
 HHroster <- HHroster %>%
@@ -1419,15 +1417,21 @@ This indicator measures the proportion of people who possess legally recognized 
 
 ***Definitions***
 
-*An identity document* is any document or credential which is legally recognized as proof of identity, which may also establish the individual’s nationality or legal status and associated rights vis-à-vis the host State and/or UNHCR. This may include documents issued by the country of asylum, country of origin, or UNHCR. An identity document or credential is “legally recognized” if national law provides that it establishes legal identity.
+*An identity document* is any document or credential which is legally recognized as proof of identity, which may also establish the individual’s nationality or legal status and associated rights vis-à-vis the host State and/or UNHCR.
+This may include documents issued by the country of asylum, country of origin, or UNHCR.
+An identity document or credential is “legally recognized” if national law provides that it establishes legal identity.
 
-*An identity credential* is a document, object, or data structure that vouches for the identity of a person through some method of trust and authentication. Common types of identity credentials include, but are not limited to, identity cards, certificates or unique identity numbers. A biometric identifier can also be used as a credential if it has been registered with the identity system.
+*An identity credential* is a document, object, or data structure that vouches for the identity of a person through some method of trust and authentication.
+Common types of identity credentials include, but are not limited to, identity cards, certificates or unique identity numbers.
+A biometric identifier can also be used as a credential if it has been registered with the identity system.
 
-| Standard Questions                                                                                                                              |
-|:-----------------------------------------------------------------------------------------------------------------------------------------------:|
-| ID_09, ID_13, Legal_birth_certificate, Legal_ID_card, Legal_passport, Legal_residency, Legal_work_permit, Legal_socsec_card, Legal_marriage_cert|
+| Standard Questions |
+|:----------------------------------------------------------------------:|
+| ID_09, ID_13, Legal_birth_certificate, Legal_ID_card, Legal_passport, Legal_residency, Legal_work_permit, Legal_socsec_card, Legal_marriage_cert |
 
-*Note that the availability of the above standard questions will differ from FDS country to country. Ensure to check your data set and identify which variables are present. Moreover, ensure to check the response options of variables ID_09 and ID_13 to determine which response options are considerd as valid identity documents or credentials are recognized by the host state and/or UNHCR. 
+\*Note that the availability of the above standard questions will differ from FDS country to country.
+Ensure to check your data set and identify which variables are present.
+Moreover, ensure to check the response options of variables ID_09 and ID_13 to determine which response options are considerd as valid identity documents or credentials are recognized by the host state and/or UNHCR.
 
 **Unit of observation:** Individual
 
@@ -1437,7 +1441,7 @@ This indicator measures the proportion of people who possess legally recognized 
 
 **Dataset**: HHroster
 
-***Sources***  
+***Sources***\
 1.[Core Outcome 1.3 Guidance](https://intranet.unhcr.org/content/dam/unhcr/intranet/protection-operations/prog-hub/program-cycle/indictors/core/outcome/Core%20outcome%201.3%20Proportion%20of%20people%20with%20legally%20recognized%20identity%20documents%20or%20credentials.pdf).
 
 ```{r, eval=FALSE}
@@ -1462,6 +1466,7 @@ HHroster <- HHroster %>%
     TRUE ~ NA))
   
 ```
+
 ```{r, eval=FALSE}
 HHroster <- HHroster %>% 
   mutate(RBM20103 = labelled(RBM20103,
@@ -1471,11 +1476,10 @@ HHroster <- HHroster %>%
                                ),
                                label = "Proportion of people with legally recognized identity documents or credentials"))
 ```
+
 ```{r, eval=FALSE}
 table(HHroster$RBM20103)
 ```
-
-
 
 ### Figure for RBM Core Outcome 1.3 by Population Groups
 
@@ -1524,11 +1528,7 @@ ggplot(RBM20103, aes(x = Intro_07, y = mean_value, fill = Intro_07)) +
 
 ```
 
-
-
-
 ### Figure for RBM Core Outcome 1.3 by Gender, Disability and Population Groups
-
 
 ```{r, eval=FALSE}
 
@@ -1573,8 +1573,6 @@ ggplot(RBM20103_AGD, aes(x = HH_02, y = mean_value, fill=HH_04_cat4)) +
 
 ```
 
-
-
 ## 4.1 Core Outcome Indicator
 
 **4.1 Proportion of people who know where to access available GBV service**
@@ -1583,7 +1581,7 @@ ggplot(RBM20103_AGD, aes(x = HH_02, y = mean_value, fill=HH_04_cat4)) +
 
 The indicator is defined as the proportion of people who know where to access at least one of the two available lifesaving gender-based violence services (health and psycho social) in the aftermath of a GBV incident.
 
-The indicator survey question collects information on knowledge of four GBV response services, but  the calculation itself focuses only on knowledge of two lifesaving GBV services that should be immediately set up at the onset of an emergency, health and psycho social services. 
+The indicator survey question collects information on knowledge of four GBV response services, but the calculation itself focuses only on knowledge of two lifesaving GBV services that should be immediately set up at the onset of an emergency, health and psycho social services.
 
 This is linked to the Inter-Agency Minimum Standards for Gender-Based Violence in Emergencies Programming.
 
@@ -1597,15 +1595,15 @@ The response options will appear as below when the standardized module is used.
 
 3.  **AS01_3a** (Safety service as safe shelters): "Options for safety and protection for survivors and their families who are at risk of further violence and who wish to be protected.
 
-4.  **AS01_3b** (Security services): "Options for safety and protection for survivors and their families who are at risk of further violence and who wish to be protected, such as police. 
+4.  **AS01_3b** (Security services): "Options for safety and protection for survivors and their families who are at risk of further violence and who wish to be protected, such as police.
 
 5.  **AS01_4** (Legal assistance): "Legal actors will clearly and honestly inform the victim/survivor of the procedures, limitations, pros, and cons of all existing legal options".
 
-6. **AS01_5** (Any other service)
+6.  **AS01_5** (Any other service)
 
 | Standard Questions |
 |:------------------:|
-|       AS01         |
+|        AS01        |
 
 **Unit of measurement**: Individual
 
@@ -1617,10 +1615,11 @@ The response options will appear as below when the standardized module is used.
 
 To calculate the indicator value, the standard methodology considers in the numerator only individuals who self-report knowledge of at least one of the two lifesaving GBV services (Health or Psycho social/Case Management services).
 
-**Sources**  
-1. [Inter-Agency Minimum Standards for Gender-Based Violence in Emergencies Programming](https://www.unfpa.org/minimum-standards)
+**Sources**\
+1.
+[Inter-Agency Minimum Standards for Gender-Based Violence in Emergencies Programming](https://www.unfpa.org/minimum-standards)
 
-2. [RBM Core Outcome Indicator 4.1 Guidance](https://intranet.unhcr.org/content/dam/unhcr/intranet/protection-operations/prog-hub/program-cycle/indictors/core/outcome/Core%20outcome%204.1%20Proportion%20of%20people%20who%20know%20where%20to%20access%20available%20GBV%20services.pdf)
+2.  [RBM Core Outcome Indicator 4.1 Guidance](https://intranet.unhcr.org/content/dam/unhcr/intranet/protection-operations/prog-hub/program-cycle/indictors/core/outcome/Core%20outcome%204.1%20Proportion%20of%20people%20who%20know%20where%20to%20access%20available%20GBV%20services.pdf)
 
 ```{r, eval=FALSE}
 
@@ -1637,15 +1636,13 @@ RA_adult <- RA_adult %>%
                                ),
                                label = "Proportion of people who know where to access available GBV service"))
 ```
+
 ```{r, eval=FALSE}
 table(RA_adult$RBM20401)
 
 ```
 
-
-
 ### Figure for RBM Core Impact 4.1 by Population Groups
-
 
 ```{r, eval=FALSE}
 ###Table standard 
@@ -1692,8 +1689,6 @@ ggplot(RBM20401, aes(x = Intro_07, y = mean_value, fill = Intro_07)) +
     axis.text.x = element_text(angle = 45, hjust = 1)  # Rotate x-axis labels for better readability
   )
 ```
-
-
 
 ### Figure for RBM Core Impact 4.1 by Population Groups, Gender and Disability
 
@@ -1746,11 +1741,12 @@ Due to its sensitivity, this module is only recommended for face-to-face surveys
 *Data Collection Safeguards*
 
 Enumerators (and data collection teams) must be trained on GBV safe disclosures and referrals prior to undertaking household surveys (or at least get a briefing on the GBV referral pathway in their area).
-To ensure quality feedback and limit risks of harm, it is advisable to administer the survey to members of the household separately in confidential spaces (consider using interview rooms at community centers in settings where layout of communities' homes do not allow for confidential discussions). It is also recommended to ensure same-sex enumerators to minimize risks of SEA particularly for female respondents.
+To ensure quality feedback and limit risks of harm, it is advisable to administer the survey to members of the household separately in confidential spaces (consider using interview rooms at community centers in settings where layout of communities' homes do not allow for confidential discussions).
+It is also recommended to ensure same-sex enumerators to minimize risks of SEA particularly for female respondents.
 
 | Standard Questions |
 |:------------------:|
-|       VW01        |
+|        VW01        |
 
 **Unit of measurement**: Individual
 
@@ -1760,23 +1756,24 @@ To ensure quality feedback and limit risks of harm, it is advisable to administe
 
 **Dataset**: RA_adult
 
-To calculate the indicator value, the standard methodology considers in the numerator only individuals who respond ‘no’ to all standard questions, i.e., believe that a husband is not justified in hitting or beating his wife for any of the listed reasons. 
+To calculate the indicator value, the standard methodology considers in the numerator only individuals who respond ‘no’ to all standard questions, i.e., believe that a husband is not justified in hitting or beating his wife for any of the listed reasons.
 
-Based on the country context, some of the questions might not be included. Check your data set to identify which standard questions are included in your FDS questionnaire. 
+Based on the country context, some of the questions might not be included.
+Check your data set to identify which standard questions are included in your FDS questionnaire.
 
-1. **VW01_1** - If she goes out without telling him?  
-2. **VW01_2** - If she does not take care of the children properly?  
-3. **VW01_4** - If she argues with him?
-4. **VW01_5** - If she refuses to have sex with him?
-5. **VW01_6** - If she burns the food?
-6. **VW01_7** - If she spends too much money?
-7. **VW01_8** - Is a husband justified in hitting or beating his wife if she disobeys her husband?
-8. **VW01_10** - If she is unfaithful?
-9. **VW01_11** - Is a husband justified in hitting or beating his wife if she disrespects him?
+1.  **VW01_1** - If she goes out without telling him?\
+2.  **VW01_2** - If she does not take care of the children properly?\
+3.  **VW01_4** - If she argues with him?
+4.  **VW01_5** - If she refuses to have sex with him?
+5.  **VW01_6** - If she burns the food?
+6.  **VW01_7** - If she spends too much money?
+7.  **VW01_8** - Is a husband justified in hitting or beating his wife if she disobeys her husband?
+8.  **VW01_10** - If she is unfaithful?
+9.  **VW01_11** - Is a husband justified in hitting or beating his wife if she disrespects him?
 10. **VW01_12** - If she disrespects her in-laws?
 11. **VW01_13** - Is a husband justified in hitting or beating his wife if she neglects household chores?
 
-**Sources**  
+**Sources**\
 1.[RBM Core Outcome Indicator 4.2 Guidance](https://intranet.unhcr.org/content/dam/unhcr/intranet/protection-operations/prog-hub/program-cycle/indictors/core/outcome/Core%20outcome%204.2%20Proportion%20of%20people%20who%20do%20not%20accept%20violence%20against%20women.pdf)
 
 ```{r, eval=FALSE}
@@ -1809,9 +1806,6 @@ RA_adult <- RA_adult %>%
 
 table(RA_adult$RBM20402)
 ```
-
-
-
 
 ### Figure for RBM Core Impact 4.2 by Population Groups
 
@@ -1861,9 +1855,6 @@ ggplot(RBM20402, aes(x = Intro_07, y = mean_value, fill = Intro_07)) +
   )
 ```
 
-
-
-
 ### Figure for RBM Core Impact 4.2 by Population Groups, Gender and Disability
 
 ```{r, eval=FALSE}
@@ -1912,10 +1903,9 @@ This is also linked to SGD indicator [7.1.2](https://sdg-tracker.org/energy) .
 
 The standard questions are similar to MICS and the calculation of indicators are based on [UNICEF MICS](https://mics.unicef.org/files?job=W1siZiIsIjIwMTcvMDIvMDMvMTYvMjcvMjUvNTk5L1BpY3RvcmlhbHNfV0hPX0hvdXNlaG9sZF9FbmVyZ3lfVXNlX0NhdGFsb2d1ZV9TZXB0ZW1iZXJfMjAxNl8ucGRmIl1d&sha=57b4a452fcc0ac88) and [WHO](https://www.who.int/data/gho/indicator-metadata-registry/imr-details/5662) guidance on the calculation of the same SGD indicator.
 
-| Standard Questions   |
-|:--------------------:|
-|   HC01, HC02, HC04   |
-
+| Standard Questions |
+|:------------------:|
+|  HC01, HC02, HC04  |
 
 **Unit of observation**: Household
 
@@ -1927,14 +1917,14 @@ The standard questions are similar to MICS and the calculation of indicators are
 
 To calculate the indicator value, the standard survey methodology considers in the numerator only individuals in households that use one of the following most of the time as their source for cooking are considered in the numerator:
 
-  + solar cooker
-  + electric stove
-  + piped natural gas stove
-  + biogas stove
-  + LPG/cooking gas stove
-  + liquid fuel stove with alcohol / ethanol.
-  
-**Sources**  
+-   solar cooker
+-   electric stove
+-   piped natural gas stove
+-   biogas stove
+-   LPG/cooking gas stove
+-   liquid fuel stove with alcohol / ethanol.
+
+**Sources**\
 1.[RBM Core Outcome Indicator 8.2 Guidance](https://intranet.unhcr.org/content/dam/unhcr/intranet/protection-operations/prog-hub/program-cycle/indictors/core/outcome/Core%20outcome%208.2%20Proportion%20of%20people%20with%20primary%20reliance%20on%20clean%20(cooking)%20fuels%20and%20technology.pdf)
 
 ```{r, eval=FALSE}
@@ -2014,23 +2004,24 @@ ggplot(RBM20802, aes(x = Intro_07, y = mean_value, fill = Intro_07)) +
 
 ```
 
-
 ## 9.1 Core Outcome Indicator
 
 **9.1 Proportion of people living in habitable and affordable housing**
 
 *Indicator Code*:RBM20901
 
-This indicator measures the proportion of people living in habitable and affordable housing. 
+This indicator measures the proportion of people living in habitable and affordable housing.
 
 **In FDS, we are only able to measure the aspect of habitable housing.**
 
-**Habitable housing** refers to the presence of adequate space which is defined by the minimum emergency standards. Habitable housing also refers to the fact that the housing should provide protection from cold, damp, heat, rain, wind, and other threats to health, structural hazards, and disease vectors. It should provide physical safety to its occupants. This indicator does not measure ‘adequate’ housing but focuses on whether housing is livable.
+**Habitable housing** refers to the presence of adequate space which is defined by the minimum emergency standards.
+Habitable housing also refers to the fact that the housing should provide protection from cold, damp, heat, rain, wind, and other threats to health, structural hazards, and disease vectors.
+It should provide physical safety to its occupants.
+This indicator does not measure ‘adequate’ housing but focuses on whether housing is livable.
 
-
-|    Standard Questions                       |
-|:-------------------------------------------:|
-| HH04, HH05, HH10,HH08,HH09, HH11,HH14       |
+|          Standard Questions           |
+|:-------------------------------------:|
+| HH04, HH05, HH10,HH08,HH09, HH11,HH14 |
 
 **Unit of observation**: Household
 
@@ -2040,11 +2031,10 @@ This indicator measures the proportion of people living in habitable and afforda
 
 **Dataset**: main
 
-To calculate the indicator value, the standard survey methodology considers in the numerator only individuals in households with habitable housing, which is not overcrowded. 
+To calculate the indicator value, the standard survey methodology considers in the numerator only individuals in households with habitable housing, which is not overcrowded.
 
-**Sources**  
+**Sources**\
 1.[RBM Core Outcome Indicator 9.1 Guidance](https://intranet.unhcr.org/content/dam/unhcr/intranet/protection-operations/prog-hub/program-cycle/indictors/core/outcome/Core%20outcome%209.1%20Proportion%20of%20people%20living%20in%20habitable%20and%20affordable%20housing.pdf)
-
 
 ```{r, eval=FALSE}
 #The below script is the same as the script for the "shelter" aspect of RBM Impact 2.2. 
@@ -2064,6 +2054,7 @@ table(main$crowding_cat) ## Crowding category - overcrowded when more than 3 per
 
 
 ```
+
 ```{r, eval=FALSE}
 ##Step 2: Classify 96 responses as NAs
 
@@ -2107,7 +2098,7 @@ main <- main %>%
 
 table(main$RBM20901)
 ```
-  
+
 ### Figure for RBM Core Outcome 9.1 by Population Groups
 
 ```{r, eval=FALSE}
@@ -2156,7 +2147,7 @@ ggplot(RBM20901, aes(x = Intro_07, y = mean_value, fill = Intro_07)) +
 
 
 ```
-  
+
 ## 9.2 Core Outcome Indicator
 
 **9.2 Proportion of people that have energy to ensure lighting**
@@ -2164,14 +2155,15 @@ ggplot(RBM20901, aes(x = Intro_07, y = mean_value, fill = Intro_07)) +
 *Indicator Code*:RBM20902
 
 This indicator measures the proportion of forcibly displaced and stateless people who primarily rely on clean fuels for lighting.
-Clean fuels for lighting include using lighting devices connected to electricity (on/off grid, including solar panels), lighting devices using renewable energy (solar-powered lantern or flashlights), lighting devices using fuels considered clean for health such as biogas/LPG lamps and battery powered/rechargeable flashlights/lantern. It excludes the usage of polluting fuels such as oil, kerosene and gasoline and insufficient sources of lighting such as candles and open fires.
+Clean fuels for lighting include using lighting devices connected to electricity (on/off grid, including solar panels), lighting devices using renewable energy (solar-powered lantern or flashlights), lighting devices using fuels considered clean for health such as biogas/LPG lamps and battery powered/rechargeable flashlights/lantern.
+It excludes the usage of polluting fuels such as oil, kerosene and gasoline and insufficient sources of lighting such as candles and open fires.
 
 The indicator for lighting is constructed from the essential questions *HL01* and *HL03* which captures the most used light source.
 [LSMS Guidebook](https://documents1.worldbank.org/curated/en/557341633679857128/pdf/Measuring-Energy-Access-A-Guide-to-Collecting-Data-Using-the-Core-Questions-on-Household-Energy-Use.pdf) is the main source for measuring energy access as defined for SGD 7.1.12.
 
 | Standard Questions |
 |:------------------:|
-| HL01, HL03         |
+|     HL01, HL03     |
 
 **Unit of observation**: Household
 
@@ -2183,15 +2175,15 @@ The indicator for lighting is constructed from the essential questions *HL01* an
 
 To calculate the indicator value, the standard survey methodology considers in the numerator only individuals in households that use one of the following as light source most of the time:
 
-  + electricity (including solar panels)
-  + solar home systems
-  + solar-powered lantern or flashlight
-  + rechargeable flashlight, mobile, torch or lantern
-  + battery powered flashlight, torch or lantern
-  + biogas lamp
-  + LPG lamp.
-  
-**Sources**  
+-   electricity (including solar panels)
+-   solar home systems
+-   solar-powered lantern or flashlight
+-   rechargeable flashlight, mobile, torch or lantern
+-   battery powered flashlight, torch or lantern
+-   biogas lamp
+-   LPG lamp.
+
+**Sources**\
 1.[RBM 9.2 Outcome Indicator Guidance](https://intranet.unhcr.org/content/dam/unhcr/intranet/protection-operations/prog-hub/program-cycle/indictors/core/outcome/Core%20outcome%209.2%20Proportion%20of%20people%20that%20have%20energy%20to%20ensure%20lighting.pdf)
 
 ```{r, eval=FALSE}
@@ -2211,8 +2203,6 @@ main <- main %>%
                                label = "Proportion of people that have energy to ensure lighting"
   ))
 ```
-
-
 
 ### Figure for RBM Core Outcome 9.2 by Population Groups
 
@@ -2263,7 +2253,6 @@ ggplot(RBM20902, aes(x = Intro_07, y = mean_value, fill = Intro_07)) +
 
 ```
 
-
 ## 10.1 Core Outcome Indicator
 
 **10.1 Proportion of children aged 9 months to five years who have received measles vaccination**
@@ -2278,7 +2267,7 @@ The calculation of this module is also aligned with UNICEF MICS6.
 
 | Standard Questions |
 |:------------------:|
-|    MV1, MV3        |
+|      MV1, MV3      |
 
 **Unit of observation**: Individual
 
@@ -2288,11 +2277,14 @@ The calculation of this module is also aligned with UNICEF MICS6.
 
 **Dataset**: RA_caregiver
 
-The standard survey methodology for this indicator is based on UNICEF MICS6, children under 5 module. It considers only children aged 9 months to 5 years in the numerator who have received at least one dose of a measles containing vaccine.
-Where administrative data are used, the number of individuals in the target group that have received measles containing vaccine is the numerator. Since the first dose of measles is usually administrated during the first year of life, the numerator may include only children under 1. The denominator will then be surviving infants (under one year).
+The standard survey methodology for this indicator is based on UNICEF MICS6, children under 5 module.
+It considers only children aged 9 months to 5 years in the numerator who have received at least one dose of a measles containing vaccine.
+Where administrative data are used, the number of individuals in the target group that have received measles containing vaccine is the numerator.
+Since the first dose of measles is usually administrated during the first year of life, the numerator may include only children under 1.
+The denominator will then be surviving infants (under one year).
 In that case the coverage may be a proxy indicator for children 9 months to 5 years.
 
-**Other sources**  
+**Other sources**\
 1.[RBM 10.1 Outcome Indicator Guidance](https://intranet.unhcr.org/content/dam/unhcr/intranet/protection-operations/prog-hub/program-cycle/indictors/core/outcome/Core%20outcome%2010.1%20Proportion%20of%20children%20aged%209%20months%20to%20five%20years%20who%20have%20received%20measles%20vaccination.pdf)
 
 ```{r, eval=FALSE}
@@ -2300,6 +2292,7 @@ table(RA_caregiver$MV2) #Has the child ever received a measles containing vaccin
 table(RA_caregiver$MV3) #How many times did the child receive the measles or MMR/MR vaccine vaccine?
 summary(RA_caregiver$child_age_immunization) #Age of the child 
 ```
+
 ```{r, eval=FALSE}
 RA_caregiver <- RA_caregiver %>%
   mutate(
@@ -2320,7 +2313,6 @@ mutate(RBM21001 = labelled(RBM21001,
                                  label = "Proportion of children aged 9 months to five years who have received measles vaccination*"))
 
 ```
-
 
 ### Figure for RBM Core Outcome 10.1 by Population Groups
 
@@ -2416,9 +2408,6 @@ ggplot(RBM21001_AGD, aes(x = HH_02_RC, y = mean_value, fill = HH_02_RC)) +  # Fi
 
 ```
 
-
-
-
 ## 10.2 Core Outcome Indicator
 
 **10.2 Proportion of births attended by skilled health personnel**
@@ -2433,11 +2422,9 @@ These surveys include Demographic and Health Surveys (DHS), Multiple Indicator C
 Standard module is from [UNICEF MICS6](https://mics.unicef.org/tools#survey-design) individual questionnaire for woman.
 The calculation of this module is also aligned with UNICEF MICS6.
 
-
-
 | Standard Questions |
 |:------------------:|
-|    BA10            |
+|        BA10        |
 
 **Unit of observation**: Individual
 
@@ -2447,16 +2434,18 @@ The calculation of this module is also aligned with UNICEF MICS6.
 
 **Dataset**: RA_woman
 
-The standard survey methodology for this indicator is based on UNICEF MICS6, individual questionnaire for women. To calculate the indicator, value, the standard survey methodology considers in the numerator only women aged 15-49 who had a live birth in the past two years and where birth was assisted by skilled health professionals: doctors, nurses or midwives.
+The standard survey methodology for this indicator is based on UNICEF MICS6, individual questionnaire for women.
+To calculate the indicator, value, the standard survey methodology considers in the numerator only women aged 15-49 who had a live birth in the past two years and where birth was assisted by skilled health professionals: doctors, nurses or midwives.
 Where routine administrative data is used instead of surveys, the denominator
 
-**Sources**  
+**Sources**\
 1.[RBM 10.2 Outcome Indicator Guidance](https://intranet.unhcr.org/content/dam/unhcr/intranet/protection-operations/prog-hub/program-cycle/indictors/core/outcome/Core%20outcome%2010.2%20Proportion%20of%20births%20attended%20by%20skilled%20health%20personnel.pdf)
 
 ```{r, eval=FALSE}
 table(RA_woman$BA10) #Who assisted you with the delivery?
 
 ```
+
 ```{r, eval=FALSE}
 RA_woman <- RA_woman %>%
   mutate(
@@ -2478,7 +2467,6 @@ mutate(RBM21002 = labelled(RBM21002,
                                 label = "Proportion of births attended by skilled health personnel"
   ))
 ```
-
 
 ### Figure for RBM Core Outcome 10.2 by Population Groups
 
@@ -2536,9 +2524,10 @@ ggplot(RBM21002, aes(x = Intro_07, y = mean_value, fill = Intro_07)) +
 
 *Indicator Code*:RBM21201
 
-This indicator is defined as the percentage of people using at least basic water services. Basic drinking water services is defined as drinking water from an improved source, provided collection time is not more than 30 minutes for a round trip, including queuing. 
+This indicator is defined as the percentage of people using at least basic water services.
+Basic drinking water services is defined as drinking water from an improved source, provided collection time is not more than 30 minutes for a round trip, including queuing.
 
-| Standard Questions                |
+|        Standard Questions         |
 |:---------------------------------:|
 | BD01, BD01a, BD20_2, BD20_3, BD22 |
 
@@ -2550,11 +2539,11 @@ This indicator is defined as the percentage of people using at least basic water
 
 **Dataset**: main
 
-To calculate the indicator value, the standard survey methodology considers for the numerator only people using improved sources of drinking water either in their dwelling/yard/plot or within 30  minutes round trip collection time.
+To calculate the indicator value, the standard survey methodology considers for the numerator only people using improved sources of drinking water either in their dwelling/yard/plot or within 30 minutes round trip collection time.
 
-The FDS only measure access to at least basic drinking water services which needs to fulfill the following conditions, in accordance with  [JMP WASH guidance](https://washdata.org/sites/default/files/documents/reports/2019-03/JMP-2018-core-questions-for-household-surveys.pdf).
+The FDS only measure access to at least basic drinking water services which needs to fulfill the following conditions, in accordance with [JMP WASH guidance](https://washdata.org/sites/default/files/documents/reports/2019-03/JMP-2018-core-questions-for-household-surveys.pdf).
 
-**Sources**  
+**Sources**\
 1.[RBM 12.1 Outcome Indicator Guidance](https://intranet.unhcr.org/content/dam/unhcr/intranet/protection-operations/prog-hub/program-cycle/indictors/core/outcome/Core%20outcome%2012.1%20Proportion%20of%20people%20using%20at%20least%20basic%20drinking%20water%20services.pdf)
 
 ```{r, eval=FALSE}
@@ -2628,8 +2617,8 @@ main <- main %>%
 table(main$RBM21201)
 
 ```
-### Figure for RBM Core Outcome 12.1 by Population Groups
 
+### Figure for RBM Core Outcome 12.1 by Population Groups
 
 ```{r, eval=FALSE}
 
@@ -2685,23 +2674,25 @@ ggplot(RBM21201, aes(x = Intro_07, y = mean_value, fill = Intro_07)) +
 
 *Indicator Code*:RBM21202
 
-This indicator measures the proportion of people with access to at least basic sanitation services. Basic sanitation services are defined as improved facilities (toilets) that are not shared with other households. 
+This indicator measures the proportion of people with access to at least basic sanitation services.
+Basic sanitation services are defined as improved facilities (toilets) that are not shared with other households.
 
-As this indicator measures 'at least basic sanitation services' as defined by the JMP sanitation ladder it includes also safely managed sanitation services which are defined as the use of hygienic toilet facilities that are not shared with other households and where excreta are either separated from human contact and safely disposed of in situ or transported and treated off-site, thereby protecting people and the environment from disease agents. Safely disposed in situ when pit latrines and septic tanks are not emptied, the excreta may still remain isolated from human contact and can reconsidered safely managed.
+As this indicator measures 'at least basic sanitation services' as defined by the JMP sanitation ladder it includes also safely managed sanitation services which are defined as the use of hygienic toilet facilities that are not shared with other households and where excreta are either separated from human contact and safely disposed of in situ or transported and treated off-site, thereby protecting people and the environment from disease agents.
+Safely disposed in situ when pit latrines and septic tanks are not emptied, the excreta may still remain isolated from human contact and can reconsidered safely managed.
 
-| Standard Questions           |
-|:----------------------------:|
-| SAN01, SAN02, SAN03, SAN05   |
+|     Standard Questions     |
+|:--------------------------:|
+| SAN01, SAN02, SAN03, SAN05 |
 
 **Unit of observation**: Household
 
-**Numerator**:  Number of individuals with access to sanitation facility at their household
+**Numerator**: Number of individuals with access to sanitation facility at their household
 
 **Denominator**: Total number of individuals
 
 **Dataset**: main
 
-**Sources**  
+**Sources**\
 1.[RBM 12.2 Outcome Indicator Guidance](https://intranet.unhcr.org/content/dam/unhcr/intranet/protection-operations/prog-hub/program-cycle/indictors/core/outcome/Core%20outcome%2012.2%20Proportion%20of%20people%20with%20access%20to%20a%20safe%20household%20toilet.pdf)
 
 ```{r, eval=FALSE}
@@ -2710,6 +2701,7 @@ table(main$SAN02) #To the best of your knowledge, has this toilet ever been empt
 table(main$SAN03) #The last time it was emptied, where were the contents emptied to?
 table(main$SAN05) #Do you share this toilet facility with others who are not members of your household?
 ```
+
 ```{r, eval=FALSE}
 #Step 1: Create a variable to check if the household uses an improved or unimproved sanitation facility 
 main <- main %>%
@@ -2719,6 +2711,7 @@ main <- main %>%
     TRUE ~ NA_real_ 
     ))# Missing or invalid
 ```
+
 ```{r, eval=FALSE}
 #Step 2: Create a variable to check if the contents of the toilet are safely disposed
 main <- main %>%
@@ -2729,6 +2722,7 @@ main <- main %>%
     SAN02 == 98 ~ 0,  # Unavailable information
     TRUE ~ NA_real_ )) # Missing or invalid
 ```
+
 ```{r, eval=FALSE}
 #Step 3: Create a variable to check if the household shares the toilet facility with other households 
 main <- main %>%
@@ -2739,6 +2733,7 @@ main <- main %>%
   ))
 
 ```
+
 ```{r, eval=FALSE}
 #Step 4: Combine all three conditions
 main <- main %>%
@@ -2758,7 +2753,6 @@ table(main$RBM21202)
 ```
 
 ### Figure for RBM Core Outcome 12.2 by Population Groups
-
 
 ```{r, eval=FALSE}
 
@@ -2807,7 +2801,6 @@ ggplot(RBM21202, aes(x = Intro_07, y = mean_value, fill = Intro_07)) +
 
 ```
 
-
 ## 13.1 Core Outcome Indicator
 
 **13.1 Proportion of people with an account at a bank or other financial institution or with a mobile-money provider**
@@ -2815,22 +2808,23 @@ ggplot(RBM21202, aes(x = Intro_07, y = mean_value, fill = Intro_07)) +
 *Indicator Code*:RBM21301
 
 This indicator measures the percentage of people (age 18+) who report having an account (by themselves or together with someone else) at a bank or another type of financial institution or personally using a mobile money service in the past 12 months in the country of asylum or habitual residence (for returnees, countries of origin are included).
-Personal mobile and bank accounts are defined as accounts that are fully owned by the person, where they can transact freely as per the country’s rules and regulations. UNHCR or any other third party does not have access to the account details (such as movements on the account) and cannot withdraw money.
-Note that in standard FDS methodology, we measure the percentage of people (age 15+). 
+Personal mobile and bank accounts are defined as accounts that are fully owned by the person, where they can transact freely as per the country’s rules and regulations.
+UNHCR or any other third party does not have access to the account details (such as movements on the account) and cannot withdraw money.
+Note that in standard FDS methodology, we measure the percentage of people (age 15+).
 
-| Standard Questions           |
-|:----------------------------:|
-| FI01, FI02, FI03, FI10       |
+|   Standard Questions   |
+|:----------------------:|
+| FI01, FI02, FI03, FI10 |
 
-**Unit of observation*: Individual
+\*\*Unit of observation\*: Individual
 
-**Numerator**: Number of individuals above 18 (above 15 in FDS) having a personal mobile or bank account 
+**Numerator**: Number of individuals above 18 (above 15 in FDS) having a personal mobile or bank account
 
 **Denominator**: Total number of individuals above 18 (above 15 in FDS)
 
 **Dataset**: RA_adult
 
-**Sources**  
+**Sources**\
 1.[RBM 13.1 Outcome Indicator Guidance](https://intranet.unhcr.org/content/dam/unhcr/intranet/protection-operations/prog-hub/program-cycle/indictors/core/outcome/Core%20outcome%213.1.%20Proportion%20of%20people%20with%20an%20account%20at%20a%20bank%20or%20other%20financial%20institution%20or%20mobile%20money.pdf)
 
 ```{r, eval=FALSE}
@@ -2850,6 +2844,7 @@ RA_adult <- RA_adult %>%
   ))
 
 ```
+
 ```{r, eval=FALSE}
 RA_adult <- RA_adult %>%
    mutate(RBM21301 = labelled(RBM21301,
@@ -2862,7 +2857,6 @@ RA_adult <- RA_adult %>%
 
 table(RA_adult$RBM21301)
 ```
-
 
 ### Figure for RBM Core Impact 13.1 by Population Groups
 
@@ -2910,8 +2904,6 @@ ggplot(RBM21301, aes(x = Intro_07, y = mean_value, fill = Intro_07)) +
   )
 ```
 
-
-
 ### Figure for RBM Core Impact 13.1 by Population Groups, Gender and Disability
 
 ```{r, eval=FALSE}
@@ -2948,17 +2940,21 @@ ggplot(RBM21301_AGD, aes(x = HH_02_RA, y = mean_value, fill = disability_RA)) +
   )
 ```
 
-## 13.2 Core Outcome Indicator 
+## 13.2 Core Outcome Indicator
 
 **13.2 Proportion of people who self-report positive changes in their income compared to the previous year**
 
 *Indicator Code*:RBM21302
 
-This indicator measures the proportion of forcibly displaced and stateless people who self-report positive changes in their income compared to the previous year. It aims to track changes in income levels compared to the previous year. According to FAO and ILO, income is defined as the value of resources flowing towards the household from their engagement in wage- or self-employment comprising of both income in money (profits, wage, interest, social benefits etc.) and in kind (goods and services). It is equal to the value of goods and services produced by the wage- or self-employed, net of operating expenses (such as salaries paid, raw materials used, depreciation of machines and instruments and taxes paid), plus any salary received and social security benefits (net of contributions).Income also includes benefits received by employed persons who are no longer in employment, such as unemployment benefits, pensions, invalidity benefits. As with income related to paid employment, all these social benefits will be part of income from employment only insofar as workers received them as a result of their participation in work activities.’ (ILO)The indicator includes income from self-employment and/or wage-employment in both agricultural and non-agricultural activities.
+This indicator measures the proportion of forcibly displaced and stateless people who self-report positive changes in their income compared to the previous year.
+It aims to track changes in income levels compared to the previous year.
+According to FAO and ILO, income is defined as the value of resources flowing towards the household from their engagement in wage- or self-employment comprising of both income in money (profits, wage, interest, social benefits etc.) and in kind (goods and services).
+It is equal to the value of goods and services produced by the wage- or self-employed, net of operating expenses (such as salaries paid, raw materials used, depreciation of machines and instruments and taxes paid), plus any salary received and social security benefits (net of contributions).Income also includes benefits received by employed persons who are no longer in employment, such as unemployment benefits, pensions, invalidity benefits.
+As with income related to paid employment, all these social benefits will be part of income from employment only insofar as workers received them as a result of their participation in work activities.’ (ILO)The indicator includes income from self-employment and/or wage-employment in both agricultural and non-agricultural activities.
 
-| Standard Questions  |
-|:-------------------:|
-| CH01b, CH02b        |
+| Standard Questions |
+|:------------------:|
+|    CH01b, CH02b    |
 
 **Unit of observation:** Household
 
@@ -2968,9 +2964,10 @@ This indicator measures the proportion of forcibly displaced and stateless peopl
 
 **Dataset**: main
 
-Note that the working age population is to be defined by each country context in line with legal definitions, this could be those aged between 18 and 65. To calculate the indicator value, the standard survey methodology considers for the numerator only individuals who state their income increased and who can also afford more goods and services, or those whose income remained the same or decreased but who can still afford more goods and services (to account for possible inflation).
+Note that the working age population is to be defined by each country context in line with legal definitions, this could be those aged between 18 and 65.
+To calculate the indicator value, the standard survey methodology considers for the numerator only individuals who state their income increased and who can also afford more goods and services, or those whose income remained the same or decreased but who can still afford more goods and services (to account for possible inflation).
 
-**Sources**  
+**Sources**\
 1.[RBM 13.2 Outcome Indicator Guidance](https://intranet.unhcr.org/content/dam/unhcr/intranet/protection-operations/prog-hub/program-cycle/indictors/core/outcome/Core%20outcome%2013.2%20Proportion%20of%20people%20who%20self-report%20positive%20changes%20in%20their%20income%20compared%20to%20previous%20year.pdf)
 
 ```{r, eval=FALSE}
@@ -2985,6 +2982,7 @@ main <- main %>%
      (CH01b == 2 | CH01b == 3) & CH02b == 1 ~ 1,  # Income decreased/same and can afford more
     TRUE ~ 0)) # Default to 2
 ```
+
 ```{r, eval=FALSE}
 main <- main %>%
    mutate(RBM21302 = labelled(RBM21302,
@@ -2996,7 +2994,6 @@ main <- main %>%
   ))
 table(main$RBM21302)
 ```
-
 
 ### Figure for RBM Core Impact 13.2 by Population Groups
 
@@ -3046,21 +3043,25 @@ ggplot(RBM21302, aes(x = Intro_07, y = mean_value, fill = Intro_07)) +
 
 
 ```
-## 13.3 Core Outcome Indicator 
+
+## 13.3 Core Outcome Indicator
 
 **13.3 Proportion of people (working age) who are unemployed**
 
 *Indicator Code*:RBM21303
 
-This indicator measures the level of unemployment among forcibly displaced and stateless people. Unemployed persons are defined as all those in the labour force who were not in employment, carried out activities to seek employment during the past 7 days and were currently available to take up employment (SDG Indicator 8.5.2). Persons in employment are defined as all those in the labour force who, during the past 7 days, were engaged in any activity to produce goods or provide services for pay or profit (SDG Indicator 8.5.2).
+This indicator measures the level of unemployment among forcibly displaced and stateless people.
+Unemployed persons are defined as all those in the labour force who were not in employment, carried out activities to seek employment during the past 7 days and were currently available to take up employment (SDG Indicator 8.5.2).
+Persons in employment are defined as all those in the labour force who, during the past 7 days, were engaged in any activity to produce goods or provide services for pay or profit (SDG Indicator 8.5.2).
 
-The labour force, also known as workforce, refers to the total number of people who are either in employment or in unemployment, as defined above (SDG Indicator 8.5.2). It is intricately linked to the working age population defined by each country's legal framework, representing the segment of the population within the designated working age range.
+The labour force, also known as workforce, refers to the total number of people who are either in employment or in unemployment, as defined above (SDG Indicator 8.5.2).
+It is intricately linked to the working age population defined by each country's legal framework, representing the segment of the population within the designated working age range.
 
-The 7 days recall period is in alignment with ILO standard methodology as well as with UNHCR Socioeconomic assessment standard. 
+The 7 days recall period is in alignment with ILO standard methodology as well as with UNHCR Socioeconomic assessment standard.
 
-| Standard Questions                                                                   |
-|:------------------------------------------------------------------------------------:|
-| EMP01, EMP02, EMP03, EMP04, EMP05, EMP06a, EMP06b, EMP06c, EMP25a, EMP25aa, EMP29    |
+| Standard Questions |
+|:----------------------------------------------------------------------:|
+| EMP01, EMP02, EMP03, EMP04, EMP05, EMP06a, EMP06b, EMP06c, EMP25a, EMP25aa, EMP29 |
 
 **Unit of observation:** Individual
 
@@ -3073,7 +3074,7 @@ The 7 days recall period is in alignment with ILO standard methodology as well a
 To calculate the indicator value, the standard survey methodology considers for the numerator only individuals in the labour force who were not in employment and seeking a job within 7 days prior to the reference date and who are available to start work within the next 14 days.
 Individuals who worked for pay or profit, even if only for one hour, in past 7 days, or who were temporarily absent from a job to which they will return are considered employed.
 
-**Other sources**  
+**Other sources**\
 1.[RBM 13.3 Outcome Indicator Guidance](https://intranet.unhcr.org/content/dam/unhcr/intranet/protection-operations/prog-hub/program-cycle/indictors/core/outcome/Core%20outcome%2013.3%20Proportion%20of%20people%20(working%20age)%20who%20are%20unemployed.pdf)
 
 ```{r, eval=FALSE}
@@ -3099,6 +3100,7 @@ RA_adult <- RA_adult %>%
     TRUE ~ NA_real_  # Set to NA if not 18+
   )) 
 ```
+
 ```{r}
 #Step 2: Determine who is employed based on various conditions 
 RA_adult <- RA_adult %>%
@@ -3114,6 +3116,7 @@ RA_adult <- RA_adult %>%
     TRUE ~ NA_real_  # Set to NA for those not in the working age group
   ))
 ```
+
 ```{r, eval=FALSE}
 #Step 3: Define unemployed: those not employed but actively looking for work
 RA_adult <- RA_adult %>%
@@ -3123,6 +3126,7 @@ RA_adult <- RA_adult %>%
     TRUE ~ NA_real_  # Set to NA for those not in the working age group
   ))
 ```
+
 ```{r, eval=FALSE}
 #Step 4: Define labour force: anyone employed or unemployed
 RA_adult <- RA_adult %>%
@@ -3142,6 +3146,7 @@ RA_adult <- RA_adult %>%
     TRUE ~ NA_real_  # Catch-all for cases not in the labor force or with missing data
   ))
 ```
+
 ```{r, eval=FALSE}
 RA_adult <- RA_adult %>%
    mutate(RBM21303 = labelled(RBM21303,
@@ -3153,7 +3158,6 @@ RA_adult <- RA_adult %>%
 
 table(RA_adult$RBM21303)
 ```
-
 
 ### Figure for RBM Core Impact 13.3 by Population Groups
 
@@ -3201,7 +3205,6 @@ ggplot(RBM21303, aes(x = Intro_07, y = mean_value, fill = Intro_07)) +
   )
 ```
 
-
 ### Figure for RBM Core Impact 13.3 by Population Groups, Gender and Disability
 
 ```{r, eval=FALSE}
@@ -3238,10 +3241,9 @@ ggplot(RBM21303_AGD, aes(x = HH_02_RA, y = mean_value, fill = disability_RA)) +
   )
 ```
 
-
 ## 14.1 Core Outcome Indicator
 
-**14.1 Proportion of returnees with legally recognized identity documents or credentials **
+**14.1 Proportion of returnees with legally recognized identity documents or credentials**
 
 *Indicator Code*:RBM21401
 
@@ -3249,17 +3251,23 @@ This indicator measures the proportion of returned refugees who possess legally 
 
 ***Definitions***
 
-*An identity document* is any document or credential which is legally recognized as proof of identity, which may also establish the individual’s nationality or legal status and associated rights vis-à-vis the host State and/or UNHCR. This may include documents issued by the country of asylum, country of origin, or UNHCR. An identity document or credential is “legally recognized” if national law provides that it establishes legal identity.
+*An identity document* is any document or credential which is legally recognized as proof of identity, which may also establish the individual’s nationality or legal status and associated rights vis-à-vis the host State and/or UNHCR.
+This may include documents issued by the country of asylum, country of origin, or UNHCR.
+An identity document or credential is “legally recognized” if national law provides that it establishes legal identity.
 
-*An identity credential* is a document, object, or data structure that vouches for the identity of a person through some method of trust and authentication. Common types of identity credentials include, but are not limited to, identity cards, certificates or unique identity numbers. A biometric identifier can also be used as a credential if it has been registered with the identity system.
+*An identity credential* is a document, object, or data structure that vouches for the identity of a person through some method of trust and authentication.
+Common types of identity credentials include, but are not limited to, identity cards, certificates or unique identity numbers.
+A biometric identifier can also be used as a credential if it has been registered with the identity system.
 
-| Standard Questions                                                                                                                                      |
-|:-------------------------------------------------------------------------------------------------------------------------------------------------------:|
-| ID_VAR, ID_09, ID_13, Legal_birth_certificate, Legal_ID_card, Legal_passport, Legal_residency, Legal_work_permit, Legal_socsec_card, Legal_marriage_cert|
+| Standard Questions |
+|:----------------------------------------------------------------------:|
+| ID_VAR, ID_09, ID_13, Legal_birth_certificate, Legal_ID_card, Legal_passport, Legal_residency, Legal_work_permit, Legal_socsec_card, Legal_marriage_cert |
 
-*Note that the availability of the above standard questions will differ from FDS country to country. Ensure to check your data set and identify which variables are present. Moreover, ensure to check the response options of variables ID_09 and ID_13 to determine which response options are considered as valid identity documents or credentials and recognized by the host state and/or UNHCR. 
+\*Note that the availability of the above standard questions will differ from FDS country to country.
+Ensure to check your data set and identify which variables are present.
+Moreover, ensure to check the response options of variables ID_09 and ID_13 to determine which response options are considered as valid identity documents or credentials and recognized by the host state and/or UNHCR.
 
-*This indicator should be calculated only for surveys where the sample includes refugee returnees! 
+\*This indicator should be calculated only for surveys where the sample includes refugee returnees!
 
 **Unit of observation**: Individual
 
@@ -3269,8 +3277,7 @@ This indicator measures the proportion of returned refugees who possess legally 
 
 **Dataset**: HHroster
 
-**Sources**
-1.[Core Outcome 14.1 Guidance](https://intranet.unhcr.org/content/dam/unhcr/intranet/protection-operations/prog-hub/program-cycle/indictors/core/outcome/Core%20outcome%2014.1%20Proportion%20of%20returnees%20with%20legally%20recognized%20identity%20documents%20or%20credentials.pdf).
+**Sources** 1.[Core Outcome 14.1 Guidance](https://intranet.unhcr.org/content/dam/unhcr/intranet/protection-operations/prog-hub/program-cycle/indictors/core/outcome/Core%20outcome%2014.1%20Proportion%20of%20returnees%20with%20legally%20recognized%20identity%20documents%20or%20credentials.pdf).
 
 ```{r, eval=FALSE}
 #table(HHroster$ID_VAR) #Identification of returnees
@@ -3297,6 +3304,7 @@ HHroster <- HHroster %>%
     TRUE ~ NA))
   
 ```
+
 ```{r, eval=FALSE}
 HHroster <- HHroster %>% 
   mutate(RBM20103 = labelled(RBM20103,
@@ -3306,10 +3314,10 @@ HHroster <- HHroster %>%
                                ),
                                label = "Proportion of people with legally recognized identity documents or credentials"))
 ```
+
 ```{r, eval=FALSE}
 table(HHroster$RBM20103)
 ```
-
 
 ### Figure for RBM Core Outcome 14.1 (For Refugee Returnees Only)
 
@@ -3368,34 +3376,39 @@ This indicator measures the proportion of people that have secure tenure rights 
 
 ***Definitions***
 
-*Tenure:* This determines who is allowed to use what asset, in what way, for how long, and by which terms and conditions. Tenure may comprise the right to use, sell, own, exclude others from, etc., a given real property asset.
+*Tenure:* This determines who is allowed to use what asset, in what way, for how long, and by which terms and conditions.
+Tenure may comprise the right to use, sell, own, exclude others from, etc., a given real property asset.
 
 *Secure Tenure:* Formally comprised of two sub-components: (i) Legally recognized documentation; and (ii) Perception of the security of tenure, which are both necessary to provide a full measurement of tenure security.
 
-*Housing:* Defined as the basis of stability and security for an individual or family. The center of our social, emotional, and sometimes economic lives, adequate housing makes for peaceful, secure, and dignified living. Importantly, housing is a human right, while adequate housing is underpinned by secure tenure. 
+*Housing:* Defined as the basis of stability and security for an individual or family.
+The center of our social, emotional, and sometimes economic lives, adequate housing makes for peaceful, secure, and dignified living.
+Importantly, housing is a human right, while adequate housing is underpinned by secure tenure.
 
-*Land:* The land on which the housing is constructed. In some cases, the same land may be used for agricultural activities as well. The land may be located in a rural or urban area.
+*Land:* The land on which the housing is constructed.
+In some cases, the same land may be used for agricultural activities as well.
+The land may be located in a rural or urban area.
 
 *Legally recognized documentation:* Legal documentation of real property rights refers to the recording and publication of information on the nature and location of land, rights and right holders in a form that is recognized by government and is therefore official.
 
 *Perceived security of tenure:* Perception of tenure security refers to an individual’s perception of the likelihood of involuntary loss of land, such as disagreement of the ownership rights over land or ability to use it, regardless of the formal status and can be more optimistic or pessimistic.
 
-| Standard Questions                                                                                        |
-|:---------------------------------------------------------------------------------------------------------:|
-| Land01, Land02, Land03, Land04, Land05, Land07, Land09, Land10, Land15, House01, House02, House04, House10|
+| Standard Questions |
+|:----------------------------------------------------------------------:|
+| Land01, Land02, Land03, Land04, Land05, Land07, Land09, Land10, Land15, House01, House02, House04, House10 |
 
 **Unit of observation:** Household
 
 **Numerator:** Number of individuals with secure tenure rights to housing and/or land
 
-**Denominator:**  Total number individuals 
+**Denominator:** Total number individuals
 
 **Dataset**: main
 
 To calculate the indicator value, the standard methodology considers in the numerator only individuals in households with official documentation for both their housing and land and who are unlikely to experience losing their right to this housing and/or land in the next 12 months.
-*Note that in FDS, the likelihood for loosing the rights to housing/land is evaluated for the next 5 years. 
+\*Note that in FDS, the likelihood for loosing the rights to housing/land is evaluated for the next 5 years.
 
-**Sources**  
+**Sources**\
 1.[Core Outcome 16.1 Guidance](https://intranet.unhcr.org/content/dam/unhcr/intranet/protection-operations/prog-hub/program-cycle/indictors/core/outcome/Core%20outcome%2016.1%20Proportion%20of%20people%20with%20secure%20tenure%20rights%20to%20housing%20and-or%20land.pdf).
 
 ```{r, eval=FALSE}
@@ -3415,7 +3428,6 @@ table(main$House10) #How likely is your household to be expelled from the housin
 
 ```
 
-
 ```{r, eval=FALSE}
 #First - Assess secure tenure rights for land
 #Step 1: Ownership of the plot they live on 
@@ -3425,6 +3437,7 @@ main <- main %>%
     Land02 == 2 ~ 0, #Assigns 0 if the HH does not own the plot they currently live on
     TRUE ~ NA_real_ )) #Assigns NA if the answer is "don't know" or "refuse to answer". 
 ```
+
 ```{r, eval=FALSE}
 
 #Step 2. - Check if the HH currently uses, owns or holds use rights for any plot of land
@@ -3435,6 +3448,7 @@ main <- main %>%
     TRUE ~ NA_real_ )) #Assigns NA if the answer is "don't know" or "refuse to answer".
     
 ```
+
 ```{r, eval=FALSE}
 #Step 3: For HH that do not own the plot they live on, but have ownership/use rights of a plot in the host country, we need to check if they have legal documents for this plot, if the use of the plot is residential, and if the likelihood of them loosing the plot is low. 
 #In FDS, HH can specify up to 5 plots they might own or have the use rights to. We are only checking plot 1, as enumerators are instructed to start the plot roster with the plot where the family currently lives. 
@@ -3454,6 +3468,7 @@ main <- main %>%
     Land05_1 %in% c(98,99) & Land07_1 == 2 ~ 0, #Assigns 0 if the HH does not have use rights of the plot they live on & they don't know/refuse      to answer to ownership rights
     TRUE ~ NA_real_ )) #Assigns NA if the answer is "don't know" or "refuse to answer".
 ```
+
 ```{r, eval=FALSE}
 #Step 3.3: Check that the HH has legal ownership or use right documents for the plot they live on
 main <- main %>%
@@ -3463,7 +3478,6 @@ main <- main %>%
     TRUE ~ NA_real_ )) #Assigns NA if the answer is "don't know" or "refuse to answer".
 ```
 
-
 ```{r, eval=FALSE}
 #Step 3.4: Check the likelihood of loosing the plot the HH live on
 main <- main %>%
@@ -3472,6 +3486,7 @@ main <- main %>%
     Land15_1 %in% c(3,4) ~ 0)) #Assigns 0 when the likelihood is "Somewhat likely" and "Very likely"
     
 ```
+
 ```{r, eval=FALSE}
 #Step 4: Combine the above conditions to assess secure tenure rights for land
 main <- main %>%
@@ -3482,6 +3497,7 @@ main <- main %>%
     TRUE ~ NA_real_ )) #Assigns NA in all other cases
     
 ```
+
 ```{r, eval=FALSE}
 #Second - Assess secure tenure rights for housing
 #Step 1: Assess ownership and use rights of the house
@@ -3493,6 +3509,7 @@ main <- main %>%
     TRUE ~ NA_real_ ))
 
 ```
+
 ```{r, eval=FALSE}
 #Step 2: Assess legal documents for households
 main <- main %>%
@@ -3501,6 +3518,7 @@ main <- main %>%
     House04 == 2 ~ 0, #Assigns 0 if the HH does not have legal documents for the ownership or use of the house
     TRUE ~ NA_real_ )) #Assigns NA in the case of "Refuse to answer" or "Don't know". 
 ```
+
 ```{r, eval=FALSE}
 #Step 3: Assess likelihood to be expelled from the house 
 main <- main %>%
@@ -3509,6 +3527,7 @@ main <- main %>%
     House10 %in% c(3,4) ~ 0)) #Assigns 0 when the likelihood is "Somewhat likely" and "Very likely"
 
 ```
+
 ```{r, eval=FALSE}
 #Step 4: Combine all conditions for housing 
 main <- main %>%
@@ -3517,6 +3536,7 @@ main <- main %>%
     own_use_house == 0 | documents_house == 0 | expelled_house == 0 ~ 0, 
     TRUE ~ NA_real_ )) #Assigns NA in all other cases
 ```
+
 ```{r, eval=FALSE}
 #Third: Combine conditions on land and housing
 main <- main %>%
@@ -3527,6 +3547,7 @@ main <- main %>%
     TRUE ~ NA_real_ )) #Assigns NA in all other cases
     
 ```
+
 ```{r, eval=FALSE}
 # Add labels to the new variable 'RBM21601'
 main <- main %>%
@@ -3539,9 +3560,6 @@ main <- main %>%
 
 table(main$RBM21601)
 ```
-
-
-
 
 ### Figure for RBM Core Impact 16.1 by Population Groups
 
@@ -3598,25 +3616,26 @@ ggplot(RBM21601, aes(x = Intro_07, y = mean_value, fill = Intro_07)) +
 
 *Indicator Code*:RBM21602
 
-This indicator measures the proportion of people who receive government social protection benefits and services as a result of inclusion in national social protection systems. This counts those who actually receive social protection benefits or are actively contributing to a social insurance scheme. This means it does not consider whether they have legal rights to social protection (for which there are other rights-based monitoring mechanisms), and it does not count just those who are registered for benefits (which can be reported using the Good Practice Indicator: “Number of people enrolled in social registries”).
+This indicator measures the proportion of people who receive government social protection benefits and services as a result of inclusion in national social protection systems.
+This counts those who actually receive social protection benefits or are actively contributing to a social insurance scheme.
+This means it does not consider whether they have legal rights to social protection (for which there are other rights-based monitoring mechanisms), and it does not count just those who are registered for benefits (which can be reported using the Good Practice Indicator: “Number of people enrolled in social registries”).
 
-|    Standard Questions               |
-|:-----------------------------------:|
-| ScProtec01, ScProtec04, ScProtec16  |
+|         Standard Questions         |
+|:----------------------------------:|
+| ScProtec01, ScProtec04, ScProtec16 |
 
 **Unit of observation**: Household
 
-**Numerator**: Number of individuals who benefit from national social protection systems 
+**Numerator**: Number of individuals who benefit from national social protection systems
 
-**Denominator**: Total number of individuals 
+**Denominator**: Total number of individuals
 
 **Dataset**: main
 
 To calculate the indicator value, the standard RMS methodology considers in the numerator only individuals in households where any household member has received any benefits from the national or local government social protection system in the country in the last 12 months.
 
-**Sources**  
+**Sources**\
 1.[RBM 16.2 Outcome Indicator Guidance](https://intranet.unhcr.org/content/dam/unhcr/intranet/protection-operations/prog-hub/program-cycle/indictors/core/outcome/Core%20outcome%2016.2%20Proportion%20of%20people%20covered%20by%20national%20social%20protection%20systems.pdf)
-
 
 ```{r, eval=FALSE}
 table(main$ScProtec01) #In the past 12 months while in the host country, have you or anyone in your household received support from any assistance programme?
@@ -3646,12 +3665,14 @@ main <- main %>%
   ungroup()
 
 ```
+
 ```{r, eval=FALSE}
 #Step 2: Create a new variable to check if the household received any support from a social assistance programme by the government
 #Step 2.2: ScProtec04 is a repeat group meaning that depending on how many social assistance programmes the respondent lists, for each of them they answer to ScProtec04. Therefore, we first need to identify all coloumns matching the pattern "ProgrammeX_ScProtec04". 
 programme_columns <- grep("^Programme\\d+_ScProtec04$", names(main), value = TRUE)
 
 ```
+
 ```{r, eval=FALSE}
 #Step 2.3: Create a new varibale checking if the household received any assistance programme from the government
 main <- main %>%
@@ -3662,6 +3683,7 @@ main <- main %>%
     TRUE ~ 0  # Condition 4: Default case
   ))
 ```
+
 ```{r, eval=FALSE}
 #Step 3: Combine social benefit and social assistance 
 main <- main %>%
@@ -3681,9 +3703,6 @@ main <- main %>%
 
 table(main$RBM21602)
 ```
-
-
-
 
 ### Figure for RBM Core Impact 16.2 by Population Groups
 
@@ -3734,8 +3753,6 @@ ggplot(RBM21602, aes(x = Intro_07, y = mean_value, fill = Intro_07)) +
 
 ```
 
-
-
 ## How to download the final RBM results?
 
 ```{r, eval=FALSE}
@@ -3777,7 +3794,6 @@ write_xlsx(combined_RBM_indicators, "Combined_Indicators.xlsx")
 
 ```
 
-
 ## How to download the final RBM results with AGD where applicable?
 
 ```{r, eval=FALSE}
@@ -3808,5 +3824,3 @@ write_xlsx(combined_RBM_indicators_AGD, "Combined_Indicators_AGD.xlsx")
 
 
 ```
-
-
